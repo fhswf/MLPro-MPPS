@@ -6,11 +6,12 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-11-22  0.0.0     SY       Creation
-## -- 2022-11-22  1.0.0     SY       Release of first version
+## -- 2022-11-22  0.0.1     SY/ML    Add TransferFunction from mpps, create Label, add drafts
+## -- 2022-??-??  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-11-22)
+Ver. 1.0.0 (2022-??-??)
 
 This module provides various elementary classes for MLPro Extensions.
 """
