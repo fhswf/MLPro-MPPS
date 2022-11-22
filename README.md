@@ -1,2 +1,5 @@
-# MLPro-Extension
-MLPro - Template for 3rd party extensions
+# MLPro-MPPS
+
+An extension feature of MLPro that deals with a simulation of multi-purpose production systems.
+
+Under development!
