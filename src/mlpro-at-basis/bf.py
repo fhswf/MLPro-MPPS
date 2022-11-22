@@ -413,37 +413,21 @@ class TransferFunction(ScientificObject, Log, Label):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class BufferElement:
-    """
-    Base class implementation for buffer element
-    """
+class FctStrans:
+    .....
 
-    ## -------------------------------------------------------------------------------------------------
-    def __init__(self, p_element: dict) -> None:
-        """
-        Parameters:
-            p_element (dict): Buffer element in dictionary
-        """
 
-        self._element = {}
 
-        self.add_value_element(p_element)
 
-    ## -------------------------------------------------------------------------------------------------
-    def add_value_element(self, p_val: dict):
-        """
-        Adding new value to the element container
-        Parameters:
-            p_val (dict): Elements in dictionary
-        """
-        self._element = {**self._element, **p_val}
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class Sensor:
+    .....
 
-    ## -------------------------------------------------------------------------------------------------
-    def get_data(self):
-        """
-        Get the buffer element.
-        Returns:
-            Returns the buffer element.
-        """
 
-        return self._element
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class Actuator:
+    .....
