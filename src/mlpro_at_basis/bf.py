@@ -39,10 +39,19 @@ class Label():
         name of the transfer function.
     p_id : int
         unique id of the transfer function. Default: None.
+        
+    Attributes
+    ----------
+    C_NAME : str
+        name of the sensor. Default: ''.
     """
+
+    C_NAME = ''
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self, p_name:str, p_id:int=None):
+
+        self.C_NAME = p_name
 
         if p_name != '':
             self.set_name(p_name)
@@ -138,7 +147,7 @@ class TransferFunction(ScientificObject, Log, Label):
         delta time. Default: 0.01.
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL.
-    p_args :
+    p_args : dict
         extra parameter for each specific transfer function.
         
     Attributes
@@ -392,7 +401,7 @@ class TransferFunction(ScientificObject, Log, Label):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def function_approximation(self, p_input, p_range=None):
+    def function_approximation(self, p_input, p_range=None) -> bool:
         """
         ........................
 
@@ -414,7 +423,7 @@ class TransferFunction(ScientificObject, Log, Label):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class FctStrans:
+class FctSTrans:
     .....
 
 
@@ -422,13 +431,98 @@ class FctStrans:
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Sensor:
-    .....
+class Sensor(ScientificObject, Log, Label):
+    """
+    This class serves as a base class of sensor in a low level that can be used for hardware control,
+    MPPS, robotics, and many more.
+    
+    Parameters
+    ----------
+    p_name : str
+        name of the sensor.
+    p_id : int
+        unique id of the sensor. Default: None.
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL.
+        
+    Attributes
+    ----------
+    C_TYPE : str
+        type of the base class. Default: 'Sensor'.
+    """
+
+    C_TYPE = 'Sensor'
+
+## -------------------------------------------------------------------------------------------------
+    def __init__(self, p_name:str, p_id:int=None, p_logging=Log.C_LOG_ALL):
+        
+        Label.__init__(self, p_name, p_id)
+        Log.__init__(self, p_logging=p_logging)
+        self.values = None
+            
+
+## -------------------------------------------------------------------------------------------------
+    def get_value(self):
+        """
+        This method provides a functionality to set get the value from the sensor. The return value
+        can be in boolean, float, integer, string, and any forms.
+        """
+
+        # self.values = ......
+
+        if self.values is None:
+            raise NotImplementedError('This method must be redefined.')
+        else:
+            return self.values
 
 
 
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Actuator:
-    .....
+class Actuator(ScientificObject, Log, Label):
+    """
+    This class serves as a base class of actuator in a low level that can be used for hardware control,
+    MPPS, robotics, and many more.
+    
+    Parameters
+    ----------
+    p_name : str
+        name of the actuator.
+    p_id : int
+        unique id of the actuator. Default: None.
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL.
+        
+    Attributes
+    ----------
+    C_TYPE : str
+        type of the base class. Default: 'Actuator'.
+    """
+
+    C_TYPE = 'Actuator'
+
+## -------------------------------------------------------------------------------------------------
+    def __init__(self, p_name:str, p_id:int=None, p_logging=Log.C_LOG_ALL):
+        
+        Label.__init__(self, p_name, p_id)
+        Log.__init__(self, p_logging=p_logging)
+            
+
+## -------------------------------------------------------------------------------------------------
+    def set_value(self, **p_input) -> bool:
+        """
+        This method provides a functionality to set a value of the actuator.
+
+
+        Parameters
+        ----------
+        p_input : dict
+            input parameters to set a value.
+
+        Returns
+        -------
+        bool
+            if set value is succesfull, then True. Otherwise False.
+        """
+        raise NotImplementedError('This method must be redefined.')
