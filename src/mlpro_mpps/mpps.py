@@ -41,9 +41,9 @@ import matplotlib.pyplot as plt
 
 
 
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
 
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class SimActuator(Actuator, ScientificObject):
     """
     This class serves as a base class of actuators in MPPS, which provides the main attributes of an
@@ -53,15 +53,33 @@ class SimActuator(Actuator, ScientificObject):
     
     Parameters
     ----------
-    see Dimension
+    p_name_short : str
+        Short name of dimension
+    p_base_set 
+        Base set of dimension. See constants C_BASE_SET_*. Default = C_BASE_SET_R.
+    p_name_long :str
+        Long name of dimension (optional)
+    p_name_latex : str
+        LaTeX name of dimension (optional)
+    p_unit : str
+        Unit (optional)
+    p_unit_latex : str
+        LaTeX code of unit (optional)
+    p_boundaries : List
+        List with minimum and maximum value (optional)
+    p_description : str
+        Description of dimension (optional)
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_kwargs : dict
+        Further keyword arguments
         
     Attributes
     ----------
     C_TYPE : str
-        Type of the base class. Default: 'Actuator'.
+        Type of the base class. Default: 'SimActuator'.
     C_NAME : str
         Name of the actuator. Default:''.
-        
     """
 
     C_TYPE = 'SimActuator'
@@ -111,7 +129,7 @@ class SimActuator(Actuator, ScientificObject):
         Returns
         -------
         bool
-            if set value is succesfull, then True. Otherwise False.
+            if set value is successful, then True. Otherwise False.
         """
         if p_input >= self.get_boundaries()[0] and p_input <= self.get_boundaries()[1]:
             self.value = p_input
@@ -126,6 +144,14 @@ class SimActuator(Actuator, ScientificObject):
 
 ## -------------------------------------------------------------------------------------------------
     def deactivate(self) -> bool:
+        """
+        This method provides a functionality to deactivate the actuator.
+
+        Returns
+        -------
+        bool
+            if deactivate is successful, then True. Otherwise False.
+        """
         self.value = None
         self.status = False
         self.log(Log.C_LOG_TYPE_I, 'Actuator ' + self.get_name_short() + ' is deactivated.')
@@ -135,40 +161,70 @@ class SimActuator(Actuator, ScientificObject):
 ## -------------------------------------------------------------------------------------------------      
     def get_status(self) -> bool:
         """
-        This method provides a functionality to get the status of the related components.
+        This method provides a functionality to get the status of the actuator.
 
         Returns
         -------
         bool
             Status is on/off. True means on, false means off.
-
         """
         return self.status
   
     
 ## -------------------------------------------------------------------------------------------------      
     def get_value(self):
+        """
+        This method provides a functionality to get the actual value of the actuator.
+
+        Returns
+        -------
+        value
+            The actual value of the actuator.
+        """
         return self.value
-  
+
+
+
+
     
-## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
-        raise NotImplementedError
-  
-    
-## -------------------------------------------------------------------------------------------------      
-    def simulate(self, p_input_signal, p_range=None) -> bool:
-        output = self._function.call(p_input_signal, p_range)
-        self.set_value(output)
-        return True
-
-
-
-
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
 class SimSensor(Sensor, ScientificObject):
     """
+    This class serves as a base class of sensors in MPPS, which provides the main attributes of a
+    sensor in a simulation mode.
+    A sensor is a component of a machine that is responsible for sensing the actual state of the
+    system.
+    
+    Parameters
+    ----------
+    p_name_short : str
+        Short name of dimension
+    p_base_set 
+        Base set of dimension. See constants C_BASE_SET_*. Default = C_BASE_SET_R.
+    p_name_long :str
+        Long name of dimension (optional)
+    p_name_latex : str
+        LaTeX name of dimension (optional)
+    p_unit : str
+        Unit (optional)
+    p_unit_latex : str
+        LaTeX code of unit (optional)
+    p_boundaries : List
+        List with minimum and maximum value (optional)
+    p_description : str
+        Description of dimension (optional)
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_kwargs : dict
+        Further keyword arguments
+        
+    Attributes
+    ----------
+    C_TYPE : str
+        Type of the base class. Default: 'SimSensor'.
+    C_NAME : str
+        Name of the sensor. Default:''.
     """
 
     C_TYPE = 'SimSensor'
@@ -206,7 +262,7 @@ class SimSensor(Sensor, ScientificObject):
 ## -------------------------------------------------------------------------------------------------
     def set_value(self, p_input) -> bool:
         """
-        This method provides a functionality to set a value of the actuator.
+        This method provides a functionality to set a value of the sensor to be read.
 
         Parameters
         ----------
@@ -216,7 +272,7 @@ class SimSensor(Sensor, ScientificObject):
         Returns
         -------
         bool
-            if set value is succesfull, then True. Otherwise False.
+            if set value is successful, then True. Otherwise False.
         """
         if p_input >= self.get_boundaries()[0] and p_input <= self.get_boundaries()[1]:
             self.value = p_input
@@ -231,6 +287,14 @@ class SimSensor(Sensor, ScientificObject):
 
 ## -------------------------------------------------------------------------------------------------
     def deactivate(self) -> bool:
+        """
+        This method provides a functionality to deactivate the sensor.
+
+        Returns
+        -------
+        bool
+            if deactivate is successful, then True. Otherwise False.
+        """
         self.value = None
         self.status = False
         self.log(Log.C_LOG_TYPE_I, 'Sensor ' + self.get_name_short() + ' is deactivated.')
@@ -253,25 +317,88 @@ class SimSensor(Sensor, ScientificObject):
     
 ## -------------------------------------------------------------------------------------------------      
     def get_value(self):
+        """
+        This method provides a functionality to get the actual value read by the sensor.
+
+        Returns
+        -------
+        value
+            The actual value of the state.
+        """
         return self.value
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def setup_function(self) -> TransferFunction:
+        """
+        This is a custom method, in which a specific TransferFunction object is incorporated.
+        The TransferFunction object describes how the sensor obtain the actual information with
+        respect to input signals according to a mathematical calculation.
+
+        Returns
+        -------
+        TransferFunction
+            TransferFunction object.
+        """
+        raise NotImplementedError
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def simulate(self, p_input_signal, p_range=None) -> bool:
+        """
+        This method provides a functionality to simulate the sensor.
+
+        Returns
+        -------
+        bool
+            True means successful, otherwise False.
+        """
+        output = self._function.call(p_input_signal, p_range)
+        self.set_value(output)
+        return True
 
 
 
+    
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-
 class SimState(Dimension, ScientificObject):
     """
-    ....
+    This class serves as a base class of states (extra informations) for a component in MPPS,
+    which provides the main attributes of a component state in a simulation mode.
+    This could be included the dynamics of the systems that can not be read by the sensors but
+    important for the simulations or triggering other components.
+    
+    Parameters
+    ----------
+    p_name_short : str
+        Short name of dimension
+    p_base_set 
+        Base set of dimension. See constants C_BASE_SET_*. Default = C_BASE_SET_R.
+    p_name_long :str
+        Long name of dimension (optional)
+    p_name_latex : str
+        LaTeX name of dimension (optional)
+    p_unit : str
+        Unit (optional)
+    p_unit_latex : str
+        LaTeX code of unit (optional)
+    p_boundaries : List
+        List with minimum and maximum value (optional)
+    p_description : str
+        Description of dimension (optional)
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_kwargs : dict
+        Further keyword arguments
         
     Attributes
     ----------
     C_TYPE : str
-        Type of the base class. Default: 'Process'.
+        Type of the base class. Default: 'SimState'.
     C_NAME : str
-        Name of the process. Default:''.
-
+        Name of the component state. Default:''.
     """
 
     C_TYPE = 'SimState'
@@ -310,7 +437,7 @@ class SimState(Dimension, ScientificObject):
 ## -------------------------------------------------------------------------------------------------
     def set_value(self, p_input) -> bool:
         """
-        This method provides a functionality to set a value of the actuator.
+        This method provides a functionality to set a value of the state.
 
         Parameters
         ----------
@@ -320,7 +447,7 @@ class SimState(Dimension, ScientificObject):
         Returns
         -------
         bool
-            if set value is succesfull, then True. Otherwise False.
+            if set value is successful, then True. Otherwise False.
         """
         if p_input >= self.get_boundaries()[0] and p_input <= self.get_boundaries()[1]:
             self.value = p_input
@@ -333,27 +460,76 @@ class SimState(Dimension, ScientificObject):
     
 ## -------------------------------------------------------------------------------------------------      
     def get_value(self):
+        """
+        This method provides a functionality to get the actual value of the state.
+
+        Returns
+        -------
+        value
+            The actual value of the state.
+        """
         return self.value
   
     
 ## -------------------------------------------------------------------------------------------------      
     def setup_function(self) -> TransferFunction:
+        """
+        This is a custom method, in which a specific TransferFunction object is incorporated.
+        The TransferFunction object describes what is the current state of the component with
+        respect to input signals according to a mathematical calculation.
+
+        Returns
+        -------
+        TransferFunction
+            TransferFunction object.
+        """
         raise NotImplementedError
   
     
 ## -------------------------------------------------------------------------------------------------      
     def simulate(self, p_input_signal, p_range=None) -> bool:
+        """
+        This method provides a functionality to simulate the sensor.
+
+        Returns
+        -------
+        bool
+            True means successful, otherwise False.
+        """
         output = self._function.call(p_input_signal, p_range)
         self.set_value(output)
         return True
 
+    
 
 
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-
 class Component(EventManager, ScientificObject, Label):
+    """
+    This class serves as a base class of components in MPPS, which provides the main attributes of a
+    component in a simulation mode.
+    A component can consist of actuators, sensors, and component states.
+    
+    Parameters
+    ----------
+    p_name_short : str
+        Short name of a component
+    p_id : int
+        Unique id. Default: None
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_kwargs : dict
+        Further keyword arguments
+        
+    Attributes
+    ----------
+    C_TYPE : str
+        Type of the base class. Default: 'Component'.
+    C_NAME : str
+        Name of the component. Default:''.
+    """
 
     C_TYPE = 'Component'
     C_NAME = ''
@@ -377,7 +553,14 @@ class Component(EventManager, ScientificObject, Label):
 
 ## -------------------------------------------------------------------------------------------------
     def deactivate(self) -> bool:
+        """
+        This method provides a functionality to deactivate the component.
 
+        Returns
+        -------
+        bool
+            if deactivate is successful, then True. Otherwise False.
+        """
         for ids in self._sensors.get_dim_ids():
             self.get_sensor(p_id=ids).deactivate()
 
@@ -390,49 +573,46 @@ class Component(EventManager, ScientificObject, Label):
 ## -------------------------------------------------------------------------------------------------
     def add_sensor(self, p_sensor:SimSensor):
         """
-        Adds a sensor to the component.
+        This method provides a functionality to add a sensor to the component.
 
         Parameters
         ----------
         p_sensor : SimSensor
             SimSensor object to be added.
         """
-
         self._sensors.add_dim(p_dim=p_sensor)
 
     
 ## -------------------------------------------------------------------------------------------------
     def get_sensors(self) -> Set:
         """
-        Returns the internal set of sensors.
+        This method provides a functionality to return the internal set of sensors.
 
         Returns
         -------
         sensors : Set
             Set of sensors.
         """
-
         return self._sensors
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_sensor(self, p_id) -> SimSensor:
         """
-        Returns a specific sensor according to the desired id.
+        This method provides a functionality to return a specific sensor according to the desired id.
 
         Returns
         -------
         sensor : SimSensor
             The sensor with the specific id.
         """
-
         return self._sensors.get_dim(p_id=p_id)
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_sensor_value(self, p_id):
         """
-        Determines the value of a sensor.
+        This method provides a functionality to determine the value of a sensor.
 
         Parameters
         ----------
@@ -444,14 +624,13 @@ class Component(EventManager, ScientificObject, Label):
             Current value of the sensor or None. None means that the sensor is deactivated or the
             value has not been set.
         """
-
         return self.get_sensor(p_id).get_value()
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_sensor_status(self, p_id):
         """
-        Determines the status of a sensor.
+        This method provides a functionality to determine the status of a sensor.
 
         Parameters
         ----------
@@ -462,14 +641,13 @@ class Component(EventManager, ScientificObject, Label):
         -------
             Sensor is switched on or off.
         """
-
         return self.get_sensor(p_id).get_status()
 
 
 ## -------------------------------------------------------------------------------------------------
     def set_sensor_value(self, p_id, p_value) -> bool:
         """
-        Sets the value of a sensor.
+        This method provides a functionality to set the value of a sensor.
 
         Parameters
         ----------
@@ -492,49 +670,46 @@ class Component(EventManager, ScientificObject, Label):
 ## -------------------------------------------------------------------------------------------------
     def add_actuator(self, p_actuator:SimActuator):
         """
-        Adds an actuator to the component.
+        This method provides a functionality to add an actuator to the component.
 
         Parameters
         ----------
         p_actuator : SimActuator
             SimActuator object to be added.
         """
-
         self._actuators.add_dim(p_dim=p_actuator)
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_actuators(self) -> Set:
         """
-        Returns the internal set of actuators.
+        This method provides a functionality to return the internal set of actuators.
 
         Returns
         -------
         actuators : Set
             Set of actuators.
         """
-
         return self._actuators
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_actuator(self, p_id) -> SimActuator:
         """
-        Returns a specific actuator according to the desired id.
+        This method provides a functionality to return a specific actuator according to the desired id.
 
         Returns
         -------
         actuator : SimActuator
             The actuator with the specific id.
         """
-
         return self._actuators.get_dim(p_id=p_id)
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_actuator_value(self, p_id):
         """
-        Determines the value of an actuator.
+        This method provides a functionality to determine the value of an actuator.
 
         Parameters
         ----------
@@ -546,14 +721,13 @@ class Component(EventManager, ScientificObject, Label):
             Current value of the actuator or None. None means that the actuator is deactivated or the
             value has not been set.
         """
-
         return self.get_actuator(p_id).get_value()
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_actuator_status(self, p_id):
         """
-        Determines the status of an actuator.
+        This method provides a functionality to determine the status of an actuator.
 
         Parameters
         ----------
@@ -564,14 +738,13 @@ class Component(EventManager, ScientificObject, Label):
         -------
             Actuator is switched on or off.
         """
-
         return self.get_actuator(p_id).get_status()
 
 
 ## -------------------------------------------------------------------------------------------------
     def set_actuator_value(self, p_id, p_value) -> bool:
         """
-        Sets the value of an actuator.
+        This method provides a functionality to set the value of an actuator.
 
         Parameters
         ----------
@@ -594,49 +767,47 @@ class Component(EventManager, ScientificObject, Label):
 ## -------------------------------------------------------------------------------------------------
     def add_component_states(self, p_comp_states:SimState):
         """
-        Adds a simulatable state to the component.
+        This method provides a functionality to add a simulatable state to the component.
 
         Parameters
         ----------
         p_comp_states : SimState
             SimState object to be added.
         """
-
         self._states.add_dim(p_dim=p_comp_states)
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_component_states(self) -> Set:
         """
-        Returns the internal set of simulatable states.
+        This method provides a functionality to return the internal set of simulatable states.
 
         Returns
         -------
         states : Set
             Set of simulatable states.
         """
-
         return self._states
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_component_state(self, p_id) -> SimState:
         """
-        Returns a specific simulatable state according to the desired id.
+        This method provides a functionality to return a specific simulatable state according to the
+        desired id.
 
         Returns
         -------
         state : SimState
             The simulatable state with the specific id.
         """
-
         return self._states.get_dim(p_id=p_id)
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_component_state_value(self, p_id):
         """
-        Determines the value of a simulatable state.
+        This method provides a functionality to determine the value of a simulatable state.
 
         Parameters
         ----------
@@ -647,14 +818,13 @@ class Component(EventManager, ScientificObject, Label):
         -------
             Current value of the simulatable state or None.
         """
-
         return self.get_component_state(p_id).get_value()
 
 
 ## -------------------------------------------------------------------------------------------------
     def set_component_state_value(self, p_id, p_value) -> bool:
         """
-        Sets the value of a simulatable state.
+        This method provides a functionality to set the value of a simulatable state.
 
         Parameters
         ----------
@@ -675,11 +845,34 @@ class Component(EventManager, ScientificObject, Label):
 
 
 
+        
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-
 class Module(Component):
+    """
+    This class serves as a base class of modules in MPPS, which provides the main attributes of a
+    module in a simulation mode.
+    A module can consist of components.
+    
+    Parameters
+    ----------
+    p_name_short : str
+        Short name of a module
+    p_id : int
+        Unique id. Default: None
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_kwargs : dict
+        Further keyword arguments
+        
+    Attributes
+    ----------
+    C_TYPE : str
+        Type of the base class. Default: 'Module'.
+    C_NAME : str
+        Name of the module. Default:''.
+    """
 
     C_TYPE = 'Module'
     C_NAME = ''
@@ -699,7 +892,14 @@ class Module(Component):
 
 ## -------------------------------------------------------------------------------------------------
     def deactivate(self) -> bool:
+        """
+        This method provides a functionality to deactivate the modules.
 
+        Returns
+        -------
+        bool
+            if deactivate is successful, then True. Otherwise False.
+        """
         for ids in self._components.get_dim_ids():
             self.get_component(p_id=ids).deactivate()
 
@@ -709,49 +909,47 @@ class Module(Component):
 ## -------------------------------------------------------------------------------------------------
     def add_component(self, p_component:Component):
         """
-        Adds a component to the module.
+        This method provides a functionality to add a component to the module.
 
         Parameters
         ----------
         p_sensor : Component
             Component object to be added.
         """
-
         self._components.add_dim(p_dim=Component)
 
     
 ## -------------------------------------------------------------------------------------------------
     def get_components(self) -> Set:
         """
-        Returns the internal set of components.
+        This method provides a functionality to return the internal set of components.
 
         Returns
         -------
         components : Set
             Set of components.
         """
-
         return self._components
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_component(self, p_id) -> Component:
         """
-        Returns a specific component according to the desired id.
+        This method provides a functionality to return a specific component according to the
+        desired id.
 
         Returns
         -------
         component : Component
             The component with the specific id.
         """
-
         return self._components.get_dim(p_id=p_id)
 
     
 ## -------------------------------------------------------------------------------------------------
     def get_sensors(self) -> list:
         """
-        Returns the internal sets of sensors.
+        This method provides a functionality to return the internal sets of sensors.
 
         Returns
         -------
@@ -769,7 +967,7 @@ class Module(Component):
 ## -------------------------------------------------------------------------------------------------
     def get_sensor(self, p_id) -> SimSensor:
         """
-        Returns a specific sensor according to the desired id.
+        This method provides a functionality to return a specific sensor according to the desired id.
 
         Returns
         -------
@@ -789,7 +987,7 @@ class Module(Component):
 ## -------------------------------------------------------------------------------------------------
     def get_actuators(self) -> list:
         """
-        Returns the internal sets of actuators.
+        This method provides a functionality to return the internal sets of actuators.
 
         Returns
         -------
@@ -807,7 +1005,7 @@ class Module(Component):
 ## -------------------------------------------------------------------------------------------------
     def get_actuator(self, p_id) -> SimActuator:
         """
-        Returns a specific actuator according to the desired id.
+        This method provides a functionality to return a specific actuator according to the desired id.
 
         Returns
         -------
@@ -827,7 +1025,7 @@ class Module(Component):
 ## -------------------------------------------------------------------------------------------------
     def get_component_states(self) -> list:
         """
-        Returns the internal sets of simulatable states.
+        This method provides a functionality to return the internal sets of simulatable states.
 
         Returns
         -------
@@ -845,7 +1043,8 @@ class Module(Component):
 ## -------------------------------------------------------------------------------------------------
     def get_component_state(self, p_id) -> SimState:
         """
-        Returns a specific simulatable state according to the desired id.
+        This method provides a functionality to return a specific simulatable state according
+        to the desired id.
 
         Returns
         -------
@@ -863,11 +1062,35 @@ class Module(Component):
 
 
 
+    
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-
 class SimMPPS(FctSTrans, Label):
+    """
+    This class serves as a base class of SimMPPS, which provides the main attributes of a
+    MPPS in a simulation mode.
+    
+    [Description of SimMPPS] -- to be added
+    
+    Parameters
+    ----------
+    p_name_short : str
+        Short name of a module
+    p_id : int
+        Unique id. Default: None
+    p_logging
+        Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_kwargs : dict
+        Further keyword arguments
+        
+    Attributes
+    ----------
+    C_TYPE : str
+        Type of the base class. Default: 'SimMPPS'.
+    C_NAME : str
+        Name of the SimMPPS. Default:''.
+    """
 
     C_TYPE = 'SimMPPS'
     C_NAME = ''
@@ -892,7 +1115,7 @@ class SimMPPS(FctSTrans, Label):
 ## -------------------------------------------------------------------------------------------------
     def add_element(self, p_elem:Component):
         """
-        Adds an element to the MPPS.
+        This method provides a functionality to add an element to the MPPS.
 
         Parameters
         ----------
@@ -900,42 +1123,39 @@ class SimMPPS(FctSTrans, Label):
             Component object to be added. Module object can also be added due to inheritance from 
             Component object.
         """
-
         self._elements.add_dim(p_dim=p_elem)
 
     
 ## -------------------------------------------------------------------------------------------------
     def get_elements(self) -> Set:
         """
-        Returns the internal set of elements.
+        This method provides a functionality to return the internal set of elements.
 
         Returns
         -------
         _elements : Set
             Set of elements.
         """
-
         return self._elements
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_element(self, p_id) -> Component:
         """
-        Returns a specific element according to the desired id.
+        This method provides a functionality to return a specific element according to the desired id.
 
         Returns
         -------
         element : Component
             The element with the specific id.
         """
-
         return self._elements.get_dim(p_id=p_id)
 
     
 ## -------------------------------------------------------------------------------------------------
     def get_sensors(self) -> list:
         """
-        Returns the internal sets of sensors.
+        This method provides a functionality to return the internal sets of sensors.
 
         Returns
         -------
@@ -956,7 +1176,7 @@ class SimMPPS(FctSTrans, Label):
 ## -------------------------------------------------------------------------------------------------
     def get_sensor(self, p_id) -> SimSensor:
         """
-        Returns a specific sensor according to the desired id.
+        This method provides a functionality to return a specific sensor according to the desired id.
 
         Returns
         -------
@@ -976,7 +1196,7 @@ class SimMPPS(FctSTrans, Label):
 ## -------------------------------------------------------------------------------------------------
     def get_actuators(self) -> list:
         """
-        Returns the internal sets of actuators.
+        This method provides a functionality to return the internal sets of actuators.
 
         Returns
         -------
@@ -997,7 +1217,8 @@ class SimMPPS(FctSTrans, Label):
 ## -------------------------------------------------------------------------------------------------
     def get_actuator(self, p_id) -> SimActuator:
         """
-        Returns a specific actuator according to the desired id.
+        This method provides a functionality to return a specific actuator according to the
+        desired id.
 
         Returns
         -------
@@ -1017,7 +1238,7 @@ class SimMPPS(FctSTrans, Label):
 ## -------------------------------------------------------------------------------------------------
     def get_component_states(self) -> list:
         """
-        Returns the internal sets of simulatable states.
+        This method provides a functionality to return the internal sets of simulatable states.
 
         Returns
         -------
@@ -1038,7 +1259,8 @@ class SimMPPS(FctSTrans, Label):
 ## -------------------------------------------------------------------------------------------------
     def get_component_state(self, p_id) -> SimState:
         """
-        Returns a specific simulatable state according to the desired id.
+        This method provides a functionality to return a specific simulatable state according to
+        the desired id.
 
         Returns
         -------
@@ -1057,6 +1279,10 @@ class SimMPPS(FctSTrans, Label):
 
 ## -------------------------------------------------------------------------------------------------
     def setup_mpps(self):
+        """
+        Custom method to setup a mpps. An howto and documentation related to setting up MPPS will be
+        available soon.
+        """
 
         # 1. Setup which actions connected to which actuators
 
@@ -1101,7 +1327,6 @@ class SimMPPS(FctSTrans, Label):
         new_state : State
             Result state after state transition.
         """
-        
         # 1. Set values to actuators
         if self._actions_in_order:
             actions = Action.get_sorted_values()
