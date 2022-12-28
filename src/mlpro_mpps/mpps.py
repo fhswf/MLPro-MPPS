@@ -95,6 +95,7 @@ class SimActuator(Actuator, ScientificObject):
                           p_kwargs=p_kwargs)
         self.value = None
         self.status = False
+        self._function = self.setup_function()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -148,6 +149,18 @@ class SimActuator(Actuator, ScientificObject):
 ## -------------------------------------------------------------------------------------------------      
     def get_value(self):
         return self.value
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def setup_function(self) -> TransferFunction:
+        raise NotImplementedError
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def simulate(self, p_input_signal, p_range=None) -> bool:
+        output = self._function.call(p_input_signal, p_range)
+        self.set_value(output)
+        return True
 
 
 
@@ -291,6 +304,7 @@ class SimState(Dimension, ScientificObject):
                            p_logging=p_logging,
                            p_kwargs=p_kwargs)
         self.value = None
+        self._function = self.setup_function()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -320,6 +334,18 @@ class SimState(Dimension, ScientificObject):
 ## -------------------------------------------------------------------------------------------------      
     def get_value(self):
         return self.value
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def setup_function(self) -> TransferFunction:
+        raise NotImplementedError
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def simulate(self, p_input_signal, p_range=None) -> bool:
+        output = self._function.call(p_input_signal, p_range)
+        self.set_value(output)
+        return True
 
 
 
@@ -860,7 +886,7 @@ class SimMPPS(FctSTrans, Label):
         
         Label.__init__(self, p_name, p_id)
         FctSTrans.__init__(self, p_logging)
-        self.setup_mpps()
+        self._actions_in_order, self._signals = self.setup_mpps()
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -1026,14 +1052,23 @@ class SimMPPS(FctSTrans, Label):
         # 1. Setup which actions connected to which actuators
 
         # Option 1: The actions are sorted in the same order as self.get_actuators() 
-        # self._actions_in_order = True
+        # _actions_in_order = True
 
         # Option 2: The actions are not sorted in any orders
-        # self._actions_in_order = False
+        # _actions_in_order = False
 
         # 2. Setup input signals for updating sensors or component states values
 
-        # ????
+        # _signals = []
+        # _signals.append([sensor/state id, input signal 1, input signal 2, ...., input signal x])
+        # _sensors = self.get_sensors()
+        # _actuators = self.get_actuators()
+        # _comp_states = self.get_component_states()
+        # _signals.append([_sensors[0], _comp_states[0].get_value])
+        # _signals.append([_comp_states[0], _actuators[0].get_value, _actuators[1].get_value])
+
+        # 3. Return _actions_in_order and _signals
+        # return _actions_in_order, _signals
 
         raise NotImplementedError
 
@@ -1067,8 +1102,14 @@ class SimMPPS(FctSTrans, Label):
             raise NotImplementedError
         
         # 2. Update values of the sensors and component states
-
-        # ?????
+        for sig in self._signals:
+            if len(sig[1:]) == 1:
+                input = sig[1]()
+            else:
+                input = []
+                for x in range(len(sig[1:])):
+                    input.append(sig[x+1]())
+            sig[0].simulate(input, p_range=None)
 
         # 3. Return the resulted states in the form of State object
         raise NotImplementedError
