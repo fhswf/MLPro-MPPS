@@ -945,7 +945,10 @@ class SimMPPS(FctSTrans, Label):
         _sensors = []
 
         for ids in self._elements.get_dim_ids():
-            _sensors.append(self.get_element(p_id=ids).get_sensors())
+            if isinstance(self.get_element(p_id=ids), Module):
+                _sensors.extend(self.get_element(p_id=ids).get_sensors())
+            else:
+                _sensors.append(self.get_element(p_id=ids).get_sensors())
             
         return _sensors
 
@@ -983,7 +986,10 @@ class SimMPPS(FctSTrans, Label):
         _actuators = []
 
         for ids in self._elements.get_dim_ids():
-            _actuators.append(self.get_element(p_id=ids).get_actuators())
+            if isinstance(self.get_element(p_id=ids), Module):
+                _actuators.extend(self.get_element(p_id=ids).get_actuators())
+            else:
+                _actuators.append(self.get_element(p_id=ids).get_actuators())
             
         return _actuators
 
@@ -1021,7 +1027,10 @@ class SimMPPS(FctSTrans, Label):
         _states = []
 
         for ids in self._elements.get_dim_ids():
-            _states.append(self.get_element(p_id=ids).get_component_states())
+            if isinstance(self.get_element(p_id=ids), Module):
+                _states.extend(self.get_element(p_id=ids).get_component_states())
+            else:
+                _states.append(self.get_element(p_id=ids).get_component_states())
             
         return _states
 
