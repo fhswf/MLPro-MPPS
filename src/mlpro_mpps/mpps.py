@@ -6,11 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-22  0.0.0     SY/ML    Creation
-## -- 2022-??-??  1.0.0     SY/ML    Release of first version
+## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 0.0.0 (2022-12-22)
+Ver. 1.0.0 (2022-12-29)
 
 This module provides a multi-purpose environment for continuous and batch production systems with
 modular setting and high-flexibility.
@@ -549,6 +549,7 @@ class Component(EventManager, ScientificObject, Label):
         
         Label.__init__(self, p_name, p_id)
         EventManager.__init__(self, p_logging=p_logging)
+        self.setup_component()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -844,6 +845,20 @@ class Component(EventManager, ScientificObject, Label):
             return False
 
 
+## -------------------------------------------------------------------------------------------------
+    def setup_component(self):
+        """
+        Custom method to setup a component. An howto and documentation related to setting up
+        a component will be available soon.
+        """
+
+        # self.add_actuator(...)
+        # self.add_component_states(...)
+        # self.add_sensor(...)
+
+        raise NotImplementedError
+
+
 
         
 
@@ -888,6 +903,7 @@ class Module(Component):
         self._components = Set()
         
         Component.__init__(self, p_name=p_name, p_id=p_id, p_logging=p_logging, p_kwargs=p_kwargs)
+        self.setup_module()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -1059,6 +1075,18 @@ class Module(Component):
                 pass
         
         return False
+
+
+## -------------------------------------------------------------------------------------------------
+    def setup_module(self):
+        """
+        Custom method to setup a module. An howto and documentation related to setting up
+        a module will be available soon.
+        """
+
+        # self.add_component(...)
+
+        raise NotImplementedError
 
 
 
