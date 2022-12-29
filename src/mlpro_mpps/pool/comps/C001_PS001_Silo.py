@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : C_001_001_Silo.py
+## -- Module  : C001_PS001_Silo.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -19,6 +19,7 @@ A silo is a component to temporary store materials that consists of two sensors.
 
 from mlpro_mpps.mpps import *
 from mlpro_at_basis.bf import *
+from mlpro.bf.math import *
 
 
          
@@ -37,10 +38,10 @@ class SiloSensor1(SimSensor):
     
 ## -------------------------------------------------------------------------------------------------      
     def setup_function(self) -> TransferFunction:
-        _func = TF_SiloSensor(p_name='TF_SiloSensor1',
-                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                              p_dt=0,
-                              theta = 0.8*17.42) # 80% of the maximum fill-level
+        _func = TF_BufferSensor(p_name='TF_SiloSensor1',
+                                p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                                p_dt=0,
+                                theta = 0.8*17.42) # 80% of the maximum fill-level
         return _func
 
 
@@ -60,10 +61,10 @@ class SiloSensor2(SimSensor):
     
 ## -------------------------------------------------------------------------------------------------      
     def setup_function(self) -> TransferFunction:
-        _func = TF_SiloSensor(p_name='TF_SiloSensor2',
-                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                              p_dt=0,
-                              theta = 0.2*17.42) # 20% of the maximum fill-level
+        _func = TF_BufferSensor(p_name='TF_SiloSensor2',
+                                p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                                p_dt=0,
+                                theta = 0.2*17.42) # 20% of the maximum fill-level
         return _func
 
 
@@ -71,7 +72,7 @@ class SiloSensor2(SimSensor):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class TF_SiloSensor(TransferFunction):
+class TF_BufferSensor(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
@@ -114,7 +115,7 @@ class SiloFillLevel(SimState):
     This class serves as a component state to calculate the actual fill-level of the silo.
     """
 
-    C_TYPE = 'SimSensor'
+    C_TYPE = 'SimState'
     C_NAME = 'SiloFillLevel'
   
     
@@ -182,7 +183,7 @@ class SiloOverflow(SimState):
     This class serves as a component state to calculate the overflow level of the silo.
     """
 
-    C_TYPE = 'SimSensor'
+    C_TYPE = 'SimState'
     C_NAME = 'SiloOverflow'
   
     
@@ -249,8 +250,23 @@ class Silo(Component):
         """
         A silo consists of two sensors and two states components.
         """
-        self.add_sensor(p_sensor=SiloSensor1)
-        self.add_sensor(p_sensor=SiloSensor2)
-        self.add_component_states(p_comp_states=SiloFillLevel)
-        self.add_component_states(p_comp_states=SiloOverflow)
+        silo_sensor_1 = SiloSensor1(p_name_short='SiloSensor1',
+                                    p_base_set=Dimension.C_BASE_SET_Z,
+                                    p_boundaries=[0,1])
+        silo_sensor_2 = SiloSensor2(p_name_short='SiloSensor2',
+                                    p_base_set=Dimension.C_BASE_SET_Z,
+                                    p_boundaries=[0,1])
+        silo_fill_level = SiloFillLevel(p_name_short='SiloFillLevel',
+                                        p_base_set=Dimension.C_BASE_SET_R,
+                                        p_unit='L',
+                                        p_boundaries=[0,17.42])
+        silo_overflow = SiloOverflow(p_name_short='SiloOverflow',
+                                     p_base_set=Dimension.C_BASE_SET_R,
+                                     p_unit='L',
+                                     p_boundaries=[0,100])
+        
+        self.add_sensor(p_sensor=silo_sensor_1)
+        self.add_sensor(p_sensor=silo_sensor_2)
+        self.add_component_states(p_comp_states=silo_fill_level)
+        self.add_component_states(p_comp_states=silo_overflow)
     
