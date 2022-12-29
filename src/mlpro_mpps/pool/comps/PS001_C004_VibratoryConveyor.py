@@ -14,7 +14,7 @@ Ver. 1.0.0 (2022-12-29)
 
 This module provides a default implementation of a component of the BGLP, which is a Vibratory
 Conveyor.
-A vibratory conveyor in the BGLP is a located on Module 2 to transport materials from Silo B to
+A vibratory conveyor is located on Module 2 of the BGLP to transport materials from Silo B to
 Hopper B.
 """
 
