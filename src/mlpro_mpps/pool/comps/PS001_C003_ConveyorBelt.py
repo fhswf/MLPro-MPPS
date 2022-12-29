@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : C003_PS001_ConveyorBelt.py
+## -- Module  : PS001_C003_ConveyorBelt.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -107,7 +107,7 @@ class CBPowerConsumption(SimState):
     def setup_function(self) -> TransferFunction:
         _func = TF_PowerBelt_Cont(p_name='TF_PowerBelt_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                  p_dt=0,
+                                  p_dt=0.05,
                                   min_power = 40.0,
                                   max_power = 50.5,
                                   min_rpm = 450,

@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : C002_PS001_Hopper.py
+## -- Module  : PS001_C002_Hopper.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -20,7 +20,8 @@ A hopper is a component to temporary store materials that consists of a sensor.
 from mlpro_mpps.mpps import *
 from mlpro_at_basis.bf import *
 from mlpro.bf.math import *
-from mlpro_mpps.pool.comps.C001_PS001_Silo import *
+from mlpro_mpps.pool.comps.PS001_C001_Silo import *
+import sys
 
 
          

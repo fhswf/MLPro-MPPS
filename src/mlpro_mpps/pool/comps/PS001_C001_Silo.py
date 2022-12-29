@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : C001_PS001_Silo.py
+## -- Module  : PS001_C001_Silo.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -20,6 +20,7 @@ A silo is a component to temporary store materials that consists of two sensors.
 from mlpro_mpps.mpps import *
 from mlpro_at_basis.bf import *
 from mlpro.bf.math import *
+import sys
 
 
          

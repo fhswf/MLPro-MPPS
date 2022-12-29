@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : C004_PS001_VibratoryConveyor.py
+## -- Module  : PS001_C004_VibratoryConveyor.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -108,7 +108,7 @@ class VCPowerConsumption(SimState):
     def setup_function(self) -> TransferFunction:
         _func = TF_PowerBelt_Cont(p_name='TF_PowerBelt_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                  p_dt=0,
+                                  p_dt=0.05,
                                   power = 26.9)
         return _func
 
@@ -161,7 +161,7 @@ class TF_PowerBelt_Binary(TransferFunction):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ConveyorBelt(Component):
+class VibratoryConveyor(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
