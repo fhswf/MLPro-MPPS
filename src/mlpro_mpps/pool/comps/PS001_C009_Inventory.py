@@ -70,17 +70,13 @@ class TF_InventoryLevel(TransferFunction):
         p_input : list
             [0] = Current level
             [1] = Volume in
-            [2] = Reset
 
         Returns
         -------
         float
             Actual level.
         """
-        if p_input[2]:
-            return 0
-        else:
-            return p_input[0]+p_input[1]
+        return p_input[0]+p_input[1]
 
 
                  

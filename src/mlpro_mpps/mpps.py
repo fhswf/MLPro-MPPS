@@ -1311,8 +1311,11 @@ class SimMPPS(FctSTrans, Label):
         Custom method to setup a mpps. An howto and documentation related to setting up MPPS will be
         available soon.
         """
+        
+        # 1. Add elements
+        # self.add_element(p_elem:Component)
 
-        # 1. Setup which actions connected to which actuators
+        # 2. Setup which actions connected to which actuators
 
         # Option 1: The actions are sorted in the same order as self.get_actuators() 
         # _actions_in_order = True
@@ -1320,17 +1323,17 @@ class SimMPPS(FctSTrans, Label):
         # Option 2: The actions are not sorted in any orders
         # _actions_in_order = False
 
-        # 2. Setup input signals for updating sensors or component states values
+        # 3. Setup input signals for updating sensors or component states values
 
         # _signals = []
-        # _signals.append([sensor/state id, input signal 1, input signal 2, ...., input signal x])
         # _sensors = self.get_sensors()
         # _actuators = self.get_actuators()
         # _comp_states = self.get_component_states()
+        # _signals.append([sensor/state id, input signal 1, input signal 2, ...., input signal x])
         # _signals.append([_sensors[0], _comp_states[0].get_value])
         # _signals.append([_comp_states[0], _actuators[0].get_value, _actuators[1].get_value])
 
-        # 3. Return _actions_in_order and _signals
+        # 4. Return _actions_in_order and _signals
         # return _actions_in_order, _signals
 
         raise NotImplementedError

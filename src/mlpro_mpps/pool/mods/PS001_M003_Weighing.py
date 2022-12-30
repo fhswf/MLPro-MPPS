@@ -40,8 +40,8 @@ class WeighingStation(Module):
         vac = VacuumPump2(p_name='VacC')
         belt = RotaryFeeder(p_name='BeltC')
         
-        self.add_component(p_component=hopper)
         self.add_component(p_component=silo)
+        self.add_component(p_component=hopper)
         self.add_component(p_component=vac)
         self.add_component(p_component=belt)
     
