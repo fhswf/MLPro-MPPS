@@ -31,8 +31,23 @@ class BGLP_RLEnv(Environment):
     C_CYCLE_LIMIT   = 0  # Recommended cycle limit for training episodes
 
 ## -------------------------------------------------------------------------------------------------
-    def __init__(self, p_logging=Log.C_LOG_ALL):
+    def __init__(self,
+                 p_reward_type=Reward.C_TYPE_EVERY_AGENT,
+                 p_logging=Log.C_LOG_ALL,
+                 t_step=0.5,
+                 t_set=10.0,
+                 demand=0.1,
+                 lr_margin=1.0,
+                 lr_demand=4.0,
+                 lr_power=0.0010, 
+                 margin_p=[0.2,0.8,4],
+                 prod_target=10000,
+                 prod_scenario='continuous',
+                 cycle_limit=0):
 
+        self.num_envs = 5                                                 # Number of internal sub-environments
+        self.reward_type = p_reward_type
+        
         super().__init__(p_mode = Mode.C_MODE_SIM, 
                          p_latency = None, 
                          p_fct_strans = BGLP, 
@@ -41,24 +56,57 @@ class BGLP_RLEnv(Environment):
                          p_fct_broken = None, 
                          p_visualize = False, 
                          p_logging = p_logging)
+        
+        self.C_SCIREF_TYPE    = self.C_SCIREF_TYPE_ARTICLE
+        self.C_SCIREF_AUTHOR  = "Dorothea Schwung, Steve Yuwono, Andreas Schwung, Steven X. Ding"
+        self.C_SCIREF_TITLE   = "Decentralized learning of energy optimal production policies using PLC-informed reinforcement learning"
+        self.C_SCIREF_JOURNAL = "Computers & Chemical Engineering"
+        self.C_SCIREF_YEAR    = "2021"
+        self.C_SCIREF_MONTH   = "05"
+        self.C_SCIREF_DAY     = "28"
+        self.C_SCIREF_VOLUME  = "152"
+        self.C_SCIREF_DOI     = "10.1016/j.compchemeng.2021.107382"
+        
+        self.C_CYCLE_LIMIT = cycle_limit
+        self.t = 0
+        self.t_step = t_step
+        self.t_set = t_set
+        self._demand = demand
+        self.lr_margin = lr_margin
+        self.lr_demand = lr_demand
+        self.lr_power = lr_power
+        self.prod_target = prod_target
+        self.prod_scenario = prod_scenario
+        self.levels_init = np.ones((6,1))*0.5
+        self.margin_p = margin_p
+        
+        self.data_lists         = ["time","overflow","power","demand"]
+        self.data_storing       = DataStoring(self.data_lists)
+        self.data_frame         = None
+        
+        self.reset()
 
 
 ## -------------------------------------------------------------------------------------------------
     @staticmethod
     def setup_spaces():
-        """
-        Static template method to set up and return state and action space of environment.
+        state_space = ESpace()
+        action_space = ESpace()
+
+        state_space.add_dim(Dimension('R-1 LvlSiloA', 'R', 'Res-1 Level of Silo A', '', '', '', [0, 1]))
+        state_space.add_dim(Dimension('R-2 LvlHopperA', 'R', 'Res-2 Level of Hopper A', '', '', '', [0, 1]))
+        state_space.add_dim(Dimension('R-3 LvlSiloB', 'R', 'Res-3 Level of Silo B', '', '', '', [0, 1]))
+        state_space.add_dim(Dimension('R-4 LvlHopperB', 'R', 'Res-4 Level of Hopper B', '', '', '', [0, 1]))
+        state_space.add_dim(Dimension('R-5 LvlSiloC', 'R', 'Res-5 Level of Silo C', '', '', '', [0, 1]))
+        state_space.add_dim(Dimension('R-6 LvlHopperC', 'R', 'Res-6 Level of Hopper C', '', '', '', [0, 1]))
         
-        Returns
-        -------
-        state_space : MSpace
-            State space object
-        action_space : MSpace
-            Action space object
+        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [0,1]))
 
-        """
-
-        raise NotImplementedError
+        return state_space, action_space
 
 
 
@@ -89,42 +137,66 @@ class BGLP_RLEnv(Environment):
 
 ## -------------------------------------------------------------------------------------------------
     def _compute_reward(self, p_state: State = None, p_state_new: State = None) -> Reward:
-        """
-        Custom reward method. See method compute_reward() for further details.
-        """
+        reward = Reward(self.reward_type)
 
-        raise NotImplementedError
+        if self.reward_type == Reward.C_TYPE_OVERALL:
+            r_overall = 0
+            r_overall = r_overall + sum(self.calc_reward()).item()
+            reward.set_overall_reward(r_overall)
+        
+        elif self.reward_type == Reward.C_TYPE_EVERY_AGENT:
+           for agent_id in self._last_action.get_agent_ids():
+               r_reward = self.calc_reward()
+               reward.add_agent_reward(agent_id, r_reward[int(agent_id)])
+               
+        else:
+           for agent_id in self._last_action.get_agent_ids():
+                agent_action_elem = self._last_action.get_elem(agent_id)
+                agent_action_ids = agent_action_elem.get_dim_ids()
+                r_agent = 0
+                r_reward = self.calc_reward()
+                action_idx = 0
+                for action_id in agent_action_ids:
+                    r_action = r_reward[action_idx]
+                    action_idx += 1
+                    reward.add_action_reward(agent_id, action_id, r_action)
+                    
+        return reward
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _compute_success(self, p_state: State) -> bool:
-        """
-        Custom method for assessment for success. See method compute_success() for further details.
-        """
-
-        raise NotImplementedError
+    def _compute_success(self, p_state: State) -> bool:        
+        if self.prod_scenario == 'continuous':
+            return False
+        else:
+            if self.prod_reached >= self.prod_target:
+                self._state.set_terminal(True)
+                return True
+            else:
+                return False
 
 
 ## -------------------------------------------------------------------------------------------------
     def _compute_broken(self, p_state: State) -> bool:
-        """
-        Custom method for assessment for breakdown. See method compute_broken() for further details.
-        """
-
-        raise NotImplementedError
+        return False
 
 
 ## -------------------------------------------------------------------------------------------------
     def _reset(self, p_seed=None) -> None:
-        """
-        Custom method to reset the system to an initial/defined state. Use method _set_status() to
-        set the state.
 
-        Parameters
-        ----------
-        p_seed : int
-            Seed parameter for an internal random generator
-        """
+        raise NotImplementedError
+            
+
+## -------------------------------------------------------------------------------------------------
+    def calc_reward(self):
+        # for actnum in range(len(self.acts)):
+        #     acts = self.acts[actnum]
+        #     self.reward[actnum] = 1/(1+self.lr_margin*self.margin_t[actnum])+1/(1+self.lr_power*self.power_t[actnum]/(acts.power_max/1000.0))
+        #     if actnum == len(self.acts)-1:
+        #         self.reward[actnum] += 1/(1-self.lr_demand*self.demand_t[-1])
+        #     else:
+        #         self.reward[actnum] += 1/(1+self.lr_margin*self.margin_t[actnum+1])
+        # return self.reward[:]
 
         raise NotImplementedError
     
