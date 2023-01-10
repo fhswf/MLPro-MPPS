@@ -6,11 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-01-03  0.0.0     SY       Creation
-## -- 2023-01-03  1.0.0     SY       Release of first version
+## -- 2023-XX-XX  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-01-03)
+Ver. 1.0.0 (2023-XX-XX)
 
 This example shows the implementation of the MPPS-based BGLP as an RL Environment.
 """
@@ -18,6 +18,7 @@ This example shows the implementation of the MPPS-based BGLP as an RL Environmen
 
 from mlpro_mpps.pool.mpps.PS001_bglp import BGLP
 from mlpro.rl.models import *
+import numpy as np
 
 
                      
@@ -26,15 +27,13 @@ from mlpro.rl.models import *
 ## -------------------------------------------------------------------------------------------------
 class BGLP_RLEnv(Environment):
 
-    C_TYPE          = 'MPPS-based BGLP - RL Environment'
-    
-    C_CYCLE_LIMIT   = 0  # Recommended cycle limit for training episodes
+    C_TYPE = 'MPPS-based BGLP - RL Environment'
+    C_CYCLE_LIMIT = 0  # Recommended cycle limit for training episodes
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self,
                  p_reward_type=Reward.C_TYPE_EVERY_AGENT,
                  p_logging=Log.C_LOG_ALL,
-                 t_step=0.5,
                  t_set=10.0,
                  demand=0.1,
                  lr_margin=1.0,
@@ -69,9 +68,8 @@ class BGLP_RLEnv(Environment):
         
         self.C_CYCLE_LIMIT = cycle_limit
         self.t = 0
-        self.t_step = t_step
         self.t_set = t_set
-        self._demand = demand
+        self.demand = 0
         self.lr_margin = lr_margin
         self.lr_demand = lr_demand
         self.lr_power = lr_power
@@ -80,9 +78,9 @@ class BGLP_RLEnv(Environment):
         self.levels_init = np.ones((6,1))*0.5
         self.margin_p = margin_p
         
-        self.data_lists         = ["time","overflow","power","demand"]
-        self.data_storing       = DataStoring(self.data_lists)
-        self.data_frame         = None
+        self.data_lists = ["time","overflow","power","demand"]
+        self.data_storing = DataStoring(self.data_lists)
+        self.data_frame = None
         
         self.reset()
 
@@ -114,14 +112,17 @@ class BGLP_RLEnv(Environment):
     def _simulate_reaction(self, p_state: State, p_action: Action) -> State:
         
         # 1. Set values to actuators
-        if self._actions_in_order:
-            actions = Action.get_sorted_values()
-            for idx, acts in enumerate(self.get_actuators()):
-                acts.set_value(actions[idx])
-        else:
-            raise NotImplementedError
+        action = []
+        for agent_id in p_action.get_agent_ids():
+            action_elem = p_action.get_elem(agent_id)
+            for action_id in action_elem.get_dim_ids():
+                action.append(action_elem.get_value(action_id))
+                
+        for idx, acts in enumerate(self.get_actuators()):
+            acts.set_value(action[idx])
         
         # 2. Update values of the sensors and component states
+        self.init_inventory_level = self.get_component_states()[22].get_value()
         for sig in self._signals:
             if len(sig[1:]) == 1:
                 input = sig[1]()
@@ -129,10 +130,80 @@ class BGLP_RLEnv(Environment):
                 input = []
                 for x in range(len(sig[1:])):
                     input.append(sig[x+1]())
-            sig[0].simulate(input, p_range=None)
+            sig[0].simulate(input, p_range=self.t_set)
 
         # 3. Return the resulted states in the form of State object
-        raise NotImplementedError
+        self.set_actions(action)
+        self._state = self.get_states()
+        self._state.set_success(False)
+        self._state.set_broken(False)
+        
+        self.t += self.t_set
+        overlfow = self.get_overflow()
+        power = self.get_power()
+        demand = self.get_demand(self.init_inventory_level)
+        
+        self.data_storing.memorize("time",str(self.data_frame),self.t)
+        self.data_storing.memorize("overflow",str(self.data_frame), overlfow/self.t_set)
+        self.data_storing.memorize("power",str(self.data_frame), power/self.t_set)
+        self.data_storing.memorize("demand",str(self.data_frame), demand/self.t_set)
+
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_states(self) -> State:
+        state = State(self._state_space)
+        ids = state.get_dim_ids()
+        comp_states = [0,2,6,8,14,16]
+        
+        for x in range(len(ids)):
+            state.set_value(ids[x], self.get_component_states()[comp_states[x]].get_value()) 
+        return state
+
+
+## -------------------------------------------------------------------------------------------------
+    # def get_margin(self) -> list:
+    #     margin = []
+    #     comp_states = [0,2,6,8,14,16]
+        
+    #     for x in range(len(comp_states)):
+            
+            
+    #         total_overflow += self.get_component_states()[comp_states[x]].get_value()
+    #     return margin
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_overflow(self) -> float:
+        total_overflow = 0
+        comp_states = [1,3,7,9,15,17]
+        
+        for x in range(len(comp_states)):
+            total_overflow += self.get_component_states()[comp_states[x]].get_value()
+        return total_overflow
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_power(self) -> float:
+        total_power = 0
+        comp_states = [5,11,13,19,21]
+        
+        for x in range(len(comp_states)):
+            total_power += self.get_component_states()[comp_states[x]].get_value()
+        return total_power
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_demand(self, init_volume) -> float:
+        current_volume = self.get_component_states()[22].get_value()
+        delta = current_volume-init_volume
+        self.prod_reached += delta
+        
+        if (self.demand*self.t_set) > delta:
+            total_demand = delta-self.demand*self.t_set
+        else:
+            total_demand = 0
+        return total_demand
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -183,20 +254,58 @@ class BGLP_RLEnv(Environment):
 
 ## -------------------------------------------------------------------------------------------------
     def _reset(self, p_seed=None) -> None:
-
-        raise NotImplementedError
+        np.random.seed(p_seed)
+        self.levels_init = np.random.rand(6,1)
+        self.get_component_states[23]._function.prod_target = self.demand
+        
+        for acts in self.get_actuators():
+            acts.deactivate()
+        for sens in self.get_sensors():
+            sens.deactivate()
+            
+        comp_states = [0,2,6,8,14,16]
+        for st in range(len(comp_states)):
+            self.get_component_states()[comp_states[st]].set_value(self.levels_init[st].item())
+        self.get_component_states()[22].set_value(0)
+        
+        self.t              = 0
+        self.prod_reached   = 0
+        self._state = self.get_states()
+        self._state.set_success(False)
+        self._state.set_broken(False)
+        
+        if self.data_frame == None:
+            self.data_frame = 0
+        else:
+            self.data_frame += 1
+        self.data_storing.add_frame(str(self.data_frame))
             
 
 ## -------------------------------------------------------------------------------------------------
     def calc_reward(self):
-        # for actnum in range(len(self.acts)):
-        #     acts = self.acts[actnum]
-        #     self.reward[actnum] = 1/(1+self.lr_margin*self.margin_t[actnum])+1/(1+self.lr_power*self.power_t[actnum]/(acts.power_max/1000.0))
-        #     if actnum == len(self.acts)-1:
-        #         self.reward[actnum] += 1/(1-self.lr_demand*self.demand_t[-1])
-        #     else:
-        #         self.reward[actnum] += 1/(1+self.lr_margin*self.margin_t[actnum+1])
-        # return self.reward[:]
+        
+        overlfow = self.get_overflow()/self.t_set
+        power = self.get_power()/self.t_set
+        demand = self.get_demand(self.init_inventory_level)/self.t_set
+        comp_states = [5,11,13,19,21]
+        
+        for actnum in range(len(self.acts)):
+            cs = comp_states[actnum]
+            try:
+                power_max = self.get_component_states[cs]._function.max_power
+            except:
+                power_max = self.get_component_states[cs]._function.power
+                
+            self.reward[actnum] = 1/(1+self.lr_margin*self.margin_t[actnum])+1/(1+self.lr_power*power[actnum]/(power_max/1000.0))
+            if actnum == len(self.acts)-1:
+                self.reward[actnum] += 1/(1-self.lr_demand*demand)
+            else:
+                self.reward[actnum] += 1/(1+self.lr_margin*self.margin_t[actnum+1])
+        return self.reward[:]
 
         raise NotImplementedError
     
+    
+    
+## set action from 0-1 to actual values
+## also for states has to be normalized to 0-1
