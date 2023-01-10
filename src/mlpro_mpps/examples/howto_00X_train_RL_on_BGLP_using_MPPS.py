@@ -119,7 +119,9 @@ class BGLP_RLEnv(Environment):
                 action.append(action_elem.get_value(action_id))
                 
         for idx, acts in enumerate(self.get_actuators()):
-            acts.set_value(action[idx])
+            boundaries = acts.get_boundaries()
+            final_action = action[idx]/(boundaries[1]-boundaries[0])+boundaries[0]
+            acts.set_value(final_action)
         
         # 2. Update values of the sensors and component states
         self.init_inventory_level = self.get_component_states()[22].get_value()
@@ -157,20 +159,30 @@ class BGLP_RLEnv(Environment):
         comp_states = [0,2,6,8,14,16]
         
         for x in range(len(ids)):
-            state.set_value(ids[x], self.get_component_states()[comp_states[x]].get_value()) 
+            fill_level = self.get_component_states()[comp_states[x]].get_value()
+            boundaries = self.get_component_states()[comp_states[x]].get_boundaries()
+            norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
+            state.set_value(ids[x], norm_fill_level) 
         return state
 
 
 ## -------------------------------------------------------------------------------------------------
-    # def get_margin(self) -> list:
-    #     margin = []
-    #     comp_states = [0,2,6,8,14,16]
+    def get_margin(self) -> list:
+        margin = []
+        comp_states = [0,2,6,8,14,16]
         
-    #     for x in range(len(comp_states)):
-            
-            
-    #         total_overflow += self.get_component_states()[comp_states[x]].get_value()
-    #     return margin
+        for x in range(len(comp_states)):
+            fill_level = self.get_component_states()[comp_states[x]].get_value()
+            boundaries = self.get_component_states()[comp_states[x]].get_boundaries()
+            norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
+            if norm_fill_level < self.margin_p[0]:
+                m = (0-self.margin_p[2])/(self.margin_p[0])*(norm_fill_level-self.margin_p[0])*self.t_step
+            elif norm_fill_level > self.margin_p[1]:
+                m = self.margin_p[2]/(1-self.margin_p[1])*(norm_fill_level-self.margin_p[1])*self.t_step
+            else:
+                m = 0.0
+            margin.append(m)
+        return margin
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -224,7 +236,6 @@ class BGLP_RLEnv(Environment):
            for agent_id in self._last_action.get_agent_ids():
                 agent_action_elem = self._last_action.get_elem(agent_id)
                 agent_action_ids = agent_action_elem.get_dim_ids()
-                r_agent = 0
                 r_reward = self.calc_reward()
                 action_idx = 0
                 for action_id in agent_action_ids:
@@ -284,7 +295,7 @@ class BGLP_RLEnv(Environment):
 ## -------------------------------------------------------------------------------------------------
     def calc_reward(self):
         
-        overlfow = self.get_overflow()/self.t_set
+        margin = self.get_margin()
         power = self.get_power()/self.t_set
         demand = self.get_demand(self.init_inventory_level)/self.t_set
         comp_states = [5,11,13,19,21]
@@ -296,16 +307,9 @@ class BGLP_RLEnv(Environment):
             except:
                 power_max = self.get_component_states[cs]._function.power
                 
-            self.reward[actnum] = 1/(1+self.lr_margin*self.margin_t[actnum])+1/(1+self.lr_power*power[actnum]/(power_max/1000.0))
+            self.reward[actnum] = 1/(1+self.lr_margin*margin[actnum])+1/(1+self.lr_power*power[actnum]/(power_max/1000.0))
             if actnum == len(self.acts)-1:
                 self.reward[actnum] += 1/(1-self.lr_demand*demand)
             else:
-                self.reward[actnum] += 1/(1+self.lr_margin*self.margin_t[actnum+1])
+                self.reward[actnum] += 1/(1+self.lr_margin*margin[actnum+1])
         return self.reward[:]
-
-        raise NotImplementedError
-    
-    
-    
-## set action from 0-1 to actual values
-## also for states has to be normalized to 0-1
