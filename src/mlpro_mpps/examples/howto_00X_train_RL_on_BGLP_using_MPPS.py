@@ -28,10 +28,77 @@ from pathlib import Path
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+class BGLP4RL(BGLP):
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_states(self) -> State:
+        state = State(self._state_space)
+        ids = state.get_dim_ids()
+        
+        for x in range(len(ids)):
+            fill_level = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_value()
+            boundaries = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_boundaries()
+            norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
+            state.set_value(ids[x], norm_fill_level) 
+        return state
+
+
+## -------------------------------------------------------------------------------------------------
+    def _simulate_reaction(self, p_state: State, p_action: Action) -> State:
+        
+        # 1. Set values to actuators
+        action = []
+        for agent_id in p_action.get_agent_ids():
+            action_elem = p_action.get_elem(agent_id)
+            for action_id in action_elem.get_dim_ids():
+                action.append(action_elem.get_value(action_id))
+                
+        for idx, acts in enumerate(self.get_actuators()):
+            if idx != len(self.get_actuators())-1:
+                boundaries = acts.get_boundaries()
+                final_action = action[idx]/(boundaries[1]-boundaries[0])+boundaries[0]
+                acts.set_value(final_action)
+        
+        # 2. Update values of the sensors and component states
+        self.init_inventory_level = self.get_component_states()[22].get_value()
+        for sig in self._signals:
+            if len(sig[1:]) == 1:
+                input = sig[1]()
+            else:
+                input = []
+                for x in range(len(sig[1:])):
+                    input.append(sig[x+1]())
+            sig[0].simulate(input, p_range=self.t_set)
+
+        # 3. Return the resulted states in the form of State object
+        self.set_actions(action)
+        self._state = self.get_states()
+        self._state.set_success(False)
+        self._state.set_broken(False)
+        
+        self.t += self.t_set
+        overlfow = self.get_overflow()
+        power = self.get_power()
+        demand = self.get_demand(self.init_inventory_level)
+        
+        self.data_storing.memorize("time",str(self.data_frame),self.t)
+        self.data_storing.memorize("overflow",str(self.data_frame), overlfow/self.t_set)
+        self.data_storing.memorize("power",str(self.data_frame), power/self.t_set)
+        self.data_storing.memorize("demand",str(self.data_frame), demand/self.t_set)
+        
+        return self._states
+
+
+                     
+                        
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class BGLP_RLEnv(Environment):
 
     C_TYPE = 'MPPS-based BGLP - RL Environment'
     C_CYCLE_LIMIT = 0  # Recommended cycle limit for training episodes
+
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self,
@@ -52,7 +119,7 @@ class BGLP_RLEnv(Environment):
         
         super().__init__(p_mode = Mode.C_MODE_SIM, 
                          p_latency = None, 
-                         p_fct_strans = BGLP, 
+                         p_fct_strans = BGLP4RL(p_name='BGLP_RL', p_logging=p_logging), 
                          p_fct_reward = None, 
                          p_fct_success = None, 
                          p_fct_broken = None, 
@@ -69,11 +136,10 @@ class BGLP_RLEnv(Environment):
         self.C_SCIREF_VOLUME  = "152"
         self.C_SCIREF_DOI     = "10.1016/j.compchemeng.2021.107382"
         
-        self._fct_strans = BGLP(p_name='BGLP_RL', p_logging=p_logging)
         self.C_CYCLE_LIMIT = cycle_limit
         self.t = 0
         self.t_set = t_set
-        self.demand = 0
+        self.demand = demand
         self.lr_margin = lr_margin
         self.lr_demand = lr_demand
         self.lr_power = lr_power
@@ -125,13 +191,14 @@ class BGLP_RLEnv(Environment):
             for action_id in action_elem.get_dim_ids():
                 action.append(action_elem.get_value(action_id))
                 
-        for idx, acts in enumerate(self.get_actuators()):
-            boundaries = acts.get_boundaries()
-            final_action = action[idx]/(boundaries[1]-boundaries[0])+boundaries[0]
-            acts.set_value(final_action)
+        for idx, acts in enumerate(self._fct_strans.get_actuators()-1):
+            if idx != len(self._fct_strans.get_actuators())-1:
+                boundaries = acts.get_boundaries()
+                final_action = action[idx]/(boundaries[1]-boundaries[0])+boundaries[0]
+                acts.set_value(final_action)
         
         # 2. Update values of the sensors and component states
-        self.init_inventory_level = self.get_component_states()[22].get_value()
+        self.init_inventory_level = self._fct_strans.get_component_states()[22].get_value()
         for sig in self._signals:
             if len(sig[1:]) == 1:
                 input = sig[1]()
@@ -156,7 +223,7 @@ class BGLP_RLEnv(Environment):
         self.data_storing.memorize("overflow",str(self.data_frame), overlfow/self.t_set)
         self.data_storing.memorize("power",str(self.data_frame), power/self.t_set)
         self.data_storing.memorize("demand",str(self.data_frame), demand/self.t_set)
-
+        return self._state
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -165,8 +232,8 @@ class BGLP_RLEnv(Environment):
         ids = state.get_dim_ids()
         
         for x in range(len(ids)):
-            fill_level = self.get_component_states()[self.set_fill_levels[x]].get_value()
-            boundaries = self.get_component_states()[self.set_fill_levels[x]].get_boundaries()
+            fill_level = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_value()
+            boundaries = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_boundaries()
             norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
             state.set_value(ids[x], norm_fill_level) 
         return state
@@ -177,8 +244,8 @@ class BGLP_RLEnv(Environment):
         margin = []
         
         for x in range(len(self.set_fill_levels)):
-            fill_level = self.get_component_states()[self.set_fill_levels[x]].get_value()
-            boundaries = self.get_component_states()[self.set_fill_levels[x]].get_boundaries()
+            fill_level = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_value()
+            boundaries = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_boundaries()
             norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
             if norm_fill_level < self.margin_p[0]:
                 m = (0-self.margin_p[2])/(self.margin_p[0])*(norm_fill_level-self.margin_p[0])*self.t_step
@@ -195,7 +262,7 @@ class BGLP_RLEnv(Environment):
         total_overflow = 0
         
         for x in range(len(comp_states)):
-            total_overflow += self.get_component_states()[self.set_overflow[x]].get_value()
+            total_overflow += self._fct_strans.get_component_states()[self.set_overflow[x]].get_value()
         return total_overflow
 
 
@@ -204,13 +271,13 @@ class BGLP_RLEnv(Environment):
         total_power = 0
         
         for x in range(len(self.set_power)):
-            total_power += self.get_component_states()[self.set_power[x]].get_value()
+            total_power += self._fct_strans.get_component_states()[self.set_power[x]].get_value()
         return total_power
 
 
 ## -------------------------------------------------------------------------------------------------
     def get_demand(self, init_volume) -> float:
-        current_volume = self.get_component_states()[22].get_value()
+        current_volume = self._fct_strans.get_component_states()[22].get_value()
         delta = current_volume-init_volume
         self.prod_reached += delta
         
@@ -269,17 +336,17 @@ class BGLP_RLEnv(Environment):
 ## -------------------------------------------------------------------------------------------------
     def _reset(self, p_seed=None) -> None:
         random.seed(p_seed)
-        self.get_component_states()[23]._function.prod_target = self.demand
+        self._fct_strans.get_component_states()[23]._function.prod_target = self.demand
         
-        for acts in self.get_actuators():
+        for acts in self._fct_strans.get_actuators():
             acts.deactivate()
-        for sens in self.get_sensors():
+        for sens in self._fct_strans.get_sensors():
             sens.deactivate()
             
         for st in range(len(self.set_fill_levels)):
             levels_init = random.uniform(0,1)
-            self.get_component_states()[self.set_fill_levels[st]].set_value(levels_init)
-        self.get_component_states()[22].set_value(0)
+            self._fct_strans.get_component_states()[self.set_fill_levels[st]].set_value(levels_init)
+        self._fct_strans.get_component_states()[22].set_value(0)
         
         self.t              = 0
         self.prod_reached   = 0
@@ -338,7 +405,7 @@ class MyBGLP(RLScenario):
         _id           = 0
         _ospace       = state_space.spawn([state_space.get_dim_ids()[0],state_space.get_dim_ids()[1]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[0]])
-        _policy       = RandomActionGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
         self._agent.add_agent(
             p_agent=Agent(
                 p_policy=_policy,
@@ -356,7 +423,7 @@ class MyBGLP(RLScenario):
         _id           = 1
         _ospace       = state_space.spawn([state_space.get_dim_ids()[1],state_space.get_dim_ids()[2]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[1]])
-        _policy       = RandomActionGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
         self._agent.add_agent(
             p_agent=Agent(
                 p_policy=_policy,
@@ -374,7 +441,7 @@ class MyBGLP(RLScenario):
         _id           = 2
         _ospace       = state_space.spawn([state_space.get_dim_ids()[2],state_space.get_dim_ids()[3]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[2]])
-        _policy       = RandomActionGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
         self._agent.add_agent(
             p_agent=Agent(
                 p_policy=_policy,
@@ -392,7 +459,7 @@ class MyBGLP(RLScenario):
         _id           = 3
         _ospace       = state_space.spawn([state_space.get_dim_ids()[3],state_space.get_dim_ids()[4]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[3]])
-        _policy       = RandomActionGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
         self._agent.add_agent(
             p_agent=Agent(
                 p_policy=_policy,
@@ -410,7 +477,7 @@ class MyBGLP(RLScenario):
         _id           = 4
         _ospace       = state_space.spawn([state_space.get_dim_ids()[4],state_space.get_dim_ids()[5]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[4]])
-        _policy       = RandomActionGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
         self._agent.add_agent(
             p_agent=Agent(
                 p_policy=_policy,
