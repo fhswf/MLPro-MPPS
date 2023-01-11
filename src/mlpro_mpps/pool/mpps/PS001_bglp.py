@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-30  0.0.0     SY       Creation
 ## -- 2022-12-30  1.0.0     SY       Release of first version
+## -- 2023-01-11  1.0.1     SY       Debugging on setup_mpps, adjusting sensors' indices
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-12-30)
+Ver. 1.0.1 (2023-01-11)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS.
 """
@@ -45,17 +46,20 @@ class BGLP(SimMPPS):
         self.C_SCIREF_DOI     = "10.1016/j.compchemeng.2021.107382"
         
         # 1. Add elements
-        self.add_element(p_elem=LoadingStation)
-        self.add_element(p_elem=StoringStation)
-        self.add_element(p_elem=WeighingStation)
-        self.add_element(p_elem=FillingStation)
+        loading = LoadingStation(p_name='LoadingStation')
+        storing = StoringStation(p_name='StoringStation')
+        weighing = WeighingStation(p_name='WeighingStation')
+        filling = FillingStation(p_name='FillingStation')
+        
+        self.add_element(p_elem=loading)
+        self.add_element(p_elem=storing)
+        self.add_element(p_elem=weighing)
+        self.add_element(p_elem=filling)
 
         # 2. Setup which actions connected to which actuators
-
         _actions_in_order = False
 
         # 3. Setup input signals for updating sensors or component states values
-
         _signals = []
         _sensors = self.get_sensors()
         _actuators = self.get_actuators()
@@ -88,20 +92,17 @@ class BGLP(SimMPPS):
         _signals.append([_comp_states[16], _comp_states[16].get_value, _comp_states[20].get_value, _comp_states[23].get_value])
         _signals.append([_comp_states[17], _comp_states[16].get_value, _comp_states[20].get_value, _comp_states[23].get_value])
         _signals.append([_comp_states[22], _comp_states[22].get_value, _comp_states[23].get_value])        
-        
+                
         # 3.2. Buffers-related sensor
         _signals.append([_sensors[0], _comp_states[0].get_value])
         _signals.append([_sensors[1], _comp_states[0].get_value])
         _signals.append([_sensors[2], _comp_states[2].get_value])
-        _signals.append([_sensors[3], _comp_states[2].get_value])
+        _signals.append([_sensors[3], _comp_states[4].get_value])
         _signals.append([_sensors[4], _comp_states[4].get_value])
-        _signals.append([_sensors[5], _comp_states[4].get_value])
-        _signals.append([_sensors[6], _comp_states[6].get_value])
-        _signals.append([_sensors[7], _comp_states[6].get_value])
-        _signals.append([_sensors[8], _comp_states[8].get_value])
-        _signals.append([_sensors[9], _comp_states[8].get_value])
-        _signals.append([_sensors[10], _comp_states[10].get_value])
-        _signals.append([_sensors[11], _comp_states[10].get_value])
+        _signals.append([_sensors[5], _comp_states[6].get_value])
+        _signals.append([_sensors[6], _comp_states[8].get_value])
+        _signals.append([_sensors[7], _comp_states[8].get_value])
+        _signals.append([_sensors[8], _comp_states[10].get_value])
 
         # 4. Return _actions_in_order and _signals
         return _actions_in_order, _signals

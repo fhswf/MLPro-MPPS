@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-29  0.0.0     SY       Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
+## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-12-29)
+Ver. 1.0.1 (2023-01-11)
 
 This module provides a default implementation of a component of the BGLP, which is a Vacuum Pump.
 This vacuum pump is located on Module 3 of the BGLP to transport materials from Hopper B to Silo C.
@@ -90,11 +91,11 @@ class VacuumPump2(Component):
         transported_material = VC2TransportedMaterial(p_name_short='VC2TransportedMaterial',
                                                       p_base_set=Dimension.C_BASE_SET_R,
                                                       p_unit='L',
-                                                      p_boundaries=[0,sys.maximize])
+                                                      p_boundaries=[0,sys.maxsize])
         power_consumption = VC2PowerConsumption(p_name_short='VC2PowerConsumption',
                                                 p_base_set=Dimension.C_BASE_SET_R,
                                                 p_unit='kW',
-                                                p_boundaries=[0,sys.maximize])
+                                                p_boundaries=[0,sys.maxsize])
         
         self.add_actuator(p_actuator=timer)
         self.add_component_states(p_comp_states=transported_material)

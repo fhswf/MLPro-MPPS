@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-22  0.0.0     SY/ML    Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
+## -- 2023-01-11  1.0.1     SY       Add p_setup on Component Class, debugging, restructuring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-12-29)
+Ver. 1.0.1 (2023-01-11)
 
 This module provides a multi-purpose environment for continuous and batch production systems with
 modular setting and high-flexibility.
@@ -100,7 +101,8 @@ class SimActuator(Actuator, ScientificObject):
                  p_logging=Log.C_LOG_NOTHING,
                  **p_kwargs):
               
-        Actuator.__init__(p_name_short=p_name_short, 
+        Actuator.__init__(self,
+                          p_name_short=p_name_short, 
                           p_base_set=p_base_set, 
                           p_name_long=p_name_long, 
                           p_name_latex=p_name_latex, 
@@ -113,7 +115,6 @@ class SimActuator(Actuator, ScientificObject):
                           p_kwargs=p_kwargs)
         self.value = None
         self.status = False
-        self._function = self.setup_function()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -244,19 +245,21 @@ class SimSensor(Sensor, ScientificObject):
                  p_logging=Log.C_LOG_NOTHING,
                  **p_kwargs):
               
-        Sensor.__init__(p_name_short=p_name_short, 
-                          p_base_set=p_base_set, 
-                          p_name_long=p_name_long, 
-                          p_name_latex=p_name_latex, 
-                          p_unit=p_unit,
-                          p_unit_latex=p_unit_latex, 
-                          p_boundaries=p_boundaries, 
-                          p_description=p_description,
-                          p_symmetrical=p_symmetrical,
-                          p_logging=p_logging,
-                          p_kwargs=p_kwargs)
+        Sensor.__init__(self,
+                        p_name_short=p_name_short, 
+                        p_base_set=p_base_set, 
+                        p_name_long=p_name_long, 
+                        p_name_latex=p_name_latex, 
+                        p_unit=p_unit,
+                        p_unit_latex=p_unit_latex, 
+                        p_boundaries=p_boundaries, 
+                        p_description=p_description,
+                        p_symmetrical=p_symmetrical,
+                        p_logging=p_logging,
+                        p_kwargs=p_kwargs)
         self.value = None
         self.status = True
+        self._function = self.setup_function()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -419,7 +422,8 @@ class SimState(Dimension, ScientificObject):
                  p_logging=Log.C_LOG_NOTHING,
                  **p_kwargs):
               
-        Dimension.__init__(p_name_short=p_name_short, 
+        Dimension.__init__(self,
+                           p_name_short=p_name_short, 
                            p_base_set=p_base_set, 
                            p_name_long=p_name_long, 
                            p_name_latex=p_name_latex, 
@@ -506,7 +510,7 @@ class SimState(Dimension, ScientificObject):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Component(EventManager, ScientificObject, Label):
+class Component(Label, EventManager, ScientificObject):
     """
     This class serves as a base class of components in MPPS, which provides the main attributes of a
     component in a simulation mode.
@@ -520,6 +524,8 @@ class Component(EventManager, ScientificObject, Label):
         Unique id. Default: None
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_setup : bool
+        Whether setup component is required. Default: True
     p_kwargs : dict
         Further keyword arguments
         
@@ -540,6 +546,7 @@ class Component(EventManager, ScientificObject, Label):
                  p_name:str,
                  p_id:int=None,
                  p_logging=Log.C_LOG_ALL,
+                 p_setup:bool=True,
                  **p_kwargs):
         
         self._kwargs = p_kwargs.copy()
@@ -549,7 +556,22 @@ class Component(EventManager, ScientificObject, Label):
         
         Label.__init__(self, p_name, p_id)
         EventManager.__init__(self, p_logging=p_logging)
-        self.setup_component()
+        if p_setup:
+            self.setup_component()
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_name_short(self) -> str:
+        """
+        This method provides a functionality to get the unique name of the related component.
+
+        Returns
+        -------
+        str
+            The unique name of the related component.
+
+        """
+        return self._name
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -902,7 +924,12 @@ class Module(Component):
         
         self._components = Set()
         
-        Component.__init__(self, p_name=p_name, p_id=p_id, p_logging=p_logging, p_kwargs=p_kwargs)
+        Component.__init__(self,
+                           p_name=p_name,
+                           p_id=p_id,
+                           p_logging=p_logging,
+                           p_setup=False,
+                           p_kwargs=p_kwargs)
         self.setup_module()
             
 
@@ -932,7 +959,7 @@ class Module(Component):
         p_sensor : Component
             Component object to be added.
         """
-        self._components.add_dim(p_dim=Component)
+        self._components.add_dim(p_dim=p_component)
 
     
 ## -------------------------------------------------------------------------------------------------
@@ -975,7 +1002,7 @@ class Module(Component):
         _sensors = []
 
         for ids in self._components.get_dim_ids():
-            _sensors.append(self.get_component(p_id=ids).get_sensors())
+            _sensors.extend(self.get_component(p_id=ids).get_sensors().get_dims())
             
         return _sensors
 
@@ -1013,7 +1040,7 @@ class Module(Component):
         _actuators = []
 
         for ids in self._components.get_dim_ids():
-            _actuators.append(self.get_component(p_id=ids).get_actuators())
+            _actuators.extend(self.get_component(p_id=ids).get_actuators().get_dims())
             
         return _actuators
 
@@ -1051,7 +1078,7 @@ class Module(Component):
         _states = []
 
         for ids in self._components.get_dim_ids():
-            _states.append(self.get_component(p_id=ids).get_component_states())
+            _states.extend(self.get_component(p_id=ids).get_component_states().get_dims())
             
         return _states
 
@@ -1094,7 +1121,7 @@ class Module(Component):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class SimMPPS(FctSTrans, Label):
+class SimMPPS(FctSTrans, Label, ScientificObject):
     """
     This class serves as a base class of SimMPPS, which provides the main attributes of a
     MPPS in a simulation mode.

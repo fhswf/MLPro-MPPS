@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-29  0.0.0     SY       Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
+## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-12-29)
+Ver. 1.0.1 (2023-01-11)
 
 This module provides a default implementation of a component of the BGLP, which is a Silo.
 A silo is a component to temporary store materials that consists of two sensors.
@@ -264,7 +265,7 @@ class Silo(Component):
         silo_overflow = SiloOverflow(p_name_short='SiloOverflow',
                                      p_base_set=Dimension.C_BASE_SET_R,
                                      p_unit='L',
-                                     p_boundaries=[0,sys.maximize])
+                                     p_boundaries=[0,sys.maxsize])
         
         self.add_sensor(p_sensor=silo_sensor_1)
         self.add_sensor(p_sensor=silo_sensor_2)
