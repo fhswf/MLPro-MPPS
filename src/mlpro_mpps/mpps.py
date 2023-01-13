@@ -8,10 +8,11 @@
 ## -- 2022-12-22  0.0.0     SY/ML    Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Add p_setup on Component Class, debugging, restructuring
+## -- 2023-01-13  1.0.2     SY       Add documentation
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-13)
 
 This module provides a multi-purpose environment for continuous and batch production systems with
 modular setting and high-flexibility.
@@ -70,6 +71,8 @@ class SimActuator(Actuator, ScientificObject):
         List with minimum and maximum value (optional)
     p_description : str
         Description of dimension (optional)
+    p_symmetrical : bool
+        Information about the symmetry of the dimension (optional, default is False)
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL
     p_kwargs : dict
@@ -215,6 +218,8 @@ class SimSensor(Sensor, ScientificObject):
         List with minimum and maximum value (optional)
     p_description : str
         Description of dimension (optional)
+    p_symmetrical : bool
+        Information about the symmetry of the dimension (optional, default is False)
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL
     p_kwargs : dict
@@ -391,6 +396,8 @@ class SimState(Dimension, ScientificObject):
         List with minimum and maximum value (optional)
     p_description : str
         Description of dimension (optional)
+    p_symmetrical : bool
+        Information about the symmetry of the dimension (optional, default is False)
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL
     p_kwargs : dict
