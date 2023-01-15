@@ -8,10 +8,11 @@
 ## -- 2022-12-29  0.0.0     SY       Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
+## -- 2023-01-13  1.0.2     SY       Debugging
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-13)
 
 This module provides a default implementation of a component of the BGLP, which is a Vacuum Pump.
 This vacuum pump is located on Module 2 of the BGLP to transport materials from Hopper A to Silo B.
@@ -81,7 +82,7 @@ class TF_VacuumPump(TransferFunction):
         float
             The transported material.
         """
-        if self.p_input[1]:
+        if p_input[1]:
             if p_range is None:
                 mass_transport = (2*self.coef[1])+self.coef[0]
             else:
@@ -157,7 +158,7 @@ class TF_PowerVacuumPump(TransferFunction):
         float
             The power consumption in kW.
         """
-        if self.p_input[1]:
+        if p_input[1]:
             if p_range is None:
                 power = self.max_power
             else:

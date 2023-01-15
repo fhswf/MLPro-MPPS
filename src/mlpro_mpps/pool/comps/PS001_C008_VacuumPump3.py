@@ -8,10 +8,11 @@
 ## -- 2022-12-30  0.0.0     SY       Creation
 ## -- 2022-12-30  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
+## -- 2023-01-15  1.0.2     SY       Debugging
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-15)
 
 This module provides a default implementation of a component of the BGLP, which is a Vacuum Pump.
 This vacuum pump is located on Module 4 of the BGLP to transport materials from Hopper C to
@@ -71,8 +72,8 @@ class TF_ConstVacuumPump(TransferFunction):
 
         Parameters
         ----------
-        p_input : list
-            [0] = Status of the actuator
+        p_input : boolean
+            Status of the actuator
         p_range : float
             period of measuring the transported material in seconds.
 
@@ -81,7 +82,7 @@ class TF_ConstVacuumPump(TransferFunction):
         float
             The transported material.
         """
-        if self.p_input[0]:
+        if p_input:
             if p_range is None:
                 mass_transport = self.prod_target
             else:

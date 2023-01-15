@@ -6,11 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-01-03  0.0.0     SY       Creation
-## -- 2023-XX-XX  1.0.0     SY       Release of first version
+## -- 2023-01-15  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-XX-XX)
+Ver. 1.0.0 (2023-01-15)
 
 This example shows the implementation of the MPPS-based BGLP as an RL Environment.
 """
@@ -32,16 +32,13 @@ class BGLP4RL(BGLP):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_states(self) -> State:
-        state = State(self._state_space)
-        ids = state.get_dim_ids()
-        
-        for x in range(len(ids)):
-            fill_level = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_value()
-            boundaries = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_boundaries()
-            norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
-            state.set_value(ids[x], norm_fill_level) 
-        return state
+    def __init__(self, p_name:str, p_id:int=None, p_logging=Log.C_LOG_ALL, **p_kwargs):
+        super().__init__(p_name=p_name, p_id=p_id, p_logging=p_logging, p_kwargs=p_kwargs)
+        try:
+            self.parent = p_kwargs['p_parent']
+        except:
+            raise NotImplementedError('Please input the parent class of this class as p_parent')
+            
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -61,7 +58,7 @@ class BGLP4RL(BGLP):
                 acts.set_value(final_action)
         
         # 2. Update values of the sensors and component states
-        self.init_inventory_level = self.get_component_states()[22].get_value()
+        self.parent.init_inventory_level = self.get_component_states()[22].get_value()
         for sig in self._signals:
             if len(sig[1:]) == 1:
                 input = sig[1]()
@@ -69,25 +66,24 @@ class BGLP4RL(BGLP):
                 input = []
                 for x in range(len(sig[1:])):
                     input.append(sig[x+1]())
-            sig[0].simulate(input, p_range=self.t_set)
+            sig[0].simulate(input, p_range=self.parent.t_set)
 
         # 3. Return the resulted states in the form of State object
-        self.set_actions(action)
-        self._state = self.get_states()
-        self._state.set_success(False)
-        self._state.set_broken(False)
+        self.parent._state = self.parent.get_states()
+        self.parent._state.set_success(False)
+        self.parent._state.set_broken(False)
         
-        self.t += self.t_set
-        overlfow = self.get_overflow()
-        power = self.get_power()
-        demand = self.get_demand(self.init_inventory_level)
+        self.parent.t += self.parent.t_set
+        overlfow = sum(self.parent.get_overflow())
+        power = sum(self.parent.get_power())
+        demand = self.parent.get_demand(self.parent.init_inventory_level)
         
-        self.data_storing.memorize("time",str(self.data_frame),self.t)
-        self.data_storing.memorize("overflow",str(self.data_frame), overlfow/self.t_set)
-        self.data_storing.memorize("power",str(self.data_frame), power/self.t_set)
-        self.data_storing.memorize("demand",str(self.data_frame), demand/self.t_set)
+        self.parent.data_storing.memorize("time",str(self.parent.data_frame),self.parent.t)
+        self.parent.data_storing.memorize("overflow",str(self.parent.data_frame), overlfow/self.parent.t_set)
+        self.parent.data_storing.memorize("power",str(self.parent.data_frame), power/self.parent.t_set)
+        self.parent.data_storing.memorize("demand",str(self.parent.data_frame), demand/self.parent.t_set)
         
-        return self._states
+        return self.parent._state
 
 
                      
@@ -119,7 +115,9 @@ class BGLP_RLEnv(Environment):
         
         super().__init__(p_mode = Mode.C_MODE_SIM, 
                          p_latency = None, 
-                         p_fct_strans = BGLP4RL(p_name='BGLP_RL', p_logging=p_logging), 
+                         p_fct_strans = BGLP4RL(p_name='BGLP_RL',
+                                                p_logging=p_logging,
+                                                p_parent=self), 
                          p_fct_reward = None, 
                          p_fct_success = None, 
                          p_fct_broken = None, 
@@ -180,52 +178,6 @@ class BGLP_RLEnv(Environment):
         return state_space, action_space
 
 
-
-## -------------------------------------------------------------------------------------------------
-    def _simulate_reaction(self, p_state: State, p_action: Action) -> State:
-        
-        # 1. Set values to actuators
-        action = []
-        for agent_id in p_action.get_agent_ids():
-            action_elem = p_action.get_elem(agent_id)
-            for action_id in action_elem.get_dim_ids():
-                action.append(action_elem.get_value(action_id))
-                
-        for idx, acts in enumerate(self._fct_strans.get_actuators()-1):
-            if idx != len(self._fct_strans.get_actuators())-1:
-                boundaries = acts.get_boundaries()
-                final_action = action[idx]/(boundaries[1]-boundaries[0])+boundaries[0]
-                acts.set_value(final_action)
-        
-        # 2. Update values of the sensors and component states
-        self.init_inventory_level = self._fct_strans.get_component_states()[22].get_value()
-        for sig in self._signals:
-            if len(sig[1:]) == 1:
-                input = sig[1]()
-            else:
-                input = []
-                for x in range(len(sig[1:])):
-                    input.append(sig[x+1]())
-            sig[0].simulate(input, p_range=self.t_set)
-
-        # 3. Return the resulted states in the form of State object
-        self.set_actions(action)
-        self._state = self.get_states()
-        self._state.set_success(False)
-        self._state.set_broken(False)
-        
-        self.t += self.t_set
-        overlfow = self.get_overflow()
-        power = self.get_power()
-        demand = self.get_demand(self.init_inventory_level)
-        
-        self.data_storing.memorize("time",str(self.data_frame),self.t)
-        self.data_storing.memorize("overflow",str(self.data_frame), overlfow/self.t_set)
-        self.data_storing.memorize("power",str(self.data_frame), power/self.t_set)
-        self.data_storing.memorize("demand",str(self.data_frame), demand/self.t_set)
-        return self._state
-
-
 ## -------------------------------------------------------------------------------------------------
     def get_states(self) -> State:
         state = State(self._state_space)
@@ -248,9 +200,9 @@ class BGLP_RLEnv(Environment):
             boundaries = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_boundaries()
             norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
             if norm_fill_level < self.margin_p[0]:
-                m = (0-self.margin_p[2])/(self.margin_p[0])*(norm_fill_level-self.margin_p[0])*self.t_step
+                m = (0-self.margin_p[2])/(self.margin_p[0])*(norm_fill_level-self.margin_p[0])*self.t_set
             elif norm_fill_level > self.margin_p[1]:
-                m = self.margin_p[2]/(1-self.margin_p[1])*(norm_fill_level-self.margin_p[1])*self.t_step
+                m = self.margin_p[2]/(1-self.margin_p[1])*(norm_fill_level-self.margin_p[1])*self.t_set
             else:
                 m = 0.0
             margin.append(m)
@@ -258,25 +210,27 @@ class BGLP_RLEnv(Environment):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_overflow(self) -> float:
-        total_overflow = 0
+    def get_overflow(self) -> list:
+        total_overflow = []
         
-        for x in range(len(comp_states)):
-            total_overflow += self._fct_strans.get_component_states()[self.set_overflow[x]].get_value()
+        for x in range(len(self.set_fill_levels)):
+            overflow = self._fct_strans.get_component_states()[self.set_overflow[x]].get_value()
+            total_overflow.append(overflow)
         return total_overflow
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_power(self) -> float:
-        total_power = 0
+    def get_power(self) -> list:
+        total_power = []
         
         for x in range(len(self.set_power)):
-            total_power += self._fct_strans.get_component_states()[self.set_power[x]].get_value()
+            power = self._fct_strans.get_component_states()[self.set_power[x]].get_value()
+            total_power.append(power)
         return total_power
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_demand(self, init_volume) -> float:
+    def get_demand(self, init_volume) -> list:
         current_volume = self._fct_strans.get_component_states()[22].get_value()
         delta = current_volume-init_volume
         self.prod_reached += delta
@@ -289,12 +243,12 @@ class BGLP_RLEnv(Environment):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _compute_reward(self, p_state: State = None, p_state_new: State = None) -> Reward:
+    def _compute_reward(self, p_state_old: State = None, p_state_new: State = None) -> Reward:
         reward = Reward(self.reward_type)
 
         if self.reward_type == Reward.C_TYPE_OVERALL:
             r_overall = 0
-            r_overall = r_overall + sum(self.calc_reward()).item()
+            r_overall = r_overall + sum(self.calc_reward())
             reward.set_overall_reward(r_overall)
         
         elif self.reward_type == Reward.C_TYPE_EVERY_AGENT:
@@ -363,23 +317,24 @@ class BGLP_RLEnv(Environment):
 
 ## -------------------------------------------------------------------------------------------------
     def calc_reward(self):
-        
+        reward = []
         margin = self.get_margin()
-        power = self.get_power()/self.t_set
+        power = self.get_power()
         demand = self.get_demand(self.init_inventory_level)/self.t_set
         
         for actnum, pwr in enumerate(self.set_power):
             try:
-                power_max = self.get_component_states[pwr]._function.max_power
+                power_max = self._fct_strans.get_component_states()[pwr]._function.max_power
             except:
-                power_max = self.get_component_states[pwr]._function.power
+                power_max = self._fct_strans.get_component_states()[pwr]._function.power
                 
-            self.reward[actnum] = 1/(1+self.lr_margin*margin[actnum])+1/(1+self.lr_power*power[actnum]/(power_max/1000.0))
+            reward.append(1/(1+self.lr_margin*margin[actnum]))
+            reward[actnum] += 1/(1+self.lr_power*power[actnum]/(power_max/1000.0))
             if actnum == len(self.set_power)-1:
-                self.reward[actnum] += 1/(1-self.lr_demand*demand)
+                reward[actnum] += 1/(1-self.lr_demand*demand)
             else:
-                self.reward[actnum] += 1/(1+self.lr_margin*margin[actnum+1])
-        return self.reward[:]
+                reward[actnum] += 1/(1+self.lr_margin*margin[actnum+1])
+        return reward
 
 
 

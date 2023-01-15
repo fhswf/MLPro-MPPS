@@ -9,10 +9,11 @@
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       - Debugging (sys.maxsize related issue)
 ## --                                - Updating TF_PowerBelt_Cont
+## -- 2023-01-15  1.0.2     SY       Debugging
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-15)
 
 This module provides a default implementation of a component of the BGLP, which is a Vibratory
 Conveyor.
@@ -73,8 +74,8 @@ class TF_TransBelt_Binary(TransferFunction):
 
         Parameters
         ----------
-        p_input : list
-            [0] = Status of the actuator
+        p_input : boolean
+            Status of the actuator
         p_range : float
             period of measuring the transported material in seconds.
 
@@ -83,7 +84,7 @@ class TF_TransBelt_Binary(TransferFunction):
         float
             The transported material.
         """
-        if self.p_input[0]:
+        if p_input:
             if p_range is None:
                 mass_transport = self.coef
             else:
@@ -138,8 +139,8 @@ class TF_PowerBelt_Binary(TransferFunction):
 
         Parameters
         ----------
-        p_input : list
-            [0] = Status of the actuator
+        p_input : boolean
+            Status of the actuator
         p_range : float
             period of measuring the power consumption in seconds.
 
@@ -148,7 +149,7 @@ class TF_PowerBelt_Binary(TransferFunction):
         float
             The power consumption in kW.
         """
-        if self.p_input[0]:
+        if p_input:
             if p_range is None:
                 power  = self.power
             else:
