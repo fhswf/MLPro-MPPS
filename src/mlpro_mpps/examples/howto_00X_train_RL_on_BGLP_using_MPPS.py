@@ -482,4 +482,5 @@ training        = RLTraining(
 )
 
 training.run()
+training._scenario.get_env().data_storing.save_data(training._root_path, 'bglp')
 
