@@ -9,10 +9,11 @@
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -- 2023-01-13  1.0.2     SY       Debugging
+## -- 2023-01-16  1.0.3     SY       Debugging on TF_PowerBelt_Cont
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-01-13)
+Ver. 1.0.3 (2023-01-16)
 
 This module provides a default implementation of a component of the BGLP, which is a Conveyor Belt.
 A conveyor belt is located on Module 1 of the BGLP to transport materials from Silo A to Hopper A.
@@ -156,7 +157,7 @@ class TF_PowerBelt_Cont(TransferFunction):
             The power consumption in kW.
         """
         if p_input[1]:
-            normalized_rpm = (p_input[0]-self.min_power)/(self.max_power-self.min_power)
+            normalized_rpm = (p_input[0]-self.min_rpm)/(self.max_rpm-self.min_rpm)
             if p_range is None:
                 power  = normalized_rpm*(self.max_power-self.min_power)+self.min_power
             else:

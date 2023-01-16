@@ -8,10 +8,11 @@
 ## -- 2022-12-29  0.0.0     SY       Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
+## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-16)
 
 This module provides a default implementation of a component of the BGLP, which is a Mini Hopper.
 A hopper is a component to temporary store materials that consists of a sensor.
@@ -118,6 +119,6 @@ class Hopper(Component):
                                          p_boundaries=[0,sys.maxsize])
         
         self.add_sensor(p_sensor=hopper_sensor)
-        self.add_component_states(p_comp_states=hopper_fill_level)
         self.add_component_states(p_comp_states=hopper_overflow)
+        self.add_component_states(p_comp_states=hopper_fill_level)
     

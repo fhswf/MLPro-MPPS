@@ -1,16 +1,16 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.examples
-## -- Module  : howto_00X_train_RL_on_BGLP_using_MPPS.py
+## -- Module  : howto_00X_run_RL_on_BGLP_using_MPPS.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-01-03  0.0.0     SY       Creation
-## -- 2023-01-15  1.0.0     SY       Release of first version
+## -- 2023-01-16  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-01-15)
+Ver. 1.0.0 (2023-01-16)
 
 This example shows the implementation of the MPPS-based BGLP as an RL Environment.
 """
@@ -54,11 +54,13 @@ class BGLP4RL(BGLP):
         for idx, acts in enumerate(self.get_actuators()):
             if idx != len(self.get_actuators())-1:
                 boundaries = acts.get_boundaries()
-                final_action = action[idx]/(boundaries[1]-boundaries[0])+boundaries[0]
+                final_action = action[idx]*(boundaries[1]-boundaries[0])+boundaries[0]
                 acts.set_value(final_action)
+            else:
+                acts.set_value(True)
         
         # 2. Update values of the sensors and component states
-        self.parent.init_inventory_level = self.get_component_states()[22].get_value()
+        self.parent.init_inventory_level = self.get_component_states()[17].get_value()
         for sig in self._signals:
             if len(sig[1:]) == 1:
                 input = sig[1]()
@@ -78,7 +80,7 @@ class BGLP4RL(BGLP):
         power = sum(self.parent.get_power())
         demand = self.parent.get_demand(self.parent.init_inventory_level)
         
-        self.parent.data_storing.memorize("time",str(self.parent.data_frame),self.parent.t)
+        self.parent.data_storing.memorize("time",str(self.parent.data_frame), self.parent.t)
         self.parent.data_storing.memorize("overflow",str(self.parent.data_frame), overlfow/self.parent.t_set)
         self.parent.data_storing.memorize("power",str(self.parent.data_frame), power/self.parent.t_set)
         self.parent.data_storing.memorize("demand",str(self.parent.data_frame), demand/self.parent.t_set)
@@ -149,8 +151,8 @@ class BGLP_RLEnv(Environment):
         self.data_storing = DataStoring(self.data_lists)
         self.data_frame = None
         
-        self.set_fill_levels = [0,2,6,8,14,16]
-        self.set_overflow = [1,3,7,9,15,17]
+        self.set_overflow = [0,2,6,8,14,16]
+        self.set_fill_levels = [1,3,7,9,15,17]
         self.set_power = [5,11,13,19,21]
         
         self.reset()
@@ -231,7 +233,7 @@ class BGLP_RLEnv(Environment):
 
 ## -------------------------------------------------------------------------------------------------
     def get_demand(self, init_volume) -> list:
-        current_volume = self._fct_strans.get_component_states()[22].get_value()
+        current_volume = self._fct_strans.get_component_states()[17].get_value()
         delta = current_volume-init_volume
         self.prod_reached += delta
         
@@ -298,8 +300,11 @@ class BGLP_RLEnv(Environment):
             sens.deactivate()
             
         for st in range(len(self.set_fill_levels)):
+            buffer = self._fct_strans.get_component_states()[self.set_fill_levels[st]]
+            boundaries = buffer.get_boundaries()
             levels_init = random.uniform(0,1)
-            self._fct_strans.get_component_states()[self.set_fill_levels[st]].set_value(levels_init)
+            fill_level = levels_init*(boundaries[1]-boundaries[0])+boundaries[0]
+            buffer.set_value(fill_level)
         self._fct_strans.get_component_states()[22].set_value(0)
         
         self.t              = 0
