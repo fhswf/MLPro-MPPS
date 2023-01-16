@@ -9,10 +9,11 @@
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Add p_setup on Component Class, debugging, restructuring
 ## -- 2023-01-13  1.0.2     SY       Add documentation
+## -- 2023-01-16  1.0.3     SY       Update due to __call__ of TransferFunction
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-01-13)
+Ver. 1.0.3 (2023-01-16)
 
 This module provides a multi-purpose environment for continuous and batch production systems with
 modular setting and high-flexibility.
@@ -33,7 +34,6 @@ from mlpro.rl.models import *
 from mlpro.bf.various import *
 from mlpro.bf.math import *
 from mlpro.bf.systems import *
-from mlpro_at_basis.bf import *
 import numpy as np
 import random
 import uuid
@@ -361,7 +361,7 @@ class SimSensor(Sensor, ScientificObject):
         bool
             True means successful, otherwise False.
         """
-        output = self._function.call(p_input_signal, p_range)
+        output = self._function(p_input_signal, p_range)
         self.set_value(output)
         return True
 
@@ -507,7 +507,7 @@ class SimState(Dimension, ScientificObject):
         bool
             True means successful, otherwise False.
         """
-        output = self._function.call(p_input_signal, p_range)
+        output = self._function(p_input_signal, p_range)
         self.set_value(output)
         return True
 

@@ -60,7 +60,7 @@ class BGLP4RL(BGLP):
                 acts.set_value(True)
         
         # 2. Update values of the sensors and component states
-        self.parent.init_inventory_level = self.get_component_states()[17].get_value()
+        init_inventory_level = self.get_component_states()[22].get_value()
         for sig in self._signals:
             if len(sig[1:]) == 1:
                 input = sig[1]()
@@ -76,14 +76,16 @@ class BGLP4RL(BGLP):
         self.parent._state.set_broken(False)
         
         self.parent.t += self.parent.t_set
+        current_volume = self.get_component_states()[22].get_value()
         overlfow = sum(self.parent.get_overflow())
         power = sum(self.parent.get_power())
-        demand = self.parent.get_demand(self.parent.init_inventory_level)
+        self.parent.current_demand = self.parent.get_demand(init_inventory_level, current_volume)
+        self.parent.prod_reached += (current_volume-init_inventory_level)
         
         self.parent.data_storing.memorize("time",str(self.parent.data_frame), self.parent.t)
         self.parent.data_storing.memorize("overflow",str(self.parent.data_frame), overlfow/self.parent.t_set)
         self.parent.data_storing.memorize("power",str(self.parent.data_frame), power/self.parent.t_set)
-        self.parent.data_storing.memorize("demand",str(self.parent.data_frame), demand/self.parent.t_set)
+        self.parent.data_storing.memorize("demand",str(self.parent.data_frame), self.parent.current_demand/self.parent.t_set)
         
         return self.parent._state
 
@@ -232,10 +234,8 @@ class BGLP_RLEnv(Environment):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_demand(self, init_volume) -> list:
-        current_volume = self._fct_strans.get_component_states()[17].get_value()
-        delta = current_volume-init_volume
-        self.prod_reached += delta
+    def get_demand(self, init_volume, cur_volume) -> list:
+        delta = cur_volume-init_volume
         
         if (self.demand*self.t_set) > delta:
             total_demand = delta-self.demand*self.t_set
@@ -307,8 +307,8 @@ class BGLP_RLEnv(Environment):
             buffer.set_value(fill_level)
         self._fct_strans.get_component_states()[22].set_value(0)
         
-        self.t              = 0
-        self.prod_reached   = 0
+        self.t = 0
+        self.prod_reached = 0
         self._state = self.get_states()
         self._state.set_success(False)
         self._state.set_broken(False)
@@ -325,7 +325,7 @@ class BGLP_RLEnv(Environment):
         reward = []
         margin = self.get_margin()
         power = self.get_power()
-        demand = self.get_demand(self.init_inventory_level)/self.t_set
+        demand = self.current_demand/self.t_set
         
         for actnum, pwr in enumerate(self.set_power):
             try:
