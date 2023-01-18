@@ -8,10 +8,11 @@
 ## -- 2022-12-30  0.0.0     SY       Creation
 ## -- 2022-12-30  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
+## -- 2023-01-18  1.0.2     SY       Update because TransferFunction is shifted to MLPro.bf.systems
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-18)
 
 This module provides a default implementation of a component of the BGLP, which is a finished goods
 inventory.
@@ -21,7 +22,7 @@ next process or packaged.
 
 
 from mlpro_mpps.mpps import *
-from mlpro_at_basis.bf import *
+from mlpro.bf.systems import TransferFunction
 from mlpro.bf.math import *
 import sys
 

@@ -10,10 +10,12 @@
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -- 2023-01-13  1.0.2     SY       Debugging
 ## -- 2023-01-16  1.0.3     SY       Debugging on TF_PowerBelt_Cont
+## -- 2023-01-18  1.0.3     SY       - Update because TransferFunction is shifted to MLPro.bf.systems
+## --                                - Update transported material function
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-16)
+Ver. 1.0.3 (2023-01-18)
 
 This module provides a default implementation of a component of the BGLP, which is a Conveyor Belt.
 A conveyor belt is located on Module 1 of the BGLP to transport materials from Silo A to Hopper A.
@@ -21,7 +23,7 @@ A conveyor belt is located on Module 1 of the BGLP to transport materials from S
 
 
 from mlpro_mpps.mpps import *
-from mlpro_at_basis.bf import *
+from mlpro.bf.systems import TransferFunction
 from mlpro.bf.math import *
 import sys
 
@@ -75,6 +77,7 @@ class TF_TransBelt_Cont(TransferFunction):
         p_input : list
             [0] = Rotational speed in rpm
             [1] = Status of the actuator
+            [2] = Fill-level of the previous buffer
         p_range : float
             period of measuring the transported material in seconds.
 
@@ -88,7 +91,11 @@ class TF_TransBelt_Cont(TransferFunction):
                 mass_transport = self.coef*p_input[0]
             else:
                 mass_transport = self.coef*p_input[0]*p_range
-            return mass_transport
+            
+            if mass_transport > p_input[2]:
+                return p_input[2]
+            else:
+                return mass_transport
         else:
             return 0
 

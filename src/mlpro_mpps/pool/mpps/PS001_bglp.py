@@ -9,10 +9,11 @@
 ## -- 2022-12-30  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging on setup_mpps, adjusting sensors' indices
 ## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
+## -- 2023-01-18  1.0.3     SY       Adjustment due to updated transported material functions
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-01-16)
+Ver. 1.0.3 (2023-01-18)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS.
 """
@@ -67,17 +68,17 @@ class BGLP(SimMPPS):
         _comp_states = self.get_component_states()
         
         # 3.1. Actuators-related states
-        _signals.append([_comp_states[4], _actuators[0].get_value, _actuators[0].get_status])
+        _signals.append([_comp_states[4], _actuators[0].get_value, _actuators[0].get_status, _comp_states[1].get_value])
         _signals.append([_comp_states[5], _actuators[0].get_value, _actuators[0].get_status])
-        _signals.append([_comp_states[10], _actuators[1].get_value, _actuators[1].get_status])
+        _signals.append([_comp_states[10], _actuators[1].get_value, _actuators[1].get_status, _comp_states[3].get_value])
         _signals.append([_comp_states[11], _actuators[1].get_value, _actuators[1].get_status])
-        _signals.append([_comp_states[12], _actuators[2].get_status])
+        _signals.append([_comp_states[12], _actuators[2].get_status, _comp_states[7].get_value])
         _signals.append([_comp_states[13], _actuators[2].get_status])
-        _signals.append([_comp_states[18], _actuators[3].get_value, _actuators[3].get_status])
+        _signals.append([_comp_states[18], _actuators[3].get_value, _actuators[3].get_status, _comp_states[9].get_value])
         _signals.append([_comp_states[19], _actuators[3].get_value, _actuators[3].get_status])
-        _signals.append([_comp_states[20], _actuators[4].get_value, _actuators[4].get_status])
+        _signals.append([_comp_states[20], _actuators[4].get_value, _actuators[4].get_status, _comp_states[15].get_value])
         _signals.append([_comp_states[21], _actuators[4].get_value, _actuators[4].get_status])
-        _signals.append([_comp_states[23], _actuators[5].get_status])
+        _signals.append([_comp_states[23], _actuators[5].get_status, _comp_states[17].get_value])
         
         # 3.2. Buffers-related states
         _signals.append([_comp_states[0], _comp_states[1].get_value, _comp_states[4].get_value])

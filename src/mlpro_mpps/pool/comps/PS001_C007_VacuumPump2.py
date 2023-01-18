@@ -8,10 +8,11 @@
 ## -- 2022-12-29  0.0.0     SY       Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
+## -- 2023-01-18  1.0.2     SY       Update because TransferFunction is shifted to MLPro.bf.systems
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-01-11)
+Ver. 1.0.2 (2023-01-18)
 
 This module provides a default implementation of a component of the BGLP, which is a Vacuum Pump.
 This vacuum pump is located on Module 3 of the BGLP to transport materials from Hopper B to Silo C.
@@ -19,7 +20,7 @@ This vacuum pump is located on Module 3 of the BGLP to transport materials from 
 
 
 from mlpro_mpps.mpps import *
-from mlpro_at_basis.bf import *
+from mlpro.bf.systems import TransferFunction
 from mlpro.bf.math import *
 from mlpro_mpps.pool.comps.PS001_C006_VacuumPump1 import *
 import sys

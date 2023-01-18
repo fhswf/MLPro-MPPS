@@ -10,10 +10,12 @@
 ## -- 2023-01-11  1.0.1     SY       - Debugging (sys.maxsize related issue)
 ## --                                - Updating TF_PowerBelt_Cont
 ## -- 2023-01-15  1.0.2     SY       Debugging
+## -- 2023-01-18  1.0.3     SY       - Update because TransferFunction is shifted to MLPro.bf.systems
+## --                                - Update transported material function
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-01-15)
+Ver. 1.0.3 (2023-01-18)
 
 This module provides a default implementation of a component of the BGLP, which is a Vibratory
 Conveyor.
@@ -23,7 +25,7 @@ Hopper B.
 
 
 from mlpro_mpps.mpps import *
-from mlpro_at_basis.bf import *
+from mlpro.bf.systems import TransferFunction
 from mlpro.bf.math import *
 import sys
 
@@ -75,7 +77,8 @@ class TF_TransBelt_Binary(TransferFunction):
         Parameters
         ----------
         p_input : boolean
-            Status of the actuator
+            [0] Status of the actuator
+            [1] Fill-level of the previous buffer
         p_range : float
             period of measuring the transported material in seconds.
 
@@ -84,12 +87,16 @@ class TF_TransBelt_Binary(TransferFunction):
         float
             The transported material.
         """
-        if p_input:
+        if p_input[0]:
             if p_range is None:
                 mass_transport = self.coef
             else:
                 mass_transport = self.coef*p_range
-            return mass_transport
+        
+            if mass_transport > p_input[1]:
+                return p_input[1]
+            else:
+                return mass_transport
         else:
             return 0
 
