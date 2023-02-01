@@ -9,10 +9,11 @@
 ## -- 2022-12-29  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -- 2023-01-18  1.0.2     SY       Update because TransferFunction is shifted to MLPro.bf.systems
+## -- 2023-02-01  1.0.3     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-01-18)
+Ver. 1.0.3 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a Rotary Feeder.
 A rotary feeder is located on Module 3 of the BGLP to transport materials from Silo C to Hopper C.
@@ -40,7 +41,7 @@ class RFTransportedMaterial(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_TransBelt_Cont(p_name='TF_TransBelt_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0.05,
@@ -62,7 +63,7 @@ class RFPowerConsumption(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_PowerBelt_Cont(p_name='TF_PowerBelt_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0.05,
@@ -81,7 +82,7 @@ class RotaryFeeder(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A rotary feeder consists of an actuator and two states components.
         """
@@ -98,7 +99,7 @@ class RotaryFeeder(Component):
                                                p_unit='kW',
                                                p_boundaries=[0,sys.maxsize])
         
-        self.add_actuator(p_actuator=motor)
-        self.add_component_states(p_comp_states=transported_material)
-        self.add_component_states(p_comp_states=power_consumption)
+        self._add_actuator(p_actuator=motor)
+        self._add_component_states(p_comp_states=transported_material)
+        self._add_component_states(p_comp_states=power_consumption)
     

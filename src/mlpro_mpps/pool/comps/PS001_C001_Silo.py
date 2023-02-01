@@ -10,10 +10,11 @@
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
 ## -- 2023-01-18  1.0.3     SY       Update because TransferFunction is shifted to MLPro.bf.systems
+## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-18)
+Ver. 1.0.4 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a Silo.
 A silo is a component to temporary store materials that consists of two sensors.
@@ -41,7 +42,7 @@ class SiloSensor1(SimSensor):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_BufferSensor(p_name='TF_SiloSensor1',
                                 p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                 p_dt=0,
@@ -64,7 +65,7 @@ class SiloSensor2(SimSensor):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_BufferSensor(p_name='TF_SiloSensor2',
                                 p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                 p_dt=0,
@@ -80,7 +81,7 @@ class TF_BufferSensor(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.theta = p_args['theta']
@@ -90,7 +91,7 @@ class TF_BufferSensor(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         If the fill-level is above the sensor, then the sensor returns True. Otherwise False.
 
@@ -124,7 +125,7 @@ class SiloFillLevel(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_FillLevel(p_name='TF_FillLevel',
                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                              p_dt=0,
@@ -141,7 +142,7 @@ class TF_FillLevel(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.max_vol = p_args['max_vol']
@@ -152,7 +153,7 @@ class TF_FillLevel(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the current fill-level.
 
@@ -192,7 +193,7 @@ class SiloOverflow(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_Overflow(p_name='TF_Overflow',
                             p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                             p_dt=0,
@@ -208,7 +209,7 @@ class TF_Overflow(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.max_vol = p_args['max_vol']
@@ -218,7 +219,7 @@ class TF_Overflow(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the current overflow level.
 
@@ -250,7 +251,7 @@ class Silo(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A silo consists of two sensors and two states components.
         """
@@ -269,8 +270,8 @@ class Silo(Component):
                                      p_unit='L',
                                      p_boundaries=[0,sys.maxsize])
         
-        self.add_sensor(p_sensor=silo_sensor_1)
-        self.add_sensor(p_sensor=silo_sensor_2)
-        self.add_component_states(p_comp_states=silo_overflow)
-        self.add_component_states(p_comp_states=silo_fill_level)
+        self._add_sensor(p_sensor=silo_sensor_1)
+        self._add_sensor(p_sensor=silo_sensor_2)
+        self._add_component_states(p_comp_states=silo_overflow)
+        self._add_component_states(p_comp_states=silo_fill_level)
     

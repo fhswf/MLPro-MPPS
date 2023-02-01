@@ -11,10 +11,11 @@
 ## -- 2023-01-15  1.0.2     SY       Debugging
 ## -- 2023-01-18  1.0.3     SY       - Update because TransferFunction is shifted to MLPro.bf.systems
 ## --                                - Update transported material function
+## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-18)
+Ver. 1.0.4 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a Vacuum Pump.
 This vacuum pump is located on Module 4 of the BGLP to transport materials from Hopper C to
@@ -42,7 +43,7 @@ class VC3TransportedMaterial(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_ConstVacuumPump(p_name='TF_ConstVacuumPump',
                                    p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                    p_dt=0.05,
@@ -58,7 +59,7 @@ class TF_ConstVacuumPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.prod_target = p_args['prod_target']
@@ -68,7 +69,7 @@ class TF_ConstVacuumPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the transported material.
 
@@ -107,7 +108,7 @@ class VacuumPump3(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A vacuum pump consists of an actuator and two states components.
         """
@@ -120,5 +121,5 @@ class VacuumPump3(Component):
                                                       p_unit='L',
                                                       p_boundaries=[0,sys.maxsize])
         
-        self.add_actuator(p_actuator=switch)
-        self.add_component_states(p_comp_states=transported_material)
+        self._add_actuator(p_actuator=switch)
+        self._add_component_states(p_comp_states=transported_material)

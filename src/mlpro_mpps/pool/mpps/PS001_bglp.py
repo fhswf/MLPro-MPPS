@@ -10,10 +10,11 @@
 ## -- 2023-01-11  1.0.1     SY       Debugging on setup_mpps, adjusting sensors' indices
 ## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
 ## -- 2023-01-18  1.0.3     SY       Adjustment due to updated transported material functions
+## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-18)
+Ver. 1.0.4 (2023-02-01)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS.
 """
@@ -34,7 +35,7 @@ class BGLP(SimMPPS):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_mpps(self):
+    def _setup_mpps(self, p_auto_adjust_names=True):
         
         # 0. Add reference
         self.C_SCIREF_TYPE    = self.C_SCIREF_TYPE_ARTICLE
@@ -53,61 +54,238 @@ class BGLP(SimMPPS):
         weighing = WeighingStation(p_name='WeighingStation')
         filling = FillingStation(p_name='FillingStation')
         
-        self.add_element(p_elem=loading)
-        self.add_element(p_elem=storing)
-        self.add_element(p_elem=weighing)
-        self.add_element(p_elem=filling)
+        self._add_element(p_elem=loading)
+        self._add_element(p_elem=storing)
+        self._add_element(p_elem=weighing)
+        self._add_element(p_elem=filling)
+        
+        # 2. Check duplications of the elements names
+        while not self._elements_names_checker():
+            if p_auto_adjust_names:
+                self._elements_names_auto_adjust()
+            else:
+                raise NameError('There are duplications of the elements names. You can just simply set p_auto_adjust_names to True.')
 
-        # 2. Setup which actions connected to which actuators
-        _actions_in_order = False
+        # 3. Setup which actions connected to which actuators
+        self._actions_in_order = False
 
-        # 3. Setup input signals for updating sensors or component states values
+        # 4. Setup input signals for updating sensors or component states values
         _signals = []
-        _sensors = self.get_sensors()
-        _actuators = self.get_actuators()
-        _comp_states = self.get_component_states()
+        _sens = self.get_sensors()
+        _acts = self.get_actuators()
+        _sts = self.get_component_states()
         
-        # 3.1. Actuators-related states
-        _signals.append([_comp_states[4], _actuators[0].get_value, _actuators[0].get_status, _comp_states[1].get_value])
-        _signals.append([_comp_states[5], _actuators[0].get_value, _actuators[0].get_status])
-        _signals.append([_comp_states[10], _actuators[1].get_value, _actuators[1].get_status, _comp_states[3].get_value])
-        _signals.append([_comp_states[11], _actuators[1].get_value, _actuators[1].get_status])
-        _signals.append([_comp_states[12], _actuators[2].get_status, _comp_states[7].get_value])
-        _signals.append([_comp_states[13], _actuators[2].get_status])
-        _signals.append([_comp_states[18], _actuators[3].get_value, _actuators[3].get_status, _comp_states[9].get_value])
-        _signals.append([_comp_states[19], _actuators[3].get_value, _actuators[3].get_status])
-        _signals.append([_comp_states[20], _actuators[4].get_value, _actuators[4].get_status, _comp_states[15].get_value])
-        _signals.append([_comp_states[21], _actuators[4].get_value, _actuators[4].get_status])
-        _signals.append([_comp_states[23], _actuators[5].get_status, _comp_states[17].get_value])
+        # 4.1. Actuators-related states
+        self._add_signal(
+            _sts['CBTransportedMaterial'],              # p_updated_elem
+            _acts['Motor'].get_value,                   # p_input_fcts[0]
+            _acts['Motor'].get_status,                  # p_input_fcts[1]
+            _sts['SiloLoadingFillLevel'].get_value      # p_input_fcts[2]
+            ) 
         
-        # 3.2. Buffers-related states
-        _signals.append([_comp_states[0], _comp_states[1].get_value, _comp_states[4].get_value])
-        _signals.append([_comp_states[1], _comp_states[1].get_value, _comp_states[4].get_value])
-        _signals.append([_comp_states[2], _comp_states[3].get_value, _comp_states[4].get_value, _comp_states[10].get_value])
-        _signals.append([_comp_states[3], _comp_states[3].get_value, _comp_states[4].get_value, _comp_states[10].get_value])
-        _signals.append([_comp_states[6], _comp_states[7].get_value, _comp_states[10].get_value, _comp_states[12].get_value])
-        _signals.append([_comp_states[7], _comp_states[7].get_value, _comp_states[10].get_value, _comp_states[12].get_value])
-        _signals.append([_comp_states[8], _comp_states[9].get_value, _comp_states[12].get_value, _comp_states[18].get_value])
-        _signals.append([_comp_states[9], _comp_states[9].get_value, _comp_states[12].get_value, _comp_states[18].get_value])
-        _signals.append([_comp_states[14], _comp_states[15].get_value, _comp_states[18].get_value, _comp_states[20].get_value])
-        _signals.append([_comp_states[15], _comp_states[15].get_value, _comp_states[18].get_value, _comp_states[20].get_value])
-        _signals.append([_comp_states[16], _comp_states[17].get_value, _comp_states[20].get_value, _comp_states[23].get_value])
-        _signals.append([_comp_states[17], _comp_states[17].get_value, _comp_states[20].get_value, _comp_states[23].get_value])
-        _signals.append([_comp_states[22], _comp_states[22].get_value, _comp_states[23].get_value])        
+        self._add_signal(
+            _sts['CBTransportedMaterial'],
+            _acts['Motor'].get_value, 
+            _acts['Motor'].get_status, 
+            _sts['SiloLoadingFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['CBPowerConsumption'],
+            _acts['Motor'].get_value, 
+            _acts['Motor'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC1TransportedMaterial'],
+            _acts['Timer'].get_value, 
+            _acts['Timer'].get_status, 
+            _sts['HopperFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VC1PowerConsumption'],
+            _acts['Timer'].get_value, 
+            _acts['Timer'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VCTransportedMaterial'],
+            _acts['Switch'].get_status,
+            _sts['SiloFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VCPowerConsumption'],
+            _acts['Switch'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC2TransportedMaterial'],
+            _acts['Timer_1'].get_value, 
+            _acts['Timer_1'].get_status, 
+            _sts['HopperFillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VC2PowerConsumption'],
+            _acts['Timer_1'].get_value,
+            _acts['Timer_1'].get_status
+            )
+        
+        self._add_signal(
+            _sts['RFTransportedMaterial'],
+            _acts['Motor_1'].get_value, 
+            _acts['Motor_1'].get_status, 
+            _sts['SiloFillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['RFPowerConsumption'],
+            _acts['Motor_1'].get_value, 
+            _acts['Motor_1'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC1TransportedMaterial_1'],
+            _acts['Switch_1'].get_status,
+            _sts['HopperFillLevel_2'].get_value
+            )
+        
+        # 4.2. Buffers-related states
+        self._add_signal(
+            _sts['SiloLoadingOverflow'],
+            _sts['SiloLoadingFillLevel'].get_value, 
+            _sts['CBTransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SiloLoadingFillLevel'],
+            _sts['SiloLoadingFillLevel'].get_value, 
+            _sts['CBTransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['HopperOverflow'], 
+            _sts['HopperFillLevel'].get_value, 
+            _sts['CBTransportedMaterial'].get_value,
+            _sts['VC1TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['HopperFillLevel'],
+            _sts['HopperFillLevel'].get_value,
+            _sts['CBTransportedMaterial'].get_value, 
+            _sts['VC1TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SiloOverflow'], 
+            _sts['SiloFillLevel'].get_value, 
+            _sts['VC1TransportedMaterial'].get_value, 
+            _sts['VCTransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SiloFillLevel'], 
+            _sts['SiloFillLevel'].get_value, 
+            _sts['VC1TransportedMaterial'].get_value, 
+            _sts['VCTransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['HopperOverflow_1'], 
+            _sts['HopperFillLevel_1'].get_value, 
+            _sts['VCTransportedMaterial'].get_value, 
+            _sts['VC2TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['HopperFillLevel_1'], 
+            _sts['HopperFillLevel_1'].get_value, 
+            _sts['VCTransportedMaterial'].get_value, 
+            _sts['VC2TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SiloOverflow_1'], 
+            _sts['SiloFillLevel_1'].get_value, 
+            _sts['VC2TransportedMaterial'].get_value, 
+            _sts['RFTransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SiloFillLevel_1'], 
+            _sts['SiloFillLevel_1'].get_value, 
+            _sts['VC2TransportedMaterial'].get_value, 
+            _sts['RFTransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['HopperOverflow_2'], 
+            _sts['HopperFillLevel_2'].get_value, 
+            _sts['RFTransportedMaterial'].get_value, 
+            _sts['VC1TransportedMaterial_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['HopperFillLevel_2'], 
+            _sts['HopperFillLevel_2'].get_value, 
+            _sts['RFTransportedMaterial'].get_value, 
+            _sts['VC1TransportedMaterial_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['InventoryLevel'], 
+            _sts['InventoryLevel'].get_value, 
+            _sts['VC1TransportedMaterial_1'].get_value
+            )        
                 
-        # 3.2. Buffers-related sensor
-        _signals.append([_sensors[0], _comp_states[1].get_value])
-        _signals.append([_sensors[1], _comp_states[1].get_value])
-        _signals.append([_sensors[2], _comp_states[3].get_value])
-        _signals.append([_sensors[3], _comp_states[7].get_value])
-        _signals.append([_sensors[4], _comp_states[7].get_value])
-        _signals.append([_sensors[5], _comp_states[9].get_value])
-        _signals.append([_sensors[6], _comp_states[15].get_value])
-        _signals.append([_sensors[7], _comp_states[15].get_value])
-        _signals.append([_sensors[8], _comp_states[17].get_value])
-
-        # 4. Return _actions_in_order and _signals
-        return _actions_in_order, _signals
+        # 4.3. Buffers-related sensor
+        self._add_signal(
+            _sens['SiloSensor1'],
+            _sts['SiloLoadingFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['SiloSensor2'], 
+            _sts['SiloLoadingFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['SiloSensor1_1'], 
+            _sts['HopperFillLevel'].get_value
+            )
+   
+        self._add_signal(
+            _sens['SiloSensor1_2'], 
+            _sts['SiloFillLevel'].get_value
+            )
+   
+        self._add_signal(
+            _sens['SiloSensor2_1'], 
+            _sts['SiloFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['SiloSensor1_3'], 
+            _sts['HopperFillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sens['SiloSensor1_4'], 
+            _sts['SiloFillLevel_1'].get_value
+            )
+   
+        self._add_signal(
+            _sens['SiloSensor2_2'], 
+            _sts['SiloFillLevel_1'].get_value
+            )
+   
+        self._add_signal(
+            _sens['SiloSensor1_5'], 
+            _sts['HopperFillLevel_2'].get_value
+            )
 
 
 
@@ -117,7 +295,7 @@ class BGLP(SimMPPS):
         # 1. Set values to actuators
         if self._actions_in_order:
             actions = Action.get_sorted_values()
-            for idx, acts in enumerate(self.get_actuators()):
+            for idx, (_, acts) in enumerate(self.get_actuators().items()):
                 acts.set_value(actions[idx])
         else:
             raise NotImplementedError

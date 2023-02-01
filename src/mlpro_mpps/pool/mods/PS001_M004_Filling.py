@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-30  0.0.0     SY       Creation
 ## -- 2022-12-30  1.0.0     SY       Release of first version
+## -- 2023-02-01  1.0.1     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-12-30)
+Ver. 1.0.1 (2023-02-01)
 
 This module provides a default implementation of a module of the BGLP, which is a Filling station
 """
@@ -29,13 +30,13 @@ class FillingStation(Module):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_module(self):
+    def _setup_module(self):
         """
         Storing station consists of a silo, a hopper, a rotary feeder, and a vacuum pump.
         """
         inv = FinishedGoodsInventory(p_name='Inventory')
         vac = VacuumPump3(p_name='VacD')
         
-        self.add_component(p_component=inv)
-        self.add_component(p_component=vac)
+        self._add_component(p_component=inv)
+        self._add_component(p_component=vac)
     

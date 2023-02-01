@@ -12,10 +12,11 @@
 ## -- 2023-01-16  1.0.3     SY       Debugging on TF_PowerBelt_Cont
 ## -- 2023-01-18  1.0.3     SY       - Update because TransferFunction is shifted to MLPro.bf.systems
 ## --                                - Update transported material function
+## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-18)
+Ver. 1.0.4 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a Conveyor Belt.
 A conveyor belt is located on Module 1 of the BGLP to transport materials from Silo A to Hopper A.
@@ -42,7 +43,7 @@ class CBTransportedMaterial(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_TransBelt_Cont(p_name='TF_TransBelt_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0.05,
@@ -58,7 +59,7 @@ class TF_TransBelt_Cont(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.coef = p_args['coef']
@@ -68,7 +69,7 @@ class TF_TransBelt_Cont(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the transported material.
 
@@ -114,7 +115,7 @@ class CBPowerConsumption(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_PowerBelt_Cont(p_name='TF_PowerBelt_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0.05,
@@ -133,7 +134,7 @@ class TF_PowerBelt_Cont(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.min_power = p_args['min_power']
@@ -146,7 +147,7 @@ class TF_PowerBelt_Cont(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the power consumption.
 
@@ -182,7 +183,7 @@ class ConveyorBelt(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A conveyor belt consists of an actuator and two states components.
         """
@@ -199,7 +200,7 @@ class ConveyorBelt(Component):
                                                p_unit='kW',
                                                p_boundaries=[0,sys.maxsize])
         
-        self.add_actuator(p_actuator=motor)
-        self.add_component_states(p_comp_states=transported_material)
-        self.add_component_states(p_comp_states=power_consumption)
+        self._add_actuator(p_actuator=motor)
+        self._add_component_states(p_comp_states=transported_material)
+        self._add_component_states(p_comp_states=power_consumption)
     

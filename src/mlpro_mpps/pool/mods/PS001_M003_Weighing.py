@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2022-12-29  0.0.0     SY       Creation
 ## -- 2022-12-29  1.0.0     SY       Release of first version
+## -- 2023-02-01  1.0.1     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2022-12-29)
+Ver. 1.0.1 (2023-02-01)
 
 This module provides a default implementation of a module of the BGLP, which is a Weighing station
 """
@@ -31,7 +32,7 @@ class WeighingStation(Module):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_module(self):
+    def _setup_module(self):
         """
         Storing station consists of a silo, a hopper, a rotary feeder, and a vacuum pump.
         """
@@ -40,8 +41,8 @@ class WeighingStation(Module):
         vac = VacuumPump2(p_name='VacC')
         belt = RotaryFeeder(p_name='BeltC')
         
-        self.add_component(p_component=silo)
-        self.add_component(p_component=hopper)
-        self.add_component(p_component=vac)
-        self.add_component(p_component=belt)
+        self._add_component(p_component=silo)
+        self._add_component(p_component=hopper)
+        self._add_component(p_component=vac)
+        self._add_component(p_component=belt)
     

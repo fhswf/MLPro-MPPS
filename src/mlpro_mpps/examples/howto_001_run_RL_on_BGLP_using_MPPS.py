@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-01-03  0.0.0     SY       Creation
 ## -- 2023-01-16  1.0.0     SY       Release of first version
+## -- 2023-02-01  1.0.1     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-01-16)
+Ver. 1.0.1 (2023-02-01)
 
 This example shows the implementation of the MPPS-based BGLP as an RL Environment.
 """
@@ -51,7 +52,7 @@ class BGLP4RL(BGLP):
             for action_id in action_elem.get_dim_ids():
                 action.append(action_elem.get_value(action_id))
                 
-        for idx, acts in enumerate(self.get_actuators()):
+        for idx, (_, acts) in enumerate(self.get_actuators().items()):
             if idx != len(self.get_actuators())-1:
                 boundaries = acts.get_boundaries()
                 final_action = action[idx]*(boundaries[1]-boundaries[0])+boundaries[0]
@@ -60,7 +61,7 @@ class BGLP4RL(BGLP):
                 acts.set_value(True)
         
         # 2. Update values of the sensors and component states
-        init_inventory_level = self.get_component_states()[22].get_value()
+        init_inventory_level = self.get_component_states()['InventoryLevel'].get_value()
         for sig in self._signals:
             if len(sig[1:]) == 1:
                 input = sig[1]()
@@ -76,7 +77,7 @@ class BGLP4RL(BGLP):
         self.parent._state.set_broken(False)
         
         self.parent.t += self.parent.t_set
-        current_volume = self.get_component_states()[22].get_value()
+        current_volume = self.get_component_states()['InventoryLevel'].get_value()
         overlfow = sum(self.parent.get_overflow())
         power = sum(self.parent.get_power())
         self.parent.current_demand = self.parent.get_demand(init_inventory_level, current_volume)
@@ -153,9 +154,23 @@ class BGLP_RLEnv(Environment):
         self.data_storing = DataStoring(self.data_lists)
         self.data_frame = None
         
-        self.set_overflow = [0,2,6,8,14,16]
-        self.set_fill_levels = [1,3,7,9,15,17]
-        self.set_power = [5,11,13,19,21]
+        self.set_overflow = ['SiloLoadingOverflow',
+                             'HopperOverflow',
+                             'SiloOverflow',
+                             'HopperOverflow_1',
+                             'SiloOverflow_1',
+                             'HopperOverflow_2']
+        self.set_fill_levels = ['SiloLoadingFillLevel',
+                                'HopperFillLevel',
+                                'SiloFillLevel',
+                                'HopperFillLevel_1',
+                                'SiloFillLevel_1',
+                                'HopperFillLevel_2']
+        self.set_power = ['CBPowerConsumption',
+                          'VC1PowerConsumption',
+                          'VCPowerConsumption',
+                          'VC2PowerConsumption',
+                          'RFPowerConsumption']
         
         self.reset()
 
@@ -292,12 +307,12 @@ class BGLP_RLEnv(Environment):
 ## -------------------------------------------------------------------------------------------------
     def _reset(self, p_seed=None) -> None:
         random.seed(p_seed)
-        self._fct_strans.get_component_states()[23]._function.prod_target = self.demand
+        self._fct_strans.get_component_states()['VC1TransportedMaterial_1']._function.prod_target = self.demand
         
         for acts in self._fct_strans.get_actuators():
-            acts.deactivate()
+            self._fct_strans.get_actuators()[acts].deactivate()
         for sens in self._fct_strans.get_sensors():
-            sens.deactivate()
+            self._fct_strans.get_sensors()[sens].deactivate()
             
         for st in range(len(self.set_fill_levels)):
             buffer = self._fct_strans.get_component_states()[self.set_fill_levels[st]]
@@ -305,7 +320,7 @@ class BGLP_RLEnv(Environment):
             levels_init = random.uniform(0,1)
             fill_level = levels_init*(boundaries[1]-boundaries[0])+boundaries[0]
             buffer.set_value(fill_level)
-        self._fct_strans.get_component_states()[22].set_value(0)
+        self._fct_strans.get_component_states()['InventoryLevel'].set_value(0)
         
         self.t = 0
         self.prod_reached = 0
