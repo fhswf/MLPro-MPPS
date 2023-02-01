@@ -10,10 +10,11 @@
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
 ## -- 2023-01-18  1.0.3     SY       Update because TransferFunction is shifted to MLPro.bf.systems
+## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-18)
+Ver. 1.0.4 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a Mini Hopper.
 A hopper is a component to temporary store materials that consists of a sensor.
@@ -42,7 +43,7 @@ class HopperSensor(SimSensor):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_BufferSensor(p_name='TF_HopperSensor',
                                 p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                 p_dt=0,
@@ -64,7 +65,7 @@ class HopperFillLevel(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_FillLevel(p_name='TF_FillLevel',
                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                              p_dt=0,
@@ -87,7 +88,7 @@ class HopperOverflow(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_Overflow(p_name='TF_Overflow',
                             p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                             p_dt=0,
@@ -103,7 +104,7 @@ class Hopper(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A silo consists of two sensors and two states components.
         """
@@ -119,7 +120,7 @@ class Hopper(Component):
                                          p_unit='L',
                                          p_boundaries=[0,sys.maxsize])
         
-        self.add_sensor(p_sensor=hopper_sensor)
-        self.add_component_states(p_comp_states=hopper_overflow)
-        self.add_component_states(p_comp_states=hopper_fill_level)
+        self._add_sensor(p_sensor=hopper_sensor)
+        self._add_component_states(p_comp_states=hopper_overflow)
+        self._add_component_states(p_comp_states=hopper_fill_level)
     

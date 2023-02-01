@@ -9,10 +9,11 @@
 ## -- 2022-12-30  1.0.0     SY       Release of first version
 ## -- 2023-01-11  1.0.1     SY       Debugging (sys.maxsize related issue)
 ## -- 2023-01-18  1.0.2     SY       Update because TransferFunction is shifted to MLPro.bf.systems
+## -- 2023-02-01  1.0.3     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-01-18)
+Ver. 1.0.3 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a finished goods
 inventory.
@@ -41,7 +42,7 @@ class InventoryLevel(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_InventoryLevel(p_name='TF_InventoryLevel',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0)
@@ -56,14 +57,14 @@ class TF_InventoryLevel(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             pass          
         return True
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the current level.
 
@@ -89,7 +90,7 @@ class FinishedGoodsInventory(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A silo consists of two sensors and two states components.
         """
@@ -98,5 +99,5 @@ class FinishedGoodsInventory(Component):
                                         p_unit='L',
                                         p_boundaries=[0,sys.maxsize])
         
-        self.add_component_states(p_comp_states=inventory_level)
+        self._add_component_states(p_comp_states=inventory_level)
     

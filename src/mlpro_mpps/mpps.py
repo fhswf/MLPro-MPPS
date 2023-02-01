@@ -10,10 +10,11 @@
 ## -- 2023-01-11  1.0.1     SY       Add p_setup on Component Class, debugging, restructuring
 ## -- 2023-01-13  1.0.2     SY       Add documentation
 ## -- 2023-01-16  1.0.3     SY       Update due to __call__ of TransferFunction
+## -- 2023-02-01  1.1.0     SY       Refactoring and adding functionalities
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-16)
+Ver. 1.1.0 (2023-02-01)
 
 This module provides a multi-purpose environment for continuous and batch production systems with
 modular setting and high-flexibility.
@@ -116,8 +117,8 @@ class SimActuator(Actuator, ScientificObject):
                           p_symmetrical=p_symmetrical,
                           p_logging=p_logging,
                           p_kwargs=p_kwargs)
-        self.value = None
-        self.status = False
+        self._value = None
+        self._status = False
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -136,8 +137,8 @@ class SimActuator(Actuator, ScientificObject):
             if set value is successful, then True. Otherwise False.
         """
         if p_input >= self.get_boundaries()[0] and p_input <= self.get_boundaries()[1]:
-            self.value = p_input
-            self.status = True
+            self._value = p_input
+            self._status = True
             self.log(Log.C_LOG_TYPE_I, 'Actuator ' + self.get_name_short() + ' is updated.')
             return True
         else:
@@ -156,8 +157,8 @@ class SimActuator(Actuator, ScientificObject):
         bool
             if deactivate is successful, then True. Otherwise False.
         """
-        self.value = None
-        self.status = False
+        self._value = None
+        self._status = False
         self.log(Log.C_LOG_TYPE_I, 'Actuator ' + self.get_name_short() + ' is deactivated.')
         return True
   
@@ -172,7 +173,7 @@ class SimActuator(Actuator, ScientificObject):
         bool
             Status is on/off. True means on, false means off.
         """
-        return self.status
+        return self._status
   
     
 ## -------------------------------------------------------------------------------------------------      
@@ -185,7 +186,7 @@ class SimActuator(Actuator, ScientificObject):
         value
             The actual value of the actuator.
         """
-        return self.value
+        return self._value
 
 
 
@@ -262,9 +263,9 @@ class SimSensor(Sensor, ScientificObject):
                         p_symmetrical=p_symmetrical,
                         p_logging=p_logging,
                         p_kwargs=p_kwargs)
-        self.value = None
-        self.status = True
-        self._function = self.setup_function()
+        self._value = None
+        self._status = True
+        self._function = self._setup_function()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -283,8 +284,8 @@ class SimSensor(Sensor, ScientificObject):
             if set value is successful, then True. Otherwise False.
         """
         if p_input >= self.get_boundaries()[0] and p_input <= self.get_boundaries()[1]:
-            self.value = p_input
-            self.status = True
+            self._value = p_input
+            self._status = True
             self.log(Log.C_LOG_TYPE_I, 'Sensor ' + self.get_name_short() + ' is updated.')
             return True
         else:
@@ -303,8 +304,8 @@ class SimSensor(Sensor, ScientificObject):
         bool
             if deactivate is successful, then True. Otherwise False.
         """
-        self.value = None
-        self.status = False
+        self._value = None
+        self._status = False
         self.log(Log.C_LOG_TYPE_I, 'Sensor ' + self.get_name_short() + ' is deactivated.')
         return True
   
@@ -320,7 +321,7 @@ class SimSensor(Sensor, ScientificObject):
             Status is on/off. True means on, false means off.
 
         """
-        return self.status
+        return self._status
   
     
 ## -------------------------------------------------------------------------------------------------      
@@ -333,11 +334,11 @@ class SimSensor(Sensor, ScientificObject):
         value
             The actual value of the state.
         """
-        return self.value
+        return self._value
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         """
         This is a custom method, in which a specific TransferFunction object is incorporated.
         The TransferFunction object describes how the sensor obtain the actual information with
@@ -441,8 +442,8 @@ class SimState(Dimension, ScientificObject):
                            p_symmetrical=p_symmetrical,
                            p_logging=p_logging,
                            p_kwargs=p_kwargs)
-        self.value = None
-        self._function = self.setup_function()
+        self._value = None
+        self._function = self._setup_function()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -461,7 +462,7 @@ class SimState(Dimension, ScientificObject):
             if set value is successful, then True. Otherwise False.
         """
         if p_input >= self.get_boundaries()[0] and p_input <= self.get_boundaries()[1]:
-            self.value = p_input
+            self._value = p_input
             self.log(Log.C_LOG_TYPE_I, 'State ' + self.get_name_short() + ' is updated.')
             return True
         else:
@@ -479,11 +480,11 @@ class SimState(Dimension, ScientificObject):
         value
             The actual value of the state.
         """
-        return self.value
+        return self._value
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         """
         This is a custom method, in which a specific TransferFunction object is incorporated.
         The TransferFunction object describes what is the current state of the component with
@@ -517,7 +518,7 @@ class SimState(Dimension, ScientificObject):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class Component(Label, EventManager, ScientificObject):
+class Component(PersonalisedStamp, EventManager, ScientificObject):
     """
     This class serves as a base class of components in MPPS, which provides the main attributes of a
     component in a simulation mode.
@@ -561,10 +562,10 @@ class Component(Label, EventManager, ScientificObject):
         self._actuators = Set()
         self._states = Set()
         
-        Label.__init__(self, p_name, p_id)
+        PersonalisedStamp.__init__(self, p_name, p_id)
         EventManager.__init__(self, p_logging=p_logging)
         if p_setup:
-            self.setup_component()
+            self._setup_component()
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -579,6 +580,20 @@ class Component(Label, EventManager, ScientificObject):
 
         """
         return self._name
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_base_set(self) -> str:
+        """
+        This is just a dummy function.
+
+        Returns
+        -------
+        str
+            'Z'.
+
+        """
+        return 'Z'
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -601,7 +616,7 @@ class Component(Label, EventManager, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def add_sensor(self, p_sensor:SimSensor):
+    def _add_sensor(self, p_sensor:SimSensor):
         """
         This method provides a functionality to add a sensor to the component.
 
@@ -698,7 +713,7 @@ class Component(Label, EventManager, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def add_actuator(self, p_actuator:SimActuator):
+    def _add_actuator(self, p_actuator:SimActuator):
         """
         This method provides a functionality to add an actuator to the component.
 
@@ -795,7 +810,7 @@ class Component(Label, EventManager, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def add_component_states(self, p_comp_states:SimState):
+    def _add_component_states(self, p_comp_states:SimState):
         """
         This method provides a functionality to add a simulatable state to the component.
 
@@ -875,15 +890,15 @@ class Component(Label, EventManager, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         Custom method to setup a component. An howto and documentation related to setting up
         a component will be available soon.
         """
 
-        # self.add_actuator(...)
-        # self.add_component_states(...)
-        # self.add_sensor(...)
+        # self._add_actuator(...)
+        # self._add_component_states(...)
+        # self._add_sensor(...)
 
         raise NotImplementedError
 
@@ -937,7 +952,7 @@ class Module(Component):
                            p_logging=p_logging,
                            p_setup=False,
                            p_kwargs=p_kwargs)
-        self.setup_module()
+        self._setup_module()
             
 
 ## -------------------------------------------------------------------------------------------------
@@ -957,7 +972,7 @@ class Module(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def add_component(self, p_component:Component):
+    def _add_component(self, p_component:Component):
         """
         This method provides a functionality to add a component to the module.
 
@@ -1112,13 +1127,13 @@ class Module(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_module(self):
+    def _setup_module(self):
         """
         Custom method to setup a module. An howto and documentation related to setting up
         a module will be available soon.
         """
 
-        # self.add_component(...)
+        # self._add_component(...)
 
         raise NotImplementedError
 
@@ -1128,7 +1143,7 @@ class Module(Component):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class SimMPPS(FctSTrans, Label, ScientificObject):
+class SimMPPS(FctSTrans, PersonalisedStamp, ScientificObject):
     """
     This class serves as a base class of SimMPPS, which provides the main attributes of a
     MPPS in a simulation mode.
@@ -1143,6 +1158,8 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
         Unique id. Default: None
     p_logging
         Log level (see constants of class Log). Default: Log.C_LOG_ALL
+    p_auto_adjust_names : bool
+        Auto adjusting duplicated names of the elements. Default: True
     p_kwargs : dict
         Further keyword arguments
         
@@ -1163,19 +1180,21 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
                  p_name:str,
                  p_id:int=None,
                  p_logging=Log.C_LOG_ALL,
+                 p_auto_adjust_names:bool=True,
                  **p_kwargs):
         
         self._elements = Set()
         self._kwargs = p_kwargs.copy()
         self._actions_in_order = False
         
-        Label.__init__(self, p_name, p_id)
+        PersonalisedStamp.__init__(self, p_name, p_id)
         FctSTrans.__init__(self, p_logging)
-        self._actions_in_order, self._signals = self.setup_mpps()
+        self._signals = []
+        self._setup_mpps(p_auto_adjust_names)
 
 
 ## -------------------------------------------------------------------------------------------------
-    def add_element(self, p_elem:Component):
+    def _add_element(self, p_elem:Component):
         """
         This method provides a functionality to add an element to the MPPS.
 
@@ -1186,6 +1205,24 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
             Component object.
         """
         self._elements.add_dim(p_dim=p_elem)
+
+
+## -------------------------------------------------------------------------------------------------
+    def _add_signal(self, p_updated_elem, *p_input_fcts):
+        """
+        This method provides a functionality to add a signal for simulating the MPPS.
+
+        Parameters
+        ----------
+        p_updated_elem :
+            the element (Sensor, Actuator, or States) that is simulated, if the signal is called.
+        p_input_fcts : list
+            required information to simulate the element. 
+        """
+        _sig = []
+        _sig.append(p_updated_elem)
+        _sig.extend(p_input_fcts)
+        self._signals.append(_sig)
 
     
 ## -------------------------------------------------------------------------------------------------
@@ -1215,22 +1252,20 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
 
     
 ## -------------------------------------------------------------------------------------------------
-    def get_sensors(self) -> list:
+    def get_sensors(self) -> dict:
         """
         This method provides a functionality to return the internal sets of sensors.
 
         Returns
         -------
-        _sensors : list
-            List of set of sensors.
+        _sensors : dict
+            Dict of set of sensors, {'short_name': element}.
         """
-        _sensors = []
+        _sensors = {}
 
-        for ids in self._elements.get_dim_ids():
-            if isinstance(self.get_element(p_id=ids), Module):
-                _sensors.extend(self.get_element(p_id=ids).get_sensors())
-            else:
-                _sensors.append(self.get_element(p_id=ids).get_sensors())
+        for ids in self.get_elements().get_dim_ids():
+            for el in self.get_element(p_id=ids).get_sensors():
+                _sensors[el.get_name_short()] = el
             
         return _sensors
 
@@ -1256,22 +1291,20 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_actuators(self) -> list:
+    def get_actuators(self) -> dict:
         """
         This method provides a functionality to return the internal sets of actuators.
 
         Returns
         -------
-        actuators : list
-            List of set of actuators.
+        actuators : dict
+            Dict of set of actuators, {'short_name': element}.
         """
-        _actuators = []
+        _actuators = {}
 
-        for ids in self._elements.get_dim_ids():
-            if isinstance(self.get_element(p_id=ids), Module):
-                _actuators.extend(self.get_element(p_id=ids).get_actuators())
-            else:
-                _actuators.append(self.get_element(p_id=ids).get_actuators())
+        for ids in self.get_elements().get_dim_ids():
+            for el in self.get_element(p_id=ids).get_actuators():
+                _actuators[el.get_name_short()] = el
             
         return _actuators
 
@@ -1298,22 +1331,20 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_component_states(self) -> list:
+    def get_component_states(self) -> dict:
         """
         This method provides a functionality to return the internal sets of simulatable states.
 
         Returns
         -------
-        states : list
-            List of set of simulatable states.
+        states : dict
+            Dict of set of simulatable states, {'short_name': element}.
         """
-        _states = []
+        _states = {}
 
-        for ids in self._elements.get_dim_ids():
-            if isinstance(self.get_element(p_id=ids), Module):
-                _states.extend(self.get_element(p_id=ids).get_component_states())
-            else:
-                _states.append(self.get_element(p_id=ids).get_component_states())
+        for ids in self.get_elements().get_dim_ids():
+            for el in self.get_element(p_id=ids).get_component_states():
+                _states[el.get_name_short()] = el
             
         return _states
 
@@ -1340,34 +1371,105 @@ class SimMPPS(FctSTrans, Label, ScientificObject):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_mpps(self):
+    def _elements_names_checker(self) -> bool:
+        """
+        This method provides a functionality to check whether the names of the elements are unique.
+
+        Returns
+        -------
+        bool
+            True means pass the check (no duplication), otherwise False.
+        """
+        _names = []
+
+        for ids in self.get_elements().get_dim_ids():
+            for el in self.get_element(p_id=ids).get_component_states():
+                if el.get_name_short() in _names:
+                    return False
+                else:
+                    _names.append(el.get_name_short())
+            for el in self.get_element(p_id=ids).get_sensors():
+                if el.get_name_short() in _names:
+                    return False
+                else:
+                    _names.append(el.get_name_short())
+            for el in self.get_element(p_id=ids).get_actuators():
+                if el.get_name_short() in _names:
+                    return False
+                else:
+                    _names.append(el.get_name_short())
+        return True
+
+
+## -------------------------------------------------------------------------------------------------
+    def _elements_names_auto_adjust(self):
+        """
+        This method provides a functionality to auto adjust the same elements names.
+        """
+        _names = []
+
+        for ids in self.get_elements().get_dim_ids():
+            for el in self.get_element(p_id=ids).get_component_states():
+                _names.append(el.get_name_short())
+                _counter = _names.count(el.get_name_short())
+                if _counter > 1:
+                    el._name_short = _names[-1]+'_'+str(_counter-1)
+            for el in self.get_element(p_id=ids).get_sensors():
+                _names.append(el.get_name_short())
+                _counter = _names.count(el.get_name_short())
+                if _counter > 1:
+                    el._name_short = _names[-1]+'_'+str(_counter-1)
+            for el in self.get_element(p_id=ids).get_actuators():
+                _names.append(el.get_name_short())
+                _counter = _names.count(el.get_name_short())
+                if _counter > 1:
+                    el._name_short = _names[-1]+'_'+str(_counter-1)
+
+
+## -------------------------------------------------------------------------------------------------
+    def _setup_mpps(self, p_auto_adjust_names:bool):
         """
         Custom method to setup a mpps. An howto and documentation related to setting up MPPS will be
         available soon.
+        
+        Parameters
+        ----------
+        p_auto_adjust_names : bool
+            Auto adjusting duplicated names of the elements. Default: True
         """
         
         # 1. Add elements
-        # self.add_element(p_elem:Component)
+        # self._add_element(p_elem:Component)
+        
+        # 2. Check duplications of the elements names
+        # while not self._elements_names_checker():
+        #     if p_auto_adjust_names:
+        #         self._elements_names_auto_adjust()
+        #     else:
+        #         raise NameError('There are duplications of the elements names. You can just simply set p_auto_adjust_names to True.')
 
-        # 2. Setup which actions connected to which actuators
+
+        # 3. Setup which actions connected to which actuators
 
         # Option 1: The actions are sorted in the same order as self.get_actuators() 
-        # _actions_in_order = True
+        # self._actions_in_order = True
 
         # Option 2: The actions are not sorted in any orders
-        # _actions_in_order = False
+        # self._actions_in_order = False
 
-        # 3. Setup input signals for updating sensors or component states values
+
+        # 4. Setup input signals for updating sensors or component states values
 
         # _signals = []
-        # _sensors = self.get_sensors()
-        # _actuators = self.get_actuators()
-        # _comp_states = self.get_component_states()
+        # _sens = self.get_sensors()
+        # _acts = self.get_actuators()
+        # _sts = self.get_component_states()
         # _signals.append([sensor/state id, input signal 1, input signal 2, ...., input signal x])
-        # _signals.append([_sensors[0], _comp_states[0].get_value])
-        # _signals.append([_comp_states[0], _actuators[0].get_value, _actuators[1].get_value])
+        # _signals.append([_sens['Sensor1'], _sts['States1'].get_value])
+        # _signals.append([_sts['States1'], _acts['Actuator2'].get_value, _acts['Actuator10'].get_value])
 
-        # 4. Return _actions_in_order and _signals
+
+        # 5. Return _actions_in_order and _signals
         # return _actions_in_order, _signals
 
         raise NotImplementedError

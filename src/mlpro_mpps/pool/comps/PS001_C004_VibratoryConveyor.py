@@ -12,10 +12,11 @@
 ## -- 2023-01-15  1.0.2     SY       Debugging
 ## -- 2023-01-18  1.0.3     SY       - Update because TransferFunction is shifted to MLPro.bf.systems
 ## --                                - Update transported material function
+## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-01-18)
+Ver. 1.0.4 (2023-02-01)
 
 This module provides a default implementation of a component of the BGLP, which is a Vibratory
 Conveyor.
@@ -44,7 +45,7 @@ class VCTransportedMaterial(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_TransBelt_Binary(p_name='TF_TransBelt_Binary',
                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                     p_dt=0.05,
@@ -60,7 +61,7 @@ class TF_TransBelt_Binary(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.coef = p_args['coef']
@@ -70,7 +71,7 @@ class TF_TransBelt_Binary(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the transported material.
 
@@ -115,7 +116,7 @@ class VCPowerConsumption(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_PowerBelt_Binary(p_name='TF_PowerBelt_Binary',
                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                     power = 26.9)
@@ -130,7 +131,7 @@ class TF_PowerBelt_Binary(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.power = p_args['power']
@@ -140,7 +141,7 @@ class TF_PowerBelt_Binary(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the power consumption.
 
@@ -174,7 +175,7 @@ class VibratoryConveyor(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A vibratory conveyor consists of an actuator and two states components.
         """
@@ -191,7 +192,7 @@ class VibratoryConveyor(Component):
                                                p_unit='kW',
                                                p_boundaries=[0,sys.maxsize])
         
-        self.add_actuator(p_actuator=switch)
-        self.add_component_states(p_comp_states=transported_material)
-        self.add_component_states(p_comp_states=power_consumption)
+        self._add_actuator(p_actuator=switch)
+        self._add_component_states(p_comp_states=transported_material)
+        self._add_component_states(p_comp_states=power_consumption)
     
