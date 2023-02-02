@@ -11,10 +11,11 @@
 ## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
 ## -- 2023-01-18  1.0.3     SY       Adjustment due to updated transported material functions
 ## -- 2023-02-01  1.0.4     SY       Refactoring
+## -- 2023-02-02  1.0.5     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.4 (2023-02-01)
+Ver. 1.0.5 (2023-02-02)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS.
 """
@@ -81,13 +82,6 @@ class BGLP(SimMPPS):
             _acts['Motor'].get_value,                   # p_input_fcts[0]
             _acts['Motor'].get_status,                  # p_input_fcts[1]
             _sts['SiloLoadingFillLevel'].get_value      # p_input_fcts[2]
-            ) 
-        
-        self._add_signal(
-            _sts['CBTransportedMaterial'],
-            _acts['Motor'].get_value, 
-            _acts['Motor'].get_status, 
-            _sts['SiloLoadingFillLevel'].get_value
             )
         
         self._add_signal(
