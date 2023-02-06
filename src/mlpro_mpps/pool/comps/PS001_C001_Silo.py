@@ -11,10 +11,11 @@
 ## -- 2023-01-16  1.0.2     SY       Change order between fill-level and overflow as comp. states
 ## -- 2023-01-18  1.0.3     SY       Update because TransferFunction is shifted to MLPro.bf.systems
 ## -- 2023-02-01  1.0.4     SY       Refactoring
+## -- 2023-02-06  1.0.5     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.4 (2023-02-01)
+Ver. 1.0.5 (2023-02-06)
 
 This module provides a default implementation of a component of the BGLP, which is a Silo.
 A silo is a component to temporary store materials that consists of two sensors.
@@ -22,7 +23,7 @@ A silo is a component to temporary store materials that consists of two sensors.
 
 
 from mlpro_mpps.mpps import *
-from mlpro.bf.systems import TransferFunction
+from mlpro.bf.physics import TransferFunction
 from mlpro.bf.math import *
 import sys
 
