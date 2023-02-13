@@ -33,6 +33,9 @@ from mlpro.bf.math import *
 import sys
 
 
+
+
+
 # 1. How to create a Sensor
 
 # 1.1. Define a sensor class
@@ -108,7 +111,10 @@ class TF_MyState(TransferFunction):
     
     # 2.4. Set up the transfer function of what does trigger the change of the state's value and how to calculate the new value.
     def _custom_function(self, p_input, p_range=None):
-        return p_input*self.coef
+        if p_input[0]:
+            return p_input[1]*self.coef
+        else:
+            return 0
     
     
     
@@ -126,7 +132,7 @@ class MyComponent(Component):
                             p_base_set=Dimension.C_BASE_SET_R,
                             p_unit='rpm',
                             p_boundaries=[0,800])
-        switch = SimActuator(p_name_short='Motor',
+        switch = SimActuator(p_name_short='Switch',
                              p_base_set=Dimension.C_BASE_SET_Z,
                              p_unit='',
                              p_boundaries=[0,1])
