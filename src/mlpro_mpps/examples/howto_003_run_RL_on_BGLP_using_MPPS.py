@@ -8,7 +8,7 @@
 ## -- 2023-01-03  0.0.0     SY       Creation
 ## -- 2023-01-16  1.0.0     SY       Release of first version
 ## -- 2023-02-01  1.0.1     SY       Refactoring
-## -- 2023-02-13  1.0.2     SY       Renaming module
+## -- 2023-02-13  1.0.2     SY       Renaming module and refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
@@ -24,6 +24,7 @@ from mlpro.rl.models import *
 from mlpro.rl.pool.policies.randomgenerator import RandomGenerator
 import random
 from pathlib import Path
+
 
 
                      
@@ -370,8 +371,8 @@ class MyBGLP(RLScenario):
 
 ## -------------------------------------------------------------------------------------------------
     def _setup(self, p_mode, p_ada, p_visualize, p_logging):
-        self._env = BGLP_RLEnv(p_logging=True)
-        self._agent = MultiAgent(p_name='Random Policy', p_ada=1, p_logging=False)
+        self._env = BGLP_RLEnv(p_logging=p_logging)
+        self._agent = MultiAgent(p_name='Random Policy', p_ada=1, p_logging=p_logging)
         state_space = self._env.get_state_space()
         action_space = self._env.get_action_space()
         
@@ -473,18 +474,31 @@ class MyBGLP(RLScenario):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-logging         = Log.C_LOG_ALL
-visualize       = False
-dest_path       = str(Path.home())
-cycle_limit     = 20000
-cycle_per_ep    = 100
-eval_freq       = 10
-eval_grp_size   = 5
-adapt_limit     = 0
-stagnant_limit  = 0
-score_ma_hor    = 5
 
-training        = RLTraining(
+if __name__ == "__main__":
+    logging         = Log.C_LOG_ALL
+    visualize       = False
+    dest_path       = str(Path.home())
+    cycle_limit     = 20000
+    cycle_per_ep    = 100
+    eval_freq       = 10
+    eval_grp_size   = 5
+    adapt_limit     = 0
+    stagnant_limit  = 0
+    score_ma_hor    = 5
+else:
+    logging         = Log.C_LOG_NOTHING
+    visualize       = False
+    dest_path       = str(Path.home())
+    cycle_limit     = 10
+    cycle_per_ep    = 10
+    eval_freq       = 10
+    eval_grp_size   = 1
+    adapt_limit     = 0
+    stagnant_limit  = 0
+    score_ma_hor    = 0
+    
+training = RLTraining(
     p_scenario_cls=MyBGLP,
     p_cycle_limit=cycle_limit,
     p_cycles_per_epi_limit=cycle_per_ep,
@@ -499,9 +513,9 @@ training        = RLTraining(
     p_collect_training=True,
     p_visualize=visualize,
     p_path=dest_path,
-    p_logging=logging
-)
+    p_logging=logging)
 
 training.run()
-training._scenario.get_env().data_storing.save_data(training._root_path, 'bglp')
+if __name__ == "__main__":
+    training._scenario.get_env().data_storing.save_data(training._root_path, 'bglp')
 
