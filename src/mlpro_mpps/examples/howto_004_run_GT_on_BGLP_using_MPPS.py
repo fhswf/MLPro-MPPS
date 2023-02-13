@@ -12,7 +12,7 @@
 """
 Ver. 1.0.0 (2023-02-13)
 
-This example shows the implementation of the MPPS-based BGLP as an GT Game Board.
+This example demonstrates the implementation of the MPPS-based BGLP as an GT Game Board.
 """
 
 
