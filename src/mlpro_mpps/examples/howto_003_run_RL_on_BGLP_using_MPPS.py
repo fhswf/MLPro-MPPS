@@ -1,17 +1,18 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.examples
-## -- Module  : howto_00X_run_RL_on_BGLP_using_MPPS.py
+## -- Module  : howto_003_run_RL_on_BGLP_using_MPPS.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-01-03  0.0.0     SY       Creation
 ## -- 2023-01-16  1.0.0     SY       Release of first version
 ## -- 2023-02-01  1.0.1     SY       Refactoring
+## -- 2023-02-13  1.0.2     SY       Renaming module
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-02-01)
+Ver. 1.0.2 (2023-02-13)
 
 This example shows the implementation of the MPPS-based BGLP as an RL Environment.
 """
