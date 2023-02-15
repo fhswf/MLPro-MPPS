@@ -9,19 +9,31 @@
 ## -- 2023-01-16  1.0.0     SY       Release of first version
 ## -- 2023-02-01  1.0.1     SY       Refactoring
 ## -- 2023-02-13  1.0.2     SY       Renaming module and refactoring
+## -- 2023-02-15  1.0.3     SY       Incorporating SB3 algorithm via SB3 Wrapper of MLPro
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2023-02-13)
+Ver. 1.0.3 (2023-02-15)
 
 This example demonstrates the implementation of the MPPS-based BGLP as an RL Environment.
+
+You will learn:
+    
+    1) How to set up a built-in MPPS to a RL environment.
+    
+    2) How to set up RL scenario and training, including agents, policies, etc.
+    
+    3) How to incoporate SB3 algorithm into the RL training
+    
 """
 
 
 from mlpro_mpps.pool.mpps.PS001_bglp import BGLP
 from mlpro.bf.math import *
 from mlpro.rl.models import *
-from mlpro.rl.pool.policies.randomgenerator import RandomGenerator
+from stable_baselines3 import PPO, A2C
+from mlpro.wrappers.sb3 import WrPolicySB32MLPro
+import torch
 import random
 from pathlib import Path
 
@@ -376,16 +388,36 @@ class MyBGLP(RLScenario):
         state_space = self._env.get_state_space()
         action_space = self._env.get_action_space()
         
+        policy_kwargs = dict(activation_fn=torch.nn.ReLU,
+                             net_arch=[dict(pi=[128, 128], vf=[128, 128])])
+        
+        policy_sb3 = PPO(
+            policy="MlpPolicy",
+            n_steps=100,
+            env=None,
+            _init_setup_model=False,
+            policy_kwargs=policy_kwargs,
+            device="cpu",
+            seed=2)
         
         # Agent 1
         _name         = 'BELT_CONVEYOR_A'
         _id           = 0
         _ospace       = state_space.spawn([state_space.get_dim_ids()[0],state_space.get_dim_ids()[1]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[0]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        
+        _policy_wrapped = WrPolicySB32MLPro(
+            p_sb3_policy=policy_sb3,
+            p_cycle_limit=self._cycle_limit,
+            p_observation_space=_ospace,
+            p_action_space=_aspace,
+            p_ada=p_ada,
+            p_visualize=p_visualize,
+            p_logging=p_logging)
+        
         self._agent.add_agent(
             p_agent=Agent(
-                p_policy=_policy,
+                p_policy=_policy_wrapped,
                 p_envmodel=None,
                 p_name=_name,
                 p_id=_id,
@@ -400,10 +432,19 @@ class MyBGLP(RLScenario):
         _id           = 1
         _ospace       = state_space.spawn([state_space.get_dim_ids()[1],state_space.get_dim_ids()[2]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[1]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        
+        _policy_wrapped = WrPolicySB32MLPro(
+            p_sb3_policy=policy_sb3,
+            p_cycle_limit=self._cycle_limit,
+            p_observation_space=_ospace,
+            p_action_space=_aspace,
+            p_ada=p_ada,
+            p_visualize=p_visualize,
+            p_logging=p_logging)
+        
         self._agent.add_agent(
             p_agent=Agent(
-                p_policy=_policy,
+                p_policy=_policy_wrapped,
                 p_envmodel=None,
                 p_name=_name,
                 p_id=_id,
@@ -418,10 +459,19 @@ class MyBGLP(RLScenario):
         _id           = 2
         _ospace       = state_space.spawn([state_space.get_dim_ids()[2],state_space.get_dim_ids()[3]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[2]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        
+        _policy_wrapped = WrPolicySB32MLPro(
+            p_sb3_policy=policy_sb3,
+            p_cycle_limit=self._cycle_limit,
+            p_observation_space=_ospace,
+            p_action_space=_aspace,
+            p_ada=p_ada,
+            p_visualize=p_visualize,
+            p_logging=p_logging)
+        
         self._agent.add_agent(
             p_agent=Agent(
-                p_policy=_policy,
+                p_policy=_policy_wrapped,
                 p_envmodel=None,
                 p_name=_name,
                 p_id=_id,
@@ -436,10 +486,19 @@ class MyBGLP(RLScenario):
         _id           = 3
         _ospace       = state_space.spawn([state_space.get_dim_ids()[3],state_space.get_dim_ids()[4]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[3]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        
+        _policy_wrapped = WrPolicySB32MLPro(
+            p_sb3_policy=policy_sb3,
+            p_cycle_limit=self._cycle_limit,
+            p_observation_space=_ospace,
+            p_action_space=_aspace,
+            p_ada=p_ada,
+            p_visualize=p_visualize,
+            p_logging=p_logging)
+        
         self._agent.add_agent(
             p_agent=Agent(
-                p_policy=_policy,
+                p_policy=_policy_wrapped,
                 p_envmodel=None,
                 p_name=_name,
                 p_id=_id,
@@ -454,10 +513,19 @@ class MyBGLP(RLScenario):
         _id           = 4
         _ospace       = state_space.spawn([state_space.get_dim_ids()[4],state_space.get_dim_ids()[5]])
         _aspace       = action_space.spawn([action_space.get_dim_ids()[4]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
+        
+        _policy_wrapped = WrPolicySB32MLPro(
+            p_sb3_policy=policy_sb3,
+            p_cycle_limit=self._cycle_limit,
+            p_observation_space=_ospace,
+            p_action_space=_aspace,
+            p_ada=p_ada,
+            p_visualize=p_visualize,
+            p_logging=p_logging)
+        
         self._agent.add_agent(
             p_agent=Agent(
-                p_policy=_policy,
+                p_policy=_policy_wrapped,
                 p_envmodel=None,
                 p_name=_name,
                 p_id=_id,
@@ -479,8 +547,8 @@ if __name__ == "__main__":
     logging         = Log.C_LOG_ALL
     visualize       = False
     dest_path       = str(Path.home())
-    cycle_limit     = 20000
-    cycle_per_ep    = 100
+    cycle_limit     = 200000
+    cycle_per_ep    = 1000
     eval_freq       = 10
     eval_grp_size   = 5
     adapt_limit     = 0
