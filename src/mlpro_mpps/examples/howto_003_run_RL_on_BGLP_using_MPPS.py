@@ -33,6 +33,7 @@ from mlpro.bf.math import *
 from mlpro.rl.models import *
 from stable_baselines3 import PPO, A2C
 from mlpro.wrappers.sb3 import WrPolicySB32MLPro
+from copy import deepcopy
 import torch
 import random
 from pathlib import Path
@@ -69,8 +70,7 @@ class BGLP4RL(BGLP):
         for idx, (_, acts) in enumerate(self.get_actuators().items()):
             if idx != len(self.get_actuators())-1:
                 boundaries = acts.get_boundaries()
-                final_action = action[idx]*(boundaries[1]-boundaries[0])+boundaries[0]
-                acts.set_value(final_action)
+                acts.set_value(action[idx])
             else:
                 acts.set_value(True)
         
@@ -111,7 +111,8 @@ class BGLP4RL(BGLP):
 ## -------------------------------------------------------------------------------------------------
 class BGLP_RLEnv(Environment):
 
-    C_TYPE = 'MPPS-based BGLP - RL Environment'
+    C_TYPE = 'Environment'
+    C_NAME = 'MPPS-based BGLP - RL Environment'
     C_CYCLE_LIMIT = 0  # Recommended cycle limit for training episodes
 
 
@@ -202,11 +203,11 @@ class BGLP_RLEnv(Environment):
         state_space.add_dim(Dimension('R-5 LvlSiloC', 'R', 'Res-5 Level of Silo C', '', '', '', [0, 1]))
         state_space.add_dim(Dimension('R-6 LvlHopperC', 'R', 'Res-6 Level of Hopper C', '', '', '', [0, 1]))
         
-        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [450,1850]))
+        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0.567, 4.575]))
         action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0.979, 9.5]))
+        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [450,1450]))
 
         return state_space, action_space
 
@@ -384,14 +385,14 @@ class MyBGLP(RLScenario):
 ## -------------------------------------------------------------------------------------------------
     def _setup(self, p_mode, p_ada, p_visualize, p_logging):
         self._env = BGLP_RLEnv(p_logging=p_logging)
-        self._agent = MultiAgent(p_name='Random Policy', p_ada=1, p_logging=p_logging)
+        self._agent = MultiAgent(p_name='SB3 Policy', p_ada=1, p_logging=p_logging)
         state_space = self._env.get_state_space()
         action_space = self._env.get_action_space()
         
         policy_kwargs = dict(activation_fn=torch.nn.ReLU,
-                             net_arch=[dict(pi=[128, 128], vf=[128, 128])])
+                              net_arch=[dict(pi=[128, 128], vf=[128, 128])])
         
-        policy_sb3 = PPO(
+        policy_sb3 = A2C(
             policy="MlpPolicy",
             n_steps=100,
             env=None,
@@ -407,7 +408,7 @@ class MyBGLP(RLScenario):
         _aspace       = action_space.spawn([action_space.get_dim_ids()[0]])
         
         _policy_wrapped = WrPolicySB32MLPro(
-            p_sb3_policy=policy_sb3,
+            p_sb3_policy=deepcopy(policy_sb3),
             p_cycle_limit=self._cycle_limit,
             p_observation_space=_ospace,
             p_action_space=_aspace,
@@ -434,7 +435,7 @@ class MyBGLP(RLScenario):
         _aspace       = action_space.spawn([action_space.get_dim_ids()[1]])
         
         _policy_wrapped = WrPolicySB32MLPro(
-            p_sb3_policy=policy_sb3,
+            p_sb3_policy=deepcopy(policy_sb3),
             p_cycle_limit=self._cycle_limit,
             p_observation_space=_ospace,
             p_action_space=_aspace,
@@ -461,7 +462,7 @@ class MyBGLP(RLScenario):
         _aspace       = action_space.spawn([action_space.get_dim_ids()[2]])
         
         _policy_wrapped = WrPolicySB32MLPro(
-            p_sb3_policy=policy_sb3,
+            p_sb3_policy=deepcopy(policy_sb3),
             p_cycle_limit=self._cycle_limit,
             p_observation_space=_ospace,
             p_action_space=_aspace,
@@ -488,7 +489,7 @@ class MyBGLP(RLScenario):
         _aspace       = action_space.spawn([action_space.get_dim_ids()[3]])
         
         _policy_wrapped = WrPolicySB32MLPro(
-            p_sb3_policy=policy_sb3,
+            p_sb3_policy=deepcopy(policy_sb3),
             p_cycle_limit=self._cycle_limit,
             p_observation_space=_ospace,
             p_action_space=_aspace,
@@ -515,7 +516,7 @@ class MyBGLP(RLScenario):
         _aspace       = action_space.spawn([action_space.get_dim_ids()[4]])
         
         _policy_wrapped = WrPolicySB32MLPro(
-            p_sb3_policy=policy_sb3,
+            p_sb3_policy=deepcopy(policy_sb3),
             p_cycle_limit=self._cycle_limit,
             p_observation_space=_ospace,
             p_action_space=_aspace,
@@ -549,19 +550,19 @@ if __name__ == "__main__":
     dest_path       = str(Path.home())
     cycle_limit     = 200000
     cycle_per_ep    = 1000
-    eval_freq       = 10
-    eval_grp_size   = 5
+    eval_freq       = 0
+    eval_grp_size   = 0
     adapt_limit     = 0
     stagnant_limit  = 0
-    score_ma_hor    = 5
+    score_ma_hor    = 0
 else:
     logging         = Log.C_LOG_NOTHING
     visualize       = False
     dest_path       = str(Path.home())
     cycle_limit     = 10
     cycle_per_ep    = 10
-    eval_freq       = 10
-    eval_grp_size   = 1
+    eval_freq       = 0
+    eval_grp_size   = 0
     adapt_limit     = 0
     stagnant_limit  = 0
     score_ma_hor    = 0
