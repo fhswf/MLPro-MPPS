@@ -10,10 +10,11 @@
 ## -- 2023-02-01  1.0.1     SY       Refactoring
 ## -- 2023-02-13  1.0.2     SY       Renaming module and refactoring
 ## -- 2023-02-15  1.0.3     SY       Incorporating SB3 algorithm via SB3 Wrapper of MLPro
+## -- 2023-02-17  1.0.4     SY       Optimizing for paper
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.3 (2023-02-15)
+Ver. 1.0.3 (2023-02-17)
 
 This example demonstrates the implementation of the MPPS-based BGLP as an RL Environment.
 
@@ -70,7 +71,8 @@ class BGLP4RL(BGLP):
         for idx, (_, acts) in enumerate(self.get_actuators().items()):
             if idx != len(self.get_actuators())-1:
                 boundaries = acts.get_boundaries()
-                acts.set_value(action[idx])
+                final_action = action[idx]*(boundaries[1]-boundaries[0])+boundaries[0]
+                acts.set_value(final_action)
             else:
                 acts.set_value(True)
         
@@ -203,11 +205,11 @@ class BGLP_RLEnv(Environment):
         state_space.add_dim(Dimension('R-5 LvlSiloC', 'R', 'Res-5 Level of Silo C', '', '', '', [0, 1]))
         state_space.add_dim(Dimension('R-6 LvlHopperC', 'R', 'Res-6 Level of Hopper C', '', '', '', [0, 1]))
         
-        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [450,1850]))
-        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0.567, 4.575]))
-        action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0.979, 9.5]))
-        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [450,1450]))
+        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [0, 1]))
 
         return state_space, action_space
 
