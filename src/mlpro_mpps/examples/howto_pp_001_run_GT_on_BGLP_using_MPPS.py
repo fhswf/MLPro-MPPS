@@ -18,7 +18,7 @@ for paper.
 """
 
 
-from mlpro_mpps.examples.howto_003_run_RL_on_BGLP_using_MPPS import BGLP_RLEnv
+from mlpro_mpps.pool.rl_environment.RL001_bglp import BGLP_RLEnv
 from mlpro.bf.various import *
 from mlpro.bf.math import *
 from mlpro.bf.ml import *
@@ -29,6 +29,7 @@ import torch
 from mlpro.gt.models import *
 import random
 from pathlib import Path
+
 
 
 
@@ -134,8 +135,8 @@ class SbPG_GlobI(Policy):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def _adapt(self, *p_args) -> bool:
-        self.add_buffer(p_args[0])
+    def _adapt(self, **p_args) -> bool:
+        self.add_buffer(p_args['p_sars_elem'])
         
         if not self._buffer.is_full():
             return False
@@ -151,8 +152,8 @@ class SbPG_GlobI(Policy):
 
 ## -------------------------------------------------------------------------------------------------
     def update_maps(self, action, utility, levels):
-        if utility.item() > self.map_utility[levels[1], levels[0]].item():
-            self.update_area(levels, action, utility.item())
+        if utility > self.map_utility[levels[1], levels[0]].item():
+            self.update_area(levels, action, utility)
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -352,21 +353,21 @@ if __name__ == "__main__":
     logging         = Log.C_LOG_ALL
     visualize       = False
     dest_path       = str(Path.home())
-    cycle_limit     = 20000
-    cycle_per_ep    = 100
-    eval_freq       = 10
-    eval_grp_size   = 5
+    cycle_limit     = 200000
+    cycle_per_ep    = 1000
+    eval_freq       = 0
+    eval_grp_size   = 0
     adapt_limit     = 0
     stagnant_limit  = 0
-    score_ma_hor    = 5
+    score_ma_hor    = 0
 else:
     logging         = Log.C_LOG_NOTHING
     visualize       = False
     dest_path       = str(Path.home())
     cycle_limit     = 10
     cycle_per_ep    = 10
-    eval_freq       = 10
-    eval_grp_size   = 1
+    eval_freq       = 0
+    eval_grp_size   = 0
     adapt_limit     = 0
     stagnant_limit  = 0
     score_ma_hor    = 0

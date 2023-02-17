@@ -7,6 +7,7 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-02-13  0.0.0     SY       Creation
 ## -- 2023-02-13  1.0.0     SY       Release of first version
+## -- 2023-02-17  1.0.1     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
@@ -23,7 +24,7 @@ You will learn:
 """
 
 
-from mlpro_mpps.examples.howto_003_run_RL_on_BGLP_using_MPPS import BGLP_RLEnv
+from mlpro_mpps.pool.rl_environment.RL001_bglp import BGLP_RLEnv
 from mlpro.bf.math import *
 from mlpro.gt.models import *
 from mlpro.rl.pool.policies.randomgenerator import RandomGenerator
