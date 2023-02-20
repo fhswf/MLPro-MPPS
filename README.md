@@ -1,4 +1,4 @@
-# MLPro-MPPS - A High-Performance Simulation Framework for Customizable Production Systems in MLPro
+# MLPro-MPPS - A Customizable Multi-Purpose Production Systems in Python
 
 ......
 
