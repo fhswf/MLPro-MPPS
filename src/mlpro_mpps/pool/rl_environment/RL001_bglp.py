@@ -1,31 +1,28 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
-## -- Package : mlpro_mpps.examples
-## -- Module  : howto_00X_run_RL_on_BGLP_using_MPPS.py
+## -- Package : mlpro_mpps.pool.rl_environment
+## -- Module  : RL001_BGLP.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
-## -- 2023-01-03  0.0.0     SY       Creation
-## -- 2023-01-16  1.0.0     SY       Release of first version
-## -- 2023-02-01  1.0.1     SY       Refactoring
+## -- 2023-02-17  0.0.0     SY       Creation
+## -- 2023-02-17  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-02-01)
+Ver. 1.0.5 (2023-02-02)
 
-This example shows the implementation of the MPPS-based BGLP as an RL Environment.
+This module provides a default implementation of the BGLP in MLPro-MPPS as RL Environment.
 """
 
 
 from mlpro_mpps.pool.mpps.PS001_bglp import BGLP
 from mlpro.bf.math import *
 from mlpro.rl.models import *
-from mlpro.rl.pool.policies.randomgenerator import RandomGenerator
-import random
-from pathlib import Path
 
 
                      
+
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
@@ -97,7 +94,8 @@ class BGLP4RL(BGLP):
 ## -------------------------------------------------------------------------------------------------
 class BGLP_RLEnv(Environment):
 
-    C_TYPE = 'MPPS-based BGLP - RL Environment'
+    C_TYPE = 'Environment'
+    C_NAME = 'MPPS-based BGLP - RL Environment'
     C_CYCLE_LIMIT = 0  # Recommended cycle limit for training episodes
 
 
@@ -188,11 +186,11 @@ class BGLP_RLEnv(Environment):
         state_space.add_dim(Dimension('R-5 LvlSiloC', 'R', 'Res-5 Level of Silo C', '', '', '', [0, 1]))
         state_space.add_dim(Dimension('R-6 LvlHopperC', 'R', 'Res-6 Level of Hopper C', '', '', '', [0, 1]))
         
-        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0,1]))
-        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [0,1]))
+        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [0, 1]))
 
         return state_space, action_space
 
@@ -359,148 +357,4 @@ class BGLP_RLEnv(Environment):
 
 
 
-
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
-class MyBGLP(RLScenario):
-
-    C_NAME = 'My_BGLP'
-    
-
-## -------------------------------------------------------------------------------------------------
-    def _setup(self, p_mode, p_ada, p_visualize, p_logging):
-        self._env = BGLP_RLEnv(p_logging=True)
-        self._agent = MultiAgent(p_name='Random Policy', p_ada=1, p_logging=False)
-        state_space = self._env.get_state_space()
-        action_space = self._env.get_action_space()
-        
-        
-        # Agent 1
-        _name         = 'BELT_CONVEYOR_A'
-        _id           = 0
-        _ospace       = state_space.spawn([state_space.get_dim_ids()[0],state_space.get_dim_ids()[1]])
-        _aspace       = action_space.spawn([action_space.get_dim_ids()[0]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
-        self._agent.add_agent(
-            p_agent=Agent(
-                p_policy=_policy,
-                p_envmodel=None,
-                p_name=_name,
-                p_id=_id,
-                p_ada=True,
-                p_logging=True),
-            p_weight=1.0
-            )
-        
-        
-        # Agent 2
-        _name         = 'VACUUM_PUMP_B'
-        _id           = 1
-        _ospace       = state_space.spawn([state_space.get_dim_ids()[1],state_space.get_dim_ids()[2]])
-        _aspace       = action_space.spawn([action_space.get_dim_ids()[1]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
-        self._agent.add_agent(
-            p_agent=Agent(
-                p_policy=_policy,
-                p_envmodel=None,
-                p_name=_name,
-                p_id=_id,
-                p_ada=True,
-                p_logging=True),
-            p_weight=1.0
-            )
-        
-        
-        # Agent 3
-        _name         = 'VIBRATORY_CONVEYOR_B'
-        _id           = 2
-        _ospace       = state_space.spawn([state_space.get_dim_ids()[2],state_space.get_dim_ids()[3]])
-        _aspace       = action_space.spawn([action_space.get_dim_ids()[2]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
-        self._agent.add_agent(
-            p_agent=Agent(
-                p_policy=_policy,
-                p_envmodel=None,
-                p_name=_name,
-                p_id=_id,
-                p_ada=True,
-                p_logging=True),
-            p_weight=1.0
-            )
-        
-        
-        # Agent 4
-        _name         = 'VACUUM_PUMP_C'
-        _id           = 3
-        _ospace       = state_space.spawn([state_space.get_dim_ids()[3],state_space.get_dim_ids()[4]])
-        _aspace       = action_space.spawn([action_space.get_dim_ids()[3]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
-        self._agent.add_agent(
-            p_agent=Agent(
-                p_policy=_policy,
-                p_envmodel=None,
-                p_name=_name,
-                p_id=_id,
-                p_ada=True,
-                p_logging=True),
-            p_weight=1.0
-            )
-        
-        
-        # Agent 5
-        _name         = 'ROTARY_FEEDER_C'
-        _id           = 4
-        _ospace       = state_space.spawn([state_space.get_dim_ids()[4],state_space.get_dim_ids()[5]])
-        _aspace       = action_space.spawn([action_space.get_dim_ids()[4]])
-        _policy       = RandomGenerator(p_observation_space=_ospace, p_action_space=_aspace, p_buffer_size=1, p_ada=1, p_logging=False)
-        self._agent.add_agent(
-            p_agent=Agent(
-                p_policy=_policy,
-                p_envmodel=None,
-                p_name=_name,
-                p_id=_id,
-                p_ada=True,
-                p_logging=True),
-            p_weight=1.0
-            )
-        
-        return self._agent
-
-
-
-
-
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
-logging         = Log.C_LOG_ALL
-visualize       = False
-dest_path       = str(Path.home())
-cycle_limit     = 20000
-cycle_per_ep    = 100
-eval_freq       = 10
-eval_grp_size   = 5
-adapt_limit     = 0
-stagnant_limit  = 0
-score_ma_hor    = 5
-
-training        = RLTraining(
-    p_scenario_cls=MyBGLP,
-    p_cycle_limit=cycle_limit,
-    p_cycles_per_epi_limit=cycle_per_ep,
-    p_eval_frequency=eval_freq,
-    p_eval_grp_size=eval_grp_size,
-    p_adaptation_limit=adapt_limit,
-    p_stagnation_limit=stagnant_limit,
-    p_score_ma_horizon=score_ma_hor,
-    p_collect_states=True,
-    p_collect_actions=True,
-    p_collect_rewards=True,
-    p_collect_training=True,
-    p_visualize=visualize,
-    p_path=dest_path,
-    p_logging=logging
-)
-
-training.run()
-training._scenario.get_env().data_storing.save_data(training._root_path, 'bglp')
 
