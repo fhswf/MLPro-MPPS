@@ -19,7 +19,6 @@ Unit test for all examples available.
 
 import pytest
 import importlib
-import mlpro_mpps
 
 
 howto_list = {
