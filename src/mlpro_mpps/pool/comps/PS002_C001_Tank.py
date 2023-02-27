@@ -277,9 +277,11 @@ class Tank(Component):
         tank_sensor_1 = TankSensor1(p_name_short='TankSensor1',
                                     p_base_set=Dimension.C_BASE_SET_Z,
                                     p_boundaries=[0,1])
+        
         tank_sensor_2 = TankSensor2(p_name_short='TankSensor2',
                                     p_base_set=Dimension.C_BASE_SET_Z,
                                     p_boundaries=[0,1])
+        
         tank_sensor_3 = TankSensor3(p_name_short='TankSensor3',
                                     p_base_set=Dimension.C_BASE_SET_Z,
                                     p_boundaries=[0,1])
@@ -288,6 +290,7 @@ class Tank(Component):
                                         p_base_set=Dimension.C_BASE_SET_R,
                                         p_unit='L',
                                         p_boundaries=[0,250])
+        
         tank_overflow = TankOverflow(p_name_short='TankOverflow',
                                      p_base_set=Dimension.C_BASE_SET_R,
                                      p_unit='L',

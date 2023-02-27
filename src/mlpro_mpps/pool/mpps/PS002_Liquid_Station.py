@@ -51,32 +51,58 @@ class Liquid_Station(SimMPPS):
         _sts = self.get_component_states()
         
         # 3.1. Actuators-related states
-        self._add_signal(
-            _sts['PC1TransportedMaterial'],             # transport matirial pump 1
-            _acts['Timer1'].get_value,                  # timer value pump 1
-            _acts['Timer1'].get_status,                 # status pump 1
-            )
+        # transport pump 1
+        self._add_signal(_sts['PC1TransportedMaterial'],             # transport matirial Pump 1
+                         _acts['Timer1'].get_value,                  # timer value Pump 1
+                         _acts['Timer1'].get_status,                 # status Pump 1
+                         )
         
         # energy pump 1 
-        # timer value pump 1
-        # status pump 1
+        self._add_signal(_sts['PC1PowerConsumption'],                # energy consumption Pump 1
+                         _acts['Timer1'].get_value,                  # timer value Pump 1
+                         _acts['Timer1'].get_status,                 # status Pump 1
+                         )
+        
+        # transport pump 2
+        self._add_signal(_sts['PC2TransportedMaterial'],             # transport matirial pump 2
+                         _acts['Timer2'].get_value,                  # timer value pump 2
+                         _acts['Timer2'].get_status,                 # status pump 2
+                         _sts['TankFillLevel'].get_value,            # fill level tank
+                         )
+        
+        # energy pump 2
+        self._add_signal(_sts['PC2PowerConsumption'],                # energy consumption Pump 2
+                         _acts['Timer2'].get_value,                  # timer value pump 2
+                         _acts['Timer2'].get_status,                 # status pump 2
+                         )
 
-        # same pump 2
-        self._add_signal(
-            _sts['PC1TransportedMaterial'],             # transport matirial pump 1
-            _acts['Timer2'].get_value,                  # timer value pump 1
-            _acts['Timer2'].get_status,                 # status pump 1
-            _sts['TankFillLevel'].get_value,            # fill level tank
-            )
-
-        # same pump 3
+        # transport pump 3
+        self._add_signal(_sts['PC3TransportedMaterial'],             # transport matirial pump 3
+                         _acts['Timer3'].get_value,                  # timer value pump 3
+                         _acts['Timer3'].get_status,                 # status pump 3
+                         _sts['TankFillLevel'].get_value,            # fill level tank
+                         )
+        
+        # energy pump 3
+        self._add_signal(_sts['PC3PowerConsumption'],                # energy consumption Pump 3
+                         _acts['Timer3'].get_value,                  # timer value pump 3
+                         _acts['Timer3'].get_status,                 # status pump 3
+                         )
 
         # tank 
-            # fill level
-            # overflow
+        self._add_signal(_sts['TankFillLevel'].get_value,            # fill level tank
+                         _sts['TankOverflow'].get_value              # overflow tank
+                         )
 
-
-    
+        # 3.2. Buffers-related sensor
+        self._add_signal(_sens['TankSensor1']
+                         )
+        
+        self._add_signal(_sens['TankSensor2']
+                         )
+        
+        self._add_signal(_sens['TankSensor3']
+                         )
 
 
 ## -------------------------------------------------------------------------------------------------

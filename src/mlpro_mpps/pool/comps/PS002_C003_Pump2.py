@@ -189,10 +189,12 @@ class Pump2(Component):
                             p_base_set=Dimension.C_BASE_SET_R,
                             p_unit='s',
                             p_boundaries=[0.567, 4.575])
+        
         transported_liquid = PC2TransportedLiquid(p_name_short='PC2TransportedMaterial',
                                                       p_base_set=Dimension.C_BASE_SET_R,
                                                       p_unit='L',
                                                       p_boundaries=[0,sys.maxsize])
+        
         power_consumption = PC2PowerConsumption(p_name_short='PC2PowerConsumption',
                                                 p_base_set=Dimension.C_BASE_SET_R,
                                                 p_unit='kW',
