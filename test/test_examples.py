@@ -1,6 +1,6 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
-## -- Package : mlpro_mpps
+## -- Package : mlpro-mpps
 ## -- Module  : test_example.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
@@ -25,10 +25,10 @@ howto_list = {
 
 # Basic Functions:
 
-    "ht_001": "mlpro_mpps.examples.howto_001_set_up_components_and_modules_in_MPPS",
-    "ht_002": "mlpro_mpps.examples.howto_002_set_up_MPPS",
-    "ht_003": "mlpro_mpps.examples.howto_003_run_RL_on_BGLP_using_MPPS",
-    "ht_004": "mlpro_mpps.examples.howto_004_run_GT_on_BGLP_using_MPPS",
+    "ht_001": "mlpro-mpps.examples.howto_001_set_up_components_and_modules_in_MPPS",
+    "ht_002": "mlpro-mpps.examples.howto_002_set_up_MPPS",
+    "ht_003": "mlpro-mpps.examples.howto_003_run_RL_on_BGLP_using_MPPS",
+    "ht_004": "mlpro-mpps.examples.howto_004_run_GT_on_BGLP_using_MPPS",
 }
 
 
