@@ -7,10 +7,9 @@ MLPro-MPPS provides functionalities to design and develop customizable multi-pur
 To get started with MLPro-MPPS, you can begin with the following tasks:
 
 ### Installation from PyPI
-............ (Available soon)
-
-### Installation from Anaconda
-............ (Available soon)
+```python
+pip install mlpro-mpps
+```
 
 ### Dependencies
 Please read [requirements.txt](https://github.com/fhswf/MLPro-MPPS/blob/main/requirements.txt)
