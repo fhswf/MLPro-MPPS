@@ -60,7 +60,7 @@ Additionally, the class diagram of the basic function is available in [this dire
 ## Project and Team
 Project MLPro-MPPS was started in 2022 by the [Group for Automation Technology and Learning Systems at the South Westphalia University of Applied Sciences, Germany](https://www.fh-swf.de/de/forschung___transfer_4/labore_3/labs/labor_fuer_automatisierungstechnik__soest_1/standardseite_57.php).
 
-MLPro is currently designed and developed by [Steve Yuwono](https://github.com/steveyuwono), [Marlon Löppenberg](https://github.com/marlonloeppenberg), [Detlef Arend](https://github.com/detlefarend) and further [contributors](https://github.com/fhswf/MLPro/graphs/contributors). 
+MLPro is currently designed and developed by [Steve Yuwono](https://github.com/steveyuwono), [Marlon Löppenberg](https://github.com/marlonloeppenberg) and further [contributors](https://github.com/fhswf/MLPro/graphs/contributors). 
 
 
 ## How to contribute
