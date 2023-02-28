@@ -1,3 +1,8 @@
+[![CI](https://github.com/fhswf/MLPro-MPPS/actions/workflows/ci.yml/badge.svg)](https://github.com/fhswf/MLPro/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/mlpro-mpps.svg)](https://badge.fury.io/py/mlpro)
+[![PyPI Total Downloads](https://static.pepy.tech/personalized-badge/mlpro-mpps?period=total&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Total%20Downloads)](https://pepy.tech/project/mlpro-mpps)
+[![PyPI Last Month Downloads](https://static.pepy.tech/personalized-badge/mlpro-mpps?period=month&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Last%20Month%20Downloads)](https://pepy.tech/project/mlpro-mpps)
+
 # MLPro-MPPS - A Customizable Multi-Purpose Production Systems in Python
 
 <img src="https://github.com/fhswf/MLPro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="25%"/>
@@ -25,10 +30,21 @@ Additionally, the class diagram of the basic function is available in [this dire
 
 
 ## Key Features and Functionalities
-What are the elements?
-How to setup components and MPPS?
-Integrations to MLPro? (MPPS as RL env, GT game board, etc.)
-............
+
+#### a) Providing base classes of components in a clean structure
+- Including base classes for a sensor, an actuator, and a component state (required for simulation)
+
+#### b) Versatile and configurable
+- MPPS is versatile, which means that it has a high degree of flexibility, where the users can set up a production system with as many sensors, actuators, components, and modules as possible
+- Moreover, MPPS is also not restricted to a modular production system, but also applicable in any form of technical systems
+
+#### c) Simplification of measurements and designs of the MPPS-based systems' dynamics
+- When MPPS is simulated, the dynamics of the sensors and component states are affected by the actual status of the actuators. In the simulation mode, their dynamics are measured through a mathematical calculation that is defined by the [TransferFunction class of MLPro](https://github.com/fhswf/MLPro/blob/main/src/mlpro/bf/physics/basics.py)
+- The mathematical calculation can be attached to the lowest level of the components, such as sensors and component states, which make them reusable and reproducible.
+
+#### d) Well-integrated to [MLPro](https://mlpro.readthedocs.io)
+- Possibility to convert MPPS into the reinforcement learning environment in MLPro-RL or game theory game board in MLPro-GT
+- Possibility to reuse functionalities from [MLPro](https://mlpro.readthedocs.io)
 
 ## Development
 - Consequent object-oriented design and programming (OOD/OOP)
