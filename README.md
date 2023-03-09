@@ -1,5 +1,5 @@
-[![CI](https://github.com/fhswf/MLPro-MPPS/actions/workflows/ci.yml/badge.svg)](https://github.com/fhswf/MLPro/actions/workflows/ci.yml)
-[![PyPI version](https://badge.fury.io/py/mlpro-mpps.svg)](https://badge.fury.io/py/mlpro)
+[![CI](https://github.com/fhswf/MLPro-MPPS/actions/workflows/ci.yml/badge.svg)](https://github.com/fhswf/MLPro-MPPS/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/mlpro-mpps.svg)](https://badge.fury.io/py/mlpro-mpps)
 [![PyPI Total Downloads](https://static.pepy.tech/personalized-badge/mlpro-mpps?period=total&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Total%20Downloads)](https://pepy.tech/project/mlpro-mpps)
 [![PyPI Last Month Downloads](https://static.pepy.tech/personalized-badge/mlpro-mpps?period=month&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Last%20Month%20Downloads)](https://pepy.tech/project/mlpro-mpps)
 
