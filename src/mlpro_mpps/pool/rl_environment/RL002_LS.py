@@ -123,8 +123,9 @@ class LS_RLEnv(Environment):
         super().__init__(p_mode = Mode.C_MODE_SIM, 
                          p_latency = None, 
                          p_fct_strans = LS4RL(p_name='BGLP_RL',
-                                                p_logging=p_logging,
-                                                p_parent=self), 
+                                              p_logging=p_logging,
+                                              p_parent=self
+                                              ), 
                          p_fct_reward = None, 
                          p_fct_success = None, 
                          p_fct_broken = None, 
@@ -305,29 +306,34 @@ class LS_RLEnv(Environment):
 
 ## -------------------------------------------------------------------------------------------------
     def _reset(self, p_seed=None) -> None:
+
+        # set seed
         random.seed(p_seed)
-        self._fct_strans.get_component_states()['VC1TransportedMaterial_1']._function.prod_target = self.demand
-        
+
+        # deactivate all actuators
         for acts in self._fct_strans.get_actuators():
             self._fct_strans.get_actuators()[acts].deactivate()
+
+        # deactivate all sensors
         for sens in self._fct_strans.get_sensors():
             self._fct_strans.get_sensors()[sens].deactivate()
             
+        # init tank fill level 
         for st in range(len(self.set_fill_levels)):
-            buffer = self._fct_strans.get_component_states()[self.set_fill_levels[st]]
-            boundaries = buffer.get_boundaries()
-            levels_init = random.uniform(0,1)
-            fill_level = levels_init*(boundaries[1]-boundaries[0])+boundaries[0]
-            buffer.set_value(fill_level)
-        self._fct_strans.get_component_states()['InventoryLevel'].set_value(0)
+            buffer = self._fct_strans.get_component_states()[self.set_fill_levels[st]]          # get tank 
+            boundaries = buffer.get_boundaries()                                                # get boundaries
+            levels_init = random.uniform(0,1)                                                   # init uniform distribution
+            fill_level = levels_init*(boundaries[1]-boundaries[0])+boundaries[0]                # compute fill level
+            buffer.set_value(fill_level)                                                        # set fill level
         
-        self.t = 0
-        self.prod_reached = 0
-        self._state = self.get_states()
-        self._state.set_success(False)
-        self._state.set_broken(False)
         
-        if self.data_frame == None:
+        self.t = 0                              # reset time set
+        self._state = self.get_states()         # set state
+        self._state.set_success(False)          # set success
+        self._state.set_broken(False)           # set broken
+        
+        # counte frame
+        if self.data_frame == None:         
             self.data_frame = 0
         else:
             self.data_frame += 1
