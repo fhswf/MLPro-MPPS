@@ -12,10 +12,11 @@
 ## -- 2023-01-18  1.0.3     SY       Adjustment due to updated transported material functions
 ## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -- 2023-02-02  1.0.5     SY       Refactoring
+## -- 2023-02-27  1.0.6     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.5 (2023-02-02)
+Ver. 1.0.6 (2023-02-27)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS.
 """
@@ -71,7 +72,6 @@ class BGLP(SimMPPS):
         self._actions_in_order = False
 
         # 4. Setup input signals for updating sensors or component states values
-        _signals = []
         _sens = self.get_sensors()
         _acts = self.get_actuators()
         _sts = self.get_component_states()
