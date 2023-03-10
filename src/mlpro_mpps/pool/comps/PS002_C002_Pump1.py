@@ -36,7 +36,7 @@ class PC1TransportedLiquid(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_Pump(p_name='TF_Pump',
                               p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                               p_dt=0.05,
@@ -52,7 +52,7 @@ class TF_Pump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.coef = p_args['coef']
@@ -106,7 +106,7 @@ class PC1PowerConsumption(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_PowerPump(p_name='TF_PowerPump',
                                    p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                    p_dt=0.05,
@@ -125,7 +125,7 @@ class TF_PowerPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.min_power = p_args['min_power']
@@ -176,7 +176,7 @@ class Pump1(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A pump consists of an actuator and two states components.
         """
@@ -195,7 +195,7 @@ class Pump1(Component):
                                                 p_unit='kW',
                                                 p_boundaries=[0,sys.maxsize])
         
-        self.add_actuator(p_actuator=timer)
-        self.add_component_states(p_comp_states=transported_liquid)
-        self.add_component_states(p_comp_states=power_consumption)
+        self._add_actuator(p_actuator=timer)
+        self._add_component_states(p_comp_states=transported_liquid)
+        self._add_component_states(p_comp_states=power_consumption)
     

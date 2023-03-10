@@ -36,7 +36,7 @@ class PC3TransportedLiquid(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_Pump(p_name='TF_Pump',
                               p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                               p_dt=0.05,
@@ -111,7 +111,7 @@ class PC3PowerConsumption(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_PowerPump(p_name='TF_PowerPump',
                                    p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                    p_dt=0.05,
@@ -181,7 +181,7 @@ class Pump3(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A pump consists of an actuator and two states components.
         """
@@ -200,7 +200,7 @@ class Pump3(Component):
                                                 p_unit='kW',
                                                 p_boundaries=[0,sys.maxsize])
         
-        self.add_actuator(p_actuator=timer)
-        self.add_component_states(p_comp_states=transported_liquid)
-        self.add_component_states(p_comp_states=power_consumption)
+        self._add_actuator(p_actuator=timer)
+        self._add_component_states(p_comp_states=transported_liquid)
+        self._add_component_states(p_comp_states=power_consumption)
     

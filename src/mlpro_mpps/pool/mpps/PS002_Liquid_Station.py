@@ -27,12 +27,12 @@ class Liquid_Station(SimMPPS):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_mpps(self, p_auto_adjust_names=True):
+    def _setup_mpps(self, p_auto_adjust_names=True):
         
         # 0. Add elements
         station = Station(p_name='LiquidStation')
         
-        self.add_element(p_elem=station)
+        self._add_element(p_elem=station)
 
 
        # 1. Check duplications of the elements names

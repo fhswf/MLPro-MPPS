@@ -30,7 +30,12 @@ class LS4RL(Liquid_Station):
 
 ## -------------------------------------------------------------------------------------------------
     def __init__(self, p_name:str, p_id:int=None, p_logging=Log.C_LOG_ALL, **p_kwargs):
-        super().__init__(p_name=p_name, p_id=p_id, p_logging=p_logging, p_kwargs=p_kwargs)
+        super().__init__(p_name=p_name, 
+                         p_id=p_id, 
+                         p_logging=p_logging, 
+                         p_kwargs=p_kwargs
+                         )
+        
         try:
             self.parent = p_kwargs['p_parent']
         except:
@@ -151,23 +156,25 @@ class LS_RLEnv(Environment):
         self.data_storing = DataStoring(self.data_lists)
         self.data_frame = None
         
-        self.set_overflow = ['SiloLoadingOverflow',
-                             'HopperOverflow',
-                             'SiloOverflow',
-                             'HopperOverflow_1',
-                             'SiloOverflow_1',
-                             'HopperOverflow_2']
-        self.set_fill_levels = ['SiloLoadingFillLevel',
-                                'HopperFillLevel',
-                                'SiloFillLevel',
-                                'HopperFillLevel_1',
-                                'SiloFillLevel_1',
-                                'HopperFillLevel_2']
-        self.set_power = ['CBPowerConsumption',
-                          'VC1PowerConsumption',
-                          'VCPowerConsumption',
-                          'VC2PowerConsumption',
-                          'RFPowerConsumption']
+        # tank overflow 
+        self.set_overflow = ['TankOverflow',
+                             ]
+        
+        # tank level
+        self.set_fill_levels = ['TankFillLevel',
+                                ]
+        
+        # pump liquid transport
+        self.set_transport_liquid = ['PC1TransportedMaterial',
+                                     'PC2TransportedMaterial',
+                                     'PC3TransportedMaterial'
+                                     ]
+        
+        # pump energy consumption
+        self.set_power = ['PC1PowerConsumption',
+                          'PC2PowerConsumption',
+                          'PC3PowerConsumption',
+                          ]
         
         self.reset()
 
@@ -178,18 +185,13 @@ class LS_RLEnv(Environment):
         state_space = ESpace()
         action_space = ESpace()
 
-        state_space.add_dim(Dimension('R-1 LvlSiloA', 'R', 'Res-1 Level of Silo A', '', '', '', [0, 1]))
-        state_space.add_dim(Dimension('R-2 LvlHopperA', 'R', 'Res-2 Level of Hopper A', '', '', '', [0, 1]))
-        state_space.add_dim(Dimension('R-3 LvlSiloB', 'R', 'Res-3 Level of Silo B', '', '', '', [0, 1]))
-        state_space.add_dim(Dimension('R-4 LvlHopperB', 'R', 'Res-4 Level of Hopper B', '', '', '', [0, 1]))
-        state_space.add_dim(Dimension('R-5 LvlSiloC', 'R', 'Res-5 Level of Silo C', '', '', '', [0, 1]))
-        state_space.add_dim(Dimension('R-6 LvlHopperC', 'R', 'Res-6 Level of Hopper C', '', '', '', [0, 1]))
+        # define state space
+        state_space.add_dim(Dimension('R-1 LvlTank', 'R', 'Res-1 Level of Tank', '', '', '', [0, 250]))
         
+        # define action space
         action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0, 1]))
         action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0, 1]))
         action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0, 1]))
-        action_space.add_dim(Dimension('A-4 Act', 'R', 'Act-4 Vacuum Pump C', '', '', '', [0, 1]))
-        action_space.add_dim(Dimension('A-5 Act', 'R', 'Act-5 Rotary Feeder C', '', '', '', [0, 1]))
 
         return state_space, action_space
 

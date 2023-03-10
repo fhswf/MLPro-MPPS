@@ -30,7 +30,7 @@ class Station(Module):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_module(self):
+    def _setup_module(self):
         """
         The station consists of a tank, one inflow pump, two outflow pumps.
         """
@@ -39,8 +39,8 @@ class Station(Module):
         pump_out_2 = Pump2(p_name='Pump_out_2')
         pump_out_3 = Pump3(p_name='Pump_out_3')
         
-        self.add_component(p_component=tank)
-        self.add_component(p_component=pump_in_1)
-        self.add_component(p_component=pump_out_2)
-        self.add_component(p_component=pump_out_3)
+        self._add_component(p_component=tank)
+        self._add_component(p_component=pump_in_1)
+        self._add_component(p_component=pump_out_2)
+        self._add_component(p_component=pump_out_3)
     

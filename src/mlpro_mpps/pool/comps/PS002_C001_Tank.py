@@ -37,7 +37,7 @@ class TankSensor1(SimSensor):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_BufferSensor(p_name='TF_TankSensor1',
                                 p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                 p_dt=0,
@@ -60,7 +60,7 @@ class TankSensor2(SimSensor):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_BufferSensor(p_name='TF_TankSensor3',
                                 p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                 p_dt=0,
@@ -83,7 +83,7 @@ class TankSensor3(SimSensor):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_BufferSensor(p_name='TF_TankSensor3',
                                 p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                 p_dt=0,
@@ -143,7 +143,7 @@ class TankFillLevel(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_FillLevel(p_name='TF_FillLevel',
                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                              p_dt=0,
@@ -160,7 +160,7 @@ class TF_FillLevel(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.max_vol = p_args['max_vol']
@@ -212,7 +212,7 @@ class TankOverflow(SimState):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def setup_function(self) -> TransferFunction:
+    def _setup_function(self) -> TransferFunction:
         _func = TF_Overflow(p_name='TF_Overflow',
                             p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                             p_dt=0,
@@ -270,7 +270,7 @@ class Tank(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def setup_component(self):
+    def _setup_component(self):
         """
         A Tank consists of three sensors and two states components.
         """
@@ -296,10 +296,10 @@ class Tank(Component):
                                      p_unit='L',
                                      p_boundaries=[0,sys.maxsize])
         
-        self.add_sensor(p_sensor=tank_sensor_1)
-        self.add_sensor(p_sensor=tank_sensor_2)
-        self.add_sensor(p_sensor=tank_sensor_3)
+        self._add_sensor(p_sensor=tank_sensor_1)
+        self._add_sensor(p_sensor=tank_sensor_2)
+        self._add_sensor(p_sensor=tank_sensor_3)
 
-        self.add_component_states(p_comp_states=tank_overflow)
-        self.add_component_states(p_comp_states=tank_fill_level)
+        self._add_component_states(p_comp_states=tank_overflow)
+        self._add_component_states(p_comp_states=tank_fill_level)
     
