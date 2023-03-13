@@ -99,7 +99,7 @@ class TF_BufferSensor(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.theta = p_args['theta']
@@ -109,7 +109,7 @@ class TF_BufferSensor(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         If the fill-level is above the sensor, then the sensor returns True. Otherwise False.
 
@@ -171,7 +171,7 @@ class TF_FillLevel(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the current fill-level.
 
@@ -179,20 +179,24 @@ class TF_FillLevel(TransferFunction):
         ----------
         p_input : list
             [0] = Actual fill-level
-            [1] = Volume in
-            [2] = Volume out
+            [1] = Volume in by pump 1
+            [2] = Volume out by pump 2
+            [3] = Volume out by pump 3
 
         Returns
         -------
         float
             Actual fill-level.
         """
-        output = p_input[0]+p_input[1]-p_input[2]
+        output = p_input[0] + p_input[1] - p_input[2] - p_input[3]
         
+        # max value - full
         if output >= self.max_vol:
             return self.max_vol
+        # min value - empty
         elif output <= self.min_vol:
             return self.min_vol
+        # current fill value
         else:
             return output
 
@@ -228,7 +232,7 @@ class TF_Overflow(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.max_vol = p_args['max_vol']
@@ -238,7 +242,7 @@ class TF_Overflow(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the current overflow level.
 
@@ -246,18 +250,21 @@ class TF_Overflow(TransferFunction):
         ----------
         p_input : list
             [0] = Actual fill-level
-            [1] = Volume in
-            [2] = Volume out
+            [1] = Volume in by pump 1
+            [2] = Volume out by pump 2
+            [3] = Volume out by pump 3
 
         Returns
         -------
         float
-            Actual fill-level.
+            Actual overflow.
         """
-        cur_level = p_input[0]+p_input[1]-p_input[2]
+        cur_level = p_input[0] + p_input[1] - p_input[2] - p_input[3]
         
+        # overflow
         if cur_level > self.max_vol:
-            return cur_level-self.max_vol
+            return cur_level - self.max_vol
+        # no overflow
         else:
             return 0
 

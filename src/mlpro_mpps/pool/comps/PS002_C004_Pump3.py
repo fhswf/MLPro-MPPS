@@ -52,7 +52,7 @@ class TF_Pump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.coef = p_args['coef']
@@ -62,7 +62,7 @@ class TF_Pump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the transported material.
 
@@ -130,7 +130,7 @@ class TF_PowerPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def set_function_parameters(self, p_args) -> bool:
+    def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
             try:
                 self.min_power = p_args['min_power']
@@ -143,7 +143,7 @@ class TF_PowerPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the power consumption.
 

@@ -38,9 +38,10 @@ class PC1TransportedLiquid(SimState):
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
         _func = TF_Pump(p_name='TF_Pump',
-                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                              p_dt=0.05,
-                              coef=[0.464, 0.0332])
+                        p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                        p_dt=0.05,
+                        coef=[0.464, 0.0332]
+                        )
         return _func
 
 
@@ -62,7 +63,7 @@ class TF_Pump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the transported material.
 
@@ -138,7 +139,7 @@ class TF_PowerPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
-    def custom_function(self, p_input, p_range=None):
+    def _custom_function(self, p_input, p_range=None):
         """
         To measure the power consumption.
 
@@ -186,14 +187,16 @@ class Pump1(Component):
                             p_boundaries=[0.567, 4.575])
         
         transported_liquid = PC1TransportedLiquid(p_name_short='PC1TransportedMaterial',
-                                                      p_base_set=Dimension.C_BASE_SET_R,
-                                                      p_unit='L',
-                                                      p_boundaries=[0,sys.maxsize])
+                                                  p_base_set=Dimension.C_BASE_SET_R,
+                                                  p_unit='L',
+                                                  p_boundaries=[0,sys.maxsize]
+                                                  )
         
         power_consumption = PC1PowerConsumption(p_name_short='PC1PowerConsumption',
                                                 p_base_set=Dimension.C_BASE_SET_R,
                                                 p_unit='kW',
-                                                p_boundaries=[0,sys.maxsize])
+                                                p_boundaries=[0,sys.maxsize]
+                                                )
         
         self._add_actuator(p_actuator=timer)
         self._add_component_states(p_comp_states=transported_liquid)

@@ -52,56 +52,72 @@ class Liquid_Station(SimMPPS):
         
         # 3.1. Actuators-related states
         # transport pump 1
-        self._add_signal(_sts['PC1TransportedMaterial'],             # transport matirial Pump 1
-                         _acts['Timer1'].get_value,                  # timer value Pump 1
-                         _acts['Timer1'].get_status,                 # status Pump 1
+        self._add_signal(_sts['PC1TransportedMaterial'],             # calculate transport matirial Pump 1
+                         _acts['Timer1'].get_value,                  # get timer value Pump 1
+                         _acts['Timer1'].get_status,                 # get status Pump 1
                          )
         
         # energy pump 1 
-        self._add_signal(_sts['PC1PowerConsumption'],                # energy consumption Pump 1
-                         _acts['Timer1'].get_value,                  # timer value Pump 1
-                         _acts['Timer1'].get_status,                 # status Pump 1
+        self._add_signal(_sts['PC1PowerConsumption'],                # calculate energy consumption Pump 1
+                         _acts['Timer1'].get_value,                  # get timer value Pump 1
+                         _acts['Timer1'].get_status,                 # get status Pump 1
                          )
         
         # transport pump 2
-        self._add_signal(_sts['PC2TransportedMaterial'],             # transport matirial pump 2
-                         _acts['Timer2'].get_value,                  # timer value pump 2
-                         _acts['Timer2'].get_status,                 # status pump 2
-                         _sts['TankFillLevel'].get_value,            # fill level tank
+        self._add_signal(_sts['PC2TransportedMaterial'],             # calculate transport matirial pump 2
+                         _acts['Timer2'].get_value,                  # get timer value pump 2
+                         _acts['Timer2'].get_status,                 # get status pump 2
+                         _sts['TankFillLevel'].get_value,            # get fill level tank
                          )
         
         # energy pump 2
-        self._add_signal(_sts['PC2PowerConsumption'],                # energy consumption Pump 2
-                         _acts['Timer2'].get_value,                  # timer value pump 2
-                         _acts['Timer2'].get_status,                 # status pump 2
+        self._add_signal(_sts['PC2PowerConsumption'],                # calculate energy consumption Pump 2
+                         _acts['Timer2'].get_value,                  # get timer value pump 2
+                         _acts['Timer2'].get_status,                 # get status pump 2
                          )
 
         # transport pump 3
-        self._add_signal(_sts['PC3TransportedMaterial'],             # transport matirial pump 3
-                         _acts['Timer3'].get_value,                  # timer value pump 3
-                         _acts['Timer3'].get_status,                 # status pump 3
-                         _sts['TankFillLevel'].get_value,            # fill level tank
+        self._add_signal(_sts['PC3TransportedMaterial'],             # calculate transport matirial pump 3
+                         _acts['Timer3'].get_value,                  # get timer value pump 3
+                         _acts['Timer3'].get_status,                 # get status pump 3
+                         _sts['TankFillLevel'].get_value,            # get fill level tank
                          )
         
         # energy pump 3
-        self._add_signal(_sts['PC3PowerConsumption'],                # energy consumption Pump 3
-                         _acts['Timer3'].get_value,                  # timer value pump 3
-                         _acts['Timer3'].get_status,                 # status pump 3
-                         )
-
-        # tank 
-        self._add_signal(_sts['TankFillLevel'].get_value,            # fill level tank
-                         _sts['TankOverflow'].get_value              # overflow tank
-                         )
-
-        # 3.2. Buffers-related sensor
-        self._add_signal(_sens['TankSensor1']
+        self._add_signal(_sts['PC3PowerConsumption'],                # calculate energy consumption Pump 3
+                         _acts['Timer3'].get_value,                  # get timer value pump 3
+                         _acts['Timer3'].get_status,                 # get status pump 3
                          )
         
-        self._add_signal(_sens['TankSensor2']
+         # tank overflow 
+        self._add_signal(_sts['TankOverflow'],                      # calculate tank overflow
+                         _sts['TankFillLevel'].get_value,           # get fill level tank
+                         _sts['PC1TransportedMaterial'].get_value,  # get transport matirial pump 1
+                         _sts['PC2TransportedMaterial'].get_value,  # get transport matirial pump 2
+                         _sts['PC3TransportedMaterial'].get_value,  # get transport matirial pump 3
+                         )
+
+        # tank level
+        self._add_signal(_sts['TankFillLevel'],                     # calculate tank fill level 
+                         _sts['TankFillLevel'].get_value,           # get tank fill level
+                         _sts['PC1TransportedMaterial'].get_value,  # get transport matirial pump 1
+                         _sts['PC2TransportedMaterial'].get_value,  # get transport matirial pump 2
+                         _sts['PC3TransportedMaterial'].get_value,  # get transport matirial pump 3
+                         )
+
+        # tank sensor 1
+        self._add_signal(_sens['TankSensor1'],                      # calculate signal tank sensor 1
+                         _sts['TankFillLevel'].get_value            # get tank fill level
                          )
         
-        self._add_signal(_sens['TankSensor3']
+        # tank sensor 2
+        self._add_signal(_sens['TankSensor2'],                      # calculate signal tank sensor 2
+                         _sts['TankFillLevel'].get_value            # get tank fill level
+                         )
+        
+        # tank sensor 3
+        self._add_signal(_sens['TankSensor3'],                      # calculate signal tank sensor 3
+                         _sts['TankFillLevel'].get_value            # get tank fill level
                          )
 
 
