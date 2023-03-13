@@ -11,7 +11,7 @@
 """
 Ver. 1.0.0 (2023-03-10)
 
-This module provides a default implementation of the BGLP in MLPro-MPPS as RL Environment.
+This module provides a default implementation of the Liquid Station in MLPro-MPPS as RL Environment.
 """
 
 
@@ -46,30 +46,38 @@ class LS4RL(Liquid_Station):
 ## -------------------------------------------------------------------------------------------------
     def _simulate_reaction(self, p_state: State, p_action: Action) -> State:
         
-        # 1. Set values to actuators
+        # 1. Set actuator values
         action = []
+
+        # 1.1 Get action values from MLPro action
         for agent_id in p_action.get_agent_ids():
             action_elem = p_action.get_elem(agent_id)
             for action_id in action_elem.get_dim_ids():
                 action.append(action_elem.get_value(action_id))
-                
+        
+        # 1.2 Write action values to actuators
         for idx, (_, acts) in enumerate(self.get_actuators().items()):
             if idx != len(self.get_actuators())-1:
                 boundaries = acts.get_boundaries()
                 final_action = action[idx]*(boundaries[1]-boundaries[0])+boundaries[0]
                 acts.set_value(final_action)
             else:
-                acts.set_value(True)
+                acts.set_value(True)   
         
         # 2. Update values of the sensors and component states
-        init_inventory_level = self.get_component_states()['InventoryLevel'].get_value()
+        # store old tank level
+        init_tank_level = self.get_component_states()['TankFillLevel'].get_value()
+
+        # 2.1 Compute states and signals
         for sig in self._signals:
+            # combine input signals
             if len(sig[1:]) == 1:
                 input = sig[1]()
             else:
                 input = []
                 for x in range(len(sig[1:])):
                     input.append(sig[x+1]())
+            # simulate
             sig[0].simulate(input, p_range=self.parent.t_set)
 
         # 3. Return the resulted states in the form of State object
@@ -77,17 +85,23 @@ class LS4RL(Liquid_Station):
         self.parent._state.set_success(False)
         self.parent._state.set_broken(False)
         
+        # compute time step
         self.parent.t += self.parent.t_set
-        current_volume = self.get_component_states()['InventoryLevel'].get_value()
+        
+        # compute transport, overflow, power
+        transport = sum(self.parent.get_transport())
         overlfow = sum(self.parent.get_overflow())
         power = sum(self.parent.get_power())
-        self.parent.current_demand = self.parent.get_demand(init_inventory_level, current_volume)
-        self.parent.prod_reached += (current_volume-init_inventory_level)
+
+        # compute tank level
+        current_volume = self.get_component_states()['TankFillLevel'].get_value()
         
+        # store parameters in data frame
         self.parent.data_storing.memorize("time",str(self.parent.data_frame), self.parent.t)
+        self.parent.data_storing.memorize("transport",str(self.parent.data_frame), transport/self.parent.t_set)
         self.parent.data_storing.memorize("overflow",str(self.parent.data_frame), overlfow/self.parent.t_set)
         self.parent.data_storing.memorize("power",str(self.parent.data_frame), power/self.parent.t_set)
-        self.parent.data_storing.memorize("demand",str(self.parent.data_frame), self.parent.current_demand/self.parent.t_set)
+        self.parent.data_storing.memorize("level",str(self.parent.data_frame), current_volume)
         
         return self.parent._state
 
@@ -108,21 +122,19 @@ class LS_RLEnv(Environment):
                  p_reward_type=Reward.C_TYPE_EVERY_AGENT,
                  p_logging=Log.C_LOG_ALL,
                  t_set=10.0,
-                 demand=0.1,
-                 lr_margin=1.0,
-                 lr_demand=4.0,
+                 lr_transport=1.0,
+                 lr_overflow=4.0,
                  lr_power=0.0010, 
-                 margin_p=[0.2,0.8,4],
-                 prod_target=10000,
+                 max_transport=[5, 5, 5],
                  prod_scenario='continuous',
                  cycle_limit=0):
 
-        self.num_envs = 5                                                 # Number of internal sub-environments
+        #self.num_envs = 5                                                 # Number of internal sub-environments
         self.reward_type = p_reward_type
         
         super().__init__(p_mode = Mode.C_MODE_SIM, 
                          p_latency = None, 
-                         p_fct_strans = LS4RL(p_name='BGLP_RL',
+                         p_fct_strans = LS4RL(p_name='Liquid_Station_RL',
                                               p_logging=p_logging,
                                               p_parent=self
                                               ), 
@@ -145,15 +157,13 @@ class LS_RLEnv(Environment):
         self.C_CYCLE_LIMIT = cycle_limit
         self.t = 0
         self.t_set = t_set
-        self.demand = demand
-        self.lr_margin = lr_margin
-        self.lr_demand = lr_demand
+        self.lr_transport = lr_transport
+        self.lr_overflow = lr_overflow
         self.lr_power = lr_power
-        self.prod_target = prod_target
+        self.max_transport = max_transport
         self.prod_scenario = prod_scenario
-        self.margin_p = margin_p
         
-        self.data_lists = ["time","overflow","power","demand"]
+        self.data_lists = ["time","transport","overflow","power", "level"]
         self.data_storing = DataStoring(self.data_lists)
         self.data_frame = None
         
@@ -187,12 +197,12 @@ class LS_RLEnv(Environment):
         action_space = ESpace()
 
         # define state space
-        state_space.add_dim(Dimension('R-1 LvlTank', 'R', 'Res-1 Level of Tank', '', '', '', [0, 250]))
+        state_space.add_dim(Dimension('R-1 Lvl', 'R', 'Res-1 Level of Tank', '', '', '', [0, 250]))
         
         # define action space
-        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Belt Conveyor A', '', '', '', [0, 1]))
-        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Vacuum Pump B', '', '', '', [0, 1]))
-        action_space.add_dim(Dimension('A-3 Act', 'Z', 'Act-3 Vibratory Conveyor B', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-1 Act', 'R', 'Act-1 Pump', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-2 Act', 'R', 'Act-2 Pump', '', '', '', [0, 1]))
+        action_space.add_dim(Dimension('A-3 Act', 'R', 'Act-3 Pump', '', '', '', [0, 1]))
 
         return state_space, action_space
 
@@ -209,23 +219,29 @@ class LS_RLEnv(Environment):
             state.set_value(ids[x], norm_fill_level) 
         return state
 
-
 ## -------------------------------------------------------------------------------------------------
-    def get_margin(self) -> list:
-        margin = []
-        
-        for x in range(len(self.set_fill_levels)):
-            fill_level = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_value()
-            boundaries = self._fct_strans.get_component_states()[self.set_fill_levels[x]].get_boundaries()
-            norm_fill_level = (fill_level-boundaries[0])/(boundaries[1]-boundaries[0])
-            if norm_fill_level < self.margin_p[0]:
-                m = (0-self.margin_p[2])/(self.margin_p[0])*(norm_fill_level-self.margin_p[0])*self.t_set
-            elif norm_fill_level > self.margin_p[1]:
-                m = self.margin_p[2]/(1-self.margin_p[1])*(norm_fill_level-self.margin_p[1])*self.t_set
-            else:
-                m = 0.0
-            margin.append(m)
-        return margin
+    def get_transport(self, p_outflow=True) -> list:
+        total_transport = []
+
+        # only output pumps (pump 1 and pump 2) count as transport
+        if p_outflow==True:
+
+            for x in [1, 2]:
+                transport = self._fct_strans.get_component_states()[self.set_transport_liquid[x]].get_value()
+                total_transport.append(transport)
+
+            return total_transport
+
+        # all pumps count as transport
+        else:
+            
+            for x in range(len(self.set_transport_liquid)):
+                transport = self._fct_strans.get_component_states()[self.set_transport_liquid[x]].get_value()
+                total_transport.append(transport)
+
+            return total_transport
+
+
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -249,17 +265,6 @@ class LS_RLEnv(Environment):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_demand(self, init_volume, cur_volume) -> list:
-        delta = cur_volume-init_volume
-        
-        if (self.demand*self.t_set) > delta:
-            total_demand = delta-self.demand*self.t_set
-        else:
-            total_demand = 0
-        return total_demand
-
-
-## -------------------------------------------------------------------------------------------------
     def _compute_reward(self, p_state_old: State = None, p_state_new: State = None) -> Reward:
         reward = Reward(self.reward_type)
 
@@ -270,8 +275,8 @@ class LS_RLEnv(Environment):
         
         elif self.reward_type == Reward.C_TYPE_EVERY_AGENT:
            for agent_id in self._last_action.get_agent_ids():
-               r_reward = self.calc_reward()
-               reward.add_agent_reward(agent_id, r_reward[int(agent_id)])
+               r_reward = self.calc_reward(agent_id)
+               reward.add_agent_reward(agent_id, r_reward)
                
         else:
            for agent_id in self._last_action.get_agent_ids():
@@ -292,11 +297,7 @@ class LS_RLEnv(Environment):
         if self.prod_scenario == 'continuous':
             return False
         else:
-            if self.prod_reached >= self.prod_target:
-                self._state.set_terminal(True)
-                return True
-            else:
-                return False
+            raise NotImplementedError
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -341,24 +342,30 @@ class LS_RLEnv(Environment):
             
 
 ## -------------------------------------------------------------------------------------------------
-    def calc_reward(self):
-        reward = []
-        margin = self.get_margin()
+    def calc_reward(self, p_agent_id):
+        reward = None
+
+        transport = self.get_transport()
+        overlfow = self.get_overflow()
         power = self.get_power()
-        demand = self.current_demand/self.t_set
+
+        # compute specific reward - Agent 1 - overflow and energy
+        if p_agent_id == 0:
+
+            reward = (1.0 / ( 1.0 + self.lr_overflow * overlfow[0])) + (1.0 / ( 1.0 + self.lr_power * power[0]))
+
+        # compute specific reward - Agent 2 - transport and energy
+        elif p_agent_id == 1:
+
+            reward = 1.0 / ( 1.0 + self.lr_overflow * (self.max_transport[1] - transport[0])) + 1.0 / ( 1.0 + self.lr_power * power[1])
+
+        # compute specific reward - Agent 3 - transport and energy
+        elif p_agent_id == 2:
+            reward = 1.0 / ( 1.0 + self.lr_overflow * (self.max_transport[2] - transport[1])) + 1.0 / ( 11.0 + self.lr_power * power[2])
+
+        else:
+            raise NotImplementedError
         
-        for actnum, pwr in enumerate(self.set_power):
-            try:
-                power_max = self._fct_strans.get_component_states()[pwr]._function.max_power
-            except:
-                power_max = self._fct_strans.get_component_states()[pwr]._function.power
-                
-            reward.append(1/(1+self.lr_margin*margin[actnum]))
-            reward[actnum] += 1/(1+self.lr_power*power[actnum]/(power_max/1000.0))
-            if actnum == len(self.set_power)-1:
-                reward[actnum] += 1/(1-self.lr_demand*demand)
-            else:
-                reward[actnum] += 1/(1+self.lr_margin*margin[actnum+1])
         return reward
 
 
