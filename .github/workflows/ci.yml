@@ -33,6 +33,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
+        pip install git+https://github.com/fhswf/MLPro-MPPS.git@main
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -65,6 +66,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
+        pip install git+https://github.com/fhswf/MLPro-MPPS.git@main
     - name: Test with pytest
       run: |
         make pytest
@@ -91,6 +93,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
+        pip install git+https://github.com/fhswf/MLPro-MPPS.git@main
     - name: Test with pytest
       run: |
         make pytest
