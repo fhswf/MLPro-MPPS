@@ -40,6 +40,7 @@ import random
 import uuid
 import math
 import matplotlib.pyplot as plt
+from mlpro.bf.physics import TransferFunction
 
 
 
