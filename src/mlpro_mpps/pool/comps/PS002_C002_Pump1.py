@@ -17,7 +17,7 @@ This pump is located on the input side of the Liquid Station to fill liquid into
 
 
 from mlpro_mpps.mpps import *
-from mlpro.bf.systems import TransferFunction
+from mlpro.bf.physics import TransferFunction
 from mlpro.bf.math import *
 import sys
 

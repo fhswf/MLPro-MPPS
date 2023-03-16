@@ -17,7 +17,7 @@ This is one of two pumps located on the output side of the Liquid Station to emp
 
 
 from mlpro_mpps.mpps import *
-from mlpro.bf.systems import TransferFunction
+from mlpro.bf.physics import TransferFunction
 from mlpro.bf.math import *
 import sys
 

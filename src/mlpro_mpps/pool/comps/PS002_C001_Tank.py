@@ -17,7 +17,7 @@ A Tank is a component to temporary store liquid that consists of three sensors.
 
 
 from mlpro_mpps.mpps import *
-from mlpro.bf.systems import TransferFunction
+from mlpro.bf.physics import TransferFunction
 from mlpro.bf.math import *
 import sys
 
