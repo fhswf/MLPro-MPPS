@@ -53,7 +53,7 @@ class EAPolicy(Policy):
         
         # init population
         self._size = p_buffer_size
-        self._population = Buffer(p_buffer_size)
+        self._population = BufferRnd(p_buffer_size)
 
 ## -------------------------------------------------------------------------------------------------
     def compute_action(self) -> Action:
@@ -78,7 +78,7 @@ class EAPolicy(Policy):
 
     def _adapt(self) -> bool:
         
-        self.ada_buffer = Buffer(2)     # adaption buffer
+        self.ada_buffer = BufferRnd(2)     # adaption buffer
         self.individual = None          # reset individual
 
         # start evolution process
@@ -95,12 +95,15 @@ class EAPolicy(Policy):
         This is an minimum example realisation of a selection function and can be changed depending 
         on the approach. 
         """
+
+        
         # select last individual
         self.ada_buffer.add_element(BufferElement(self._population.get_latest()))
 
         # select random individual
-        individual_values = self._population.get_sample(random.randint(0, self._size-1)).values()
-        individual_list = [item for sublist in individual_values for item in sublist]
+        individual_values = self._population.get_sample(1)
+        individual_list = [item for sublist in individual_values.values() for item in sublist]
+    
         # select last individual
         self.ada_buffer.add_element(BufferElement(dict(action=individual_list[0],
                                                        state=individual_list[1],
