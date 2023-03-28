@@ -582,21 +582,21 @@ class SupervisedLearner(Training):
 ## -------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     # Parameters for demo mode
-    cycle_limit = 500          
-    epi_limit   = 20
-    data_epi_limit = 2000
-    logging     = Log.C_LOG_WE
-    visualize   = None
-    path        = str(Path.home())
+    cycle_limit     = 500          
+    epi_limit       = 20
+    data_epi_limit  = 2000
+    logging         = Log.C_LOG_WE
+    visualize       = None
+    path            = str(Path.home())
  
 else:
     # Parameters for internal unit test
-    cycle_limit = 50
-    epi_limit   = 10
-    data_epi_limit = 20
-    logging     = Log.C_LOG_NOTHING
-    visualize   = False
-    path        = None
+    cycle_limit     = 50
+    epi_limit       = 10
+    data_epi_limit  = 20
+    logging         = Log.C_LOG_NOTHING
+    visualize       = False
+    path            = None
 
 
 # Create and run training object
