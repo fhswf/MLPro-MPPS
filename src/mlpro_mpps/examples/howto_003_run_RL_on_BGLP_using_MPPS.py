@@ -11,10 +11,11 @@
 ## -- 2023-02-13  1.0.2     SY       Renaming module and refactoring
 ## -- 2023-02-15  1.0.3     SY       Incorporating SB3 algorithm via SB3 Wrapper of MLPro
 ## -- 2023-02-17  1.0.4     SY       Optimizing for paper
+## -- 2023-02-28  1.0.5     SY       Update following new pool.ml
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.4 (2023-02-17)
+Ver. 1.0.5 (2023-02-28)
 
 This example demonstrates the implementation of the MPPS-based BGLP as an RL Environment.
 
@@ -29,7 +30,7 @@ You will learn:
 """
 
 
-from mlpro_mpps.pool.rl_environment.RL001_bglp import BGLP_RLEnv
+from mlpro_mpps.pool.ml.rl_environment.RL001_BGLP import BGLP_RLEnv
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 from stable_baselines3 import PPO, A2C

@@ -6,10 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-10  0.0.0     ML       Creation
+## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-10)
+Ver. 1.0.0 (2023-03-28)
 
 This module provides a default implementation of the Liquid Station in MLPro-MPPS as RL Environment.
 """

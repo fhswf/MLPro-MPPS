@@ -1,15 +1,16 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.examples
-## -- Module  : howto_005_run_RL_on_LS_using_MPPS.py
+## -- Module  : howto_006_run_EA_on_LS_using_MPPS.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
+## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-13)
+Ver. 1.0.0 (2023-03-28)
 
 This example demonstrates the implementation of the MPPS-based Liquid Laboratroy Station as an EA Environment.
 
@@ -22,15 +23,18 @@ You will learn:
 """
 
 
-from mlpro_mpps.pool.ea_environment.EA001_LS import LS_EAEnv
+from mlpro_mpps.pool.ml.ea_environment.EA001_LS import LS_EAEnv
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 from pathlib import Path
 
 
-# Implement EA agent policy
+
+
+
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+# 1 Implement EA agent policy
 class EAPolicy(Policy):
 
     C_NAME      = 'EAPolicy'

@@ -6,10 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-13  0.0.0     ML       Creation
+## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-13)
+Ver. 1.0.0 (2023-03-28)
 
 This example demonstrates the implementation of the MPPS-based Liquid Station as an RL Environment.
 
@@ -24,7 +25,7 @@ You will learn:
 """
 
 
-from mlpro_mpps.pool.rl_environment.RL002_LS import LS_RLEnv
+from mlpro_mpps.pool.ml.rl_environment.RL002_LS import LS_RLEnv
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 from stable_baselines3 import PPO, A2C
@@ -36,7 +37,7 @@ from pathlib import Path
 
 
                         
-# 2 Implement your own RL scenario
+# 1 Implement your own RL scenario
 class RL_Liquid_Station_Scenario(RLScenario):
 
     C_NAME = 'RL_Liquid_Station_Scenario'

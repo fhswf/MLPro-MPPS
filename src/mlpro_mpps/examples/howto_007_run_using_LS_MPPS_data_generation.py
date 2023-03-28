@@ -1,15 +1,16 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.examples
-## -- Module  : howto_005_run_RL_on_LS_using_MPPS.py
+## -- Module  : howto_007_run_using_LS_MPPS_data_generation.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
+## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-13)
+Ver. 1.0.0 (2023-03-28)
 
 This example demonstrates the implementation of the MPPS-based Liquid Laboratroy Station for data storing.
 Based on this a dataset can be generated automatically from a MPPS environment and can be used to train a 
@@ -24,7 +25,7 @@ You will learn:
 """
 
 
-from mlpro_mpps.pool.sl_environment.SL001_LS import LS_SLEnv
+from mlpro_mpps.pool.ml.sl_environment.SL001_LS import LS_SLEnv
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 from pathlib import Path
@@ -32,6 +33,12 @@ import torch
 from torch.utils.data import Dataset
 import pandas as pd
 
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class CreateCustomDataset(Dataset):
     '''
     This class is an example of an custome dataset to predict a timeseries.
@@ -66,6 +73,8 @@ class CreateCustomDataset(Dataset):
 
 
 
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class ThisDataStoring(DataStoring):
     # Frame ID renamed
     C_VAR0          = 'Episode ID'
@@ -118,7 +127,8 @@ class ThisDataStoring(DataStoring):
 
 
 
-# Implement EA agent policy
+
+
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
 class RandomActionGenerator(Policy):
@@ -128,21 +138,18 @@ class RandomActionGenerator(Policy):
 ## -------------------------------------------------------------------------------------------------
     def compute_action(self) -> Action:
 
-        # 1.1 Create a numpy array for your action values 
         my_action_values = np.zeros(self._action_space.get_num_dim())
 
-        # 1.2 Computing action values is up to you...
         for d in range(self._action_space.get_num_dim()):
             my_action_values[d] = random.random() 
 
-        # 1.3 Return an action object with your values
         return Action(self._id, self._action_space, my_action_values)
     
 
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-# 2 Implement DataGenerator
+# Implement DataGenerator
 class DataGenerator(Scenario):
     """
     This class creates an DataGenerator what interacts with the LS MPPS environment.
@@ -158,7 +165,7 @@ class DataGenerator(Scenario):
                  p_visualize:bool=True,  
                  p_logging=Log.C_LOG_ALL):  
 
-        # 1 Setup entire scenario
+        # Setup entire scenario
         self._env : Environment = None
 
         super().__init__(p_mode=p_mode, 
@@ -179,14 +186,14 @@ class DataGenerator(Scenario):
 
     def _setup(self, p_mode, p_ada: bool, p_visualize: bool, p_logging) -> Model:
 
-        # 1.1 Setup Environment
+        # Setup Environment
         """
         As example is the Liquid Laboratory Station as EA environment selected.
         This approach can be expanded to other environments.
         """
         self._env = LS_SLEnv(p_logging=p_logging)
         
-        # 2.2 Setup and return standard single-agent with own policy
+        # Setup and return standard single-agent with own policy
         return Agent(p_policy=RandomActionGenerator(p_observation_space=self._env.get_state_space(),
                                                     p_action_space=self._env.get_action_space(),
                                                     p_buffer_size=10,
@@ -241,9 +248,13 @@ class DataGenerator(Scenario):
 ## -------------------------------------------------------------------------------------------------
     def get_latency(self) -> timedelta:
         return self._env.get_latency()
-    
 
 
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 # 1 Implement your own agent policy
 class MyPolicy (Policy):
 
@@ -254,39 +265,39 @@ class MyPolicy (Policy):
 
 
     def compute_action(self, p_state: State) -> Action:
-        # 1.1 Create a numpy array for your action values 
+        # Create a numpy array for your action values 
         my_action_values = np.zeros(self._action_space.get_num_dim())
 
-        # 1.2 Computing action values is up to you...
+        # Computing action values is up to you...
         for d in range(self._action_space.get_num_dim()):
             my_action_values[d] = random.random() 
 
-        # 1.3 Return an action object with your values
+        # Return an action object with your values
         return Action(self._id, self._action_space, my_action_values)
 
 
     def _adapt(self) -> bool:
-        # 1.4 Adapting neural network with the created dataset
+        # Adapting neural network with the created dataset
         self.log(self.C_LOG_TYPE_I, 'Sorry, I am a stupid agent...')
 
-        # 1.5 Only return True if something has been adapted...
+        # Only return True if something has been adapted...
         return False
     
 
-# 2 Implement your own SL scenario
+# Implement your own SL scenario
 class SLScenario(Scenario):
 
     C_NAME      = 'Matrix'
 
     def _setup(self, p_mode, p_ada: bool, p_visualize: bool, p_logging) -> Model:
-        # 1.1 Setup Environment
+        # Setup Environment
         """
         As example is the Liquid Laboratory Station as EA environment selected.
         This approach can be expanded to other environments.
         """
         self._env = LS_SLEnv(p_logging=p_logging)
 
-        # 2.2 Setup and return standard single-agent with own policy
+        # Setup and return standard single-agent with own policy
         return Agent(p_policy=MyPolicy(p_observation_space=self._env.get_state_space(),
                                        p_action_space=self._env.get_action_space(),
                                        p_buffer_size=10,
@@ -344,13 +355,13 @@ class SupervisedLearner(Training):
     def __init__(self, **p_kwargs):
         super().__init__(**p_kwargs)
 
-        # 1.1 Mandatory parameter p_scenario_dg - DataGeneration
+        # Mandatory parameter p_scenario_dg - DataGeneration
         try:
             scenario_dg = self._kwargs['p_scenario_dg']
         except:
             raise ParamError('Mandatory parameter p_scenario_dg not supplied')
         
-        # 1.2 Mandatory parameter p_scenario_cls - SupervisedLearning
+        # Mandatory parameter p_scenario_cls - SupervisedLearning
         try:
             scenario_cls = self._kwargs['p_scenario_cls']
         except:
@@ -368,7 +379,7 @@ class SupervisedLearner(Training):
         except KeyError:
             num_episode_limit = -1
 
-        # 1.9 Optional environment mode
+        # Optional environment mode
         try:
             env_mode = self._kwargs['p_env_mode']
         except:
@@ -566,11 +577,11 @@ class SupervisedLearner(Training):
 
 
 
-# 3 Create scenario and start training
+# Create scenario and start training
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    # 3.1 Parameters for demo mode
+    # Parameters for demo mode
     cycle_limit = 500          
     epi_limit   = 20
     data_epi_limit = 2000
@@ -579,7 +590,7 @@ if __name__ == "__main__":
     path        = str(Path.home())
  
 else:
-    # 3.2 Parameters for internal unit test
+    # Parameters for internal unit test
     cycle_limit = 50
     epi_limit   = 10
     data_epi_limit = 20
@@ -588,7 +599,7 @@ else:
     path        = None
 
 
-# 3.3 Create and run training object
+# Create and run training object
 training = SupervisedLearner(p_scenario_dg=DataGenerator,          # init DataGenerator senario
                              p_scenario_cls=SLScenario,            # init SuperviseLearning senario
                              p_cycle_limit=cycle_limit,            # set training cyle limit
