@@ -7,18 +7,19 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-02-27  0.0.0     SY/MRD   Creation
 ## -- 2023-02-27  1.0.0     SY/MRD   Release First Version
+## -- 2023-03-28  1.0.1     SY/MRD   Replacing importlib with runpy
 ## -------------------------------------------------------------------------------------------------
 
 
 """
-Ver. 1.0.0 (2023-02-27)
+Ver. 1.0.1 (2023-03-28)
 
 Unit test for all examples available.
 """
 
 
 import pytest
-import importlib
+import runpy
 
 
 howto_list = {
@@ -35,4 +36,4 @@ howto_list = {
 
 @pytest.mark.parametrize("cls", list(howto_list.keys()))
 def test_howto(cls):
-    importlib.import_module(howto_list[cls])
+    runpy.run_path("src/"+howto_list[cls].replace(".","/")+".py")
