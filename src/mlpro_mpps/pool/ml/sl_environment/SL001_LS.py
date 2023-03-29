@@ -6,10 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-10  0.0.0     ML       Creation
+## -- 2023-03-29  1.0.0     ML/SY    Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-10)
+Ver. 1.0.0 (2023-03-29)
 
 This module provides a default implementation of the Liquid Station in MLPro-MPPS as SL Environment.
 """
@@ -19,9 +20,15 @@ from mlpro_mpps.pool.mpps.PS002_Liquid_Station import Liquid_Station
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 
+          
 
+
+              
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 class Reward(Reward):       
 
+    
 ## -------------------------------------------------------------------------------------------------
     def get_action_reward(self, p_agent_id):
         if self.type != self.C_TYPE_EVERY_ACTION:
@@ -38,7 +45,10 @@ class Reward(Reward):
         except:
             return None
 
-                        
+          
+
+
+              
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
 class LS4SL(Liquid_Station):
