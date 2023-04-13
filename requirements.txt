@@ -1,2 +1,2 @@
-git+https://github.com/fhswf/MLPro-MPPS.git@Liquid-Laboratory-Station
+git+https://github.com/fhswf/MLPro-MPPS.git@main
 mlpro[full]
