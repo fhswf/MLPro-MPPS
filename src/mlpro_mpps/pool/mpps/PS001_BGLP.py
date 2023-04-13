@@ -306,4 +306,3 @@ class BGLP(SimMPPS):
 
         # 3. Return the resulted states in the form of State object
         raise NotImplementedError
-    

@@ -8,10 +8,11 @@
 ## -- 2023-02-13  0.0.0     SY       Creation
 ## -- 2023-02-13  1.0.0     SY       Release of first version
 ## -- 2023-02-17  1.0.1     SY       Refactoring
+## -- 2023-02-28  1.0.2     SY       Update following new pool.ml
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-02-13)
+Ver. 1.0.2 (2023-02-28)
 
 This example demonstrates the implementation of the MPPS-based BGLP as an GT Game Board.
 
@@ -24,7 +25,7 @@ You will learn:
 """
 
 
-from mlpro_mpps.pool.rl_environment.RL001_bglp import BGLP_RLEnv
+from mlpro_mpps.pool.ml.rl_environment.RL001_BGLP import BGLP_RLEnv
 from mlpro.bf.math import *
 from mlpro.gt.models import *
 from mlpro.rl.pool.policies.randomgenerator import RandomGenerator

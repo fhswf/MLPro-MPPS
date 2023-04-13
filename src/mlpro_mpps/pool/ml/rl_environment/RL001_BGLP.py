@@ -7,16 +7,17 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-02-17  0.0.0     SY       Creation
 ## -- 2023-02-17  1.0.0     SY       Release of first version
+## -- 2023-03-28  1.0.1     SY       Refactoring compute_reward
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.5 (2023-02-02)
+Ver. 1.0.1 (2023-03-28)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS as RL Environment.
 """
 
 
-from mlpro_mpps.pool.mpps.PS001_bglp import BGLP
+from mlpro_mpps.pool.mpps.PS001_BGLP import BGLP
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 
@@ -269,7 +270,8 @@ class BGLP_RLEnv(Environment):
         elif self.reward_type == Reward.C_TYPE_EVERY_AGENT:
            for agent_id in self._last_action.get_agent_ids():
                r_reward = self.calc_reward()
-               reward.add_agent_reward(agent_id, r_reward[int(agent_id)])
+               idx = self._last_action.get_agent_ids().index(agent_id)
+               reward.add_agent_reward(agent_id, r_reward[idx])
                
         else:
            for agent_id in self._last_action.get_agent_ids():
