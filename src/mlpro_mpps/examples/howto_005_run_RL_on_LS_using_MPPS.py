@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-13  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
+## -- 2023-04-13  1.0.1     SY       Code Cleaning
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-28)
+Ver. 1.0.1 (2023-04-13)
 
 This example demonstrates the implementation of the MPPS-based Liquid Station as an RL Environment.
 
@@ -42,7 +43,6 @@ class RL_Liquid_Station_Scenario(RLScenario):
 
     C_NAME = 'RL_Liquid_Station_Scenario'
 
-## -------------------------------------------------------------------------------------------------
     def _setup(self, p_mode, p_ada, p_visualize, p_logging):
 
         # 1.1 Setup Environment

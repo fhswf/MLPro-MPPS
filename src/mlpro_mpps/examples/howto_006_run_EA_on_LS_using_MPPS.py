@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
+## -- 2023-04-13  1.0.1     SY       Code Cleaning
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-28)
+Ver. 1.0.1 (2023-04-13)
 
 This example demonstrates the implementation of the MPPS-based Liquid Laboratroy Station as an EA Environment.
 
@@ -59,6 +60,7 @@ class EAPolicy(Policy):
         self._size = p_buffer_size
         self._population = BufferRnd(p_buffer_size)
 
+
 ## -------------------------------------------------------------------------------------------------
     def compute_action(self) -> Action:
 
@@ -66,6 +68,7 @@ class EAPolicy(Policy):
         action_values = self.individual['action'][0].get_sorted_values()
 
         return Action(self._id, self._action_space, action_values)  
+
 
 ## -------------------------------------------------------------------------------------------------
     def _store_behaviour(self, p_action:Action, p_state:State, p_reward:Reward):
@@ -89,7 +92,6 @@ class EAPolicy(Policy):
         self.selection()
         self.recombination()
         self.mutation()
-        
         
         return True
     
@@ -139,6 +141,7 @@ class EAPolicy(Policy):
         # write new action to next individual
         self.individual = dict(action=[Action(self._id, self._action_space, action_values)])
 
+
 ## -------------------------------------------------------------------------------------------------
     def mutation(self):
         """
@@ -160,6 +163,8 @@ class EAPolicy(Policy):
         self.individual = dict(action=[Action(self._id, self._action_space, action_values)])
 
         
+
+
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
@@ -190,10 +195,12 @@ class EASenario(Scenario):
                      p_logging=p_logging
                      )
     
+
 ## -------------------------------------------------------------------------------------------------
     def get_latency(self) -> timedelta:
         return self._env.get_latency()
     
+
 ## -------------------------------------------------------------------------------------------------
     def _init_population(self):
 
@@ -245,9 +252,9 @@ class EASenario(Scenario):
         self.log(self.C_LOG_TYPE_I, 'Process time', self._timer.get_time(), ': Agent adapts policy...')
         adapted = self._model._policy._adapt()
 
-        
-
         return False, False, adapted, False
+
+
 
     
     
@@ -275,6 +282,7 @@ class EATraining(Training):
         self._num_cycles = 0
 
         self._scenario._init_population()
+
 
 ## -------------------------------------------------------------------------------------------------
     def _run_cycle(self) -> bool:
@@ -345,6 +353,7 @@ class EATraining(Training):
 
         # 6 Outro
         return eof_training
+
 
 
 

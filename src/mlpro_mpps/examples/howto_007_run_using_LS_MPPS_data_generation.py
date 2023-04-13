@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
+## -- 2023-04-13  1.0.1     SY       Code Cleaning and Debugging
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-28)
+Ver. 1.0.1 (2023-04-13)
 
 This example demonstrates the implementation of the MPPS-based Liquid Laboratroy Station for data storing.
 Based on this a dataset can be generated automatically from a MPPS environment and can be used to train a 
@@ -39,12 +40,17 @@ import pandas as pd
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+
 class CreateCustomDataset(Dataset):
-    '''
+    """
     This class is an example of an custome dataset to predict a timeseries.
     This class is initalised with the path of data loading, target channel generation and the sequence length.
-    '''
+    """
+
+
+## -------------------------------------------------------------------------------------------------
     def __init__(self, p_path:str, p_channels:list=['Transport', 'Overflow', 'Energy'], p_seq_len=1):
+        
         super().__init__()
 
         # load logged data
@@ -62,10 +68,15 @@ class CreateCustomDataset(Dataset):
         # create target tensor
         self._target_tensor = torch.tensor(self._df_reward[p_channels].values)
 
+
+## -------------------------------------------------------------------------------------------------
     def __len__(self):
+        
         return self._input_tensor.__len__() - 2*self._seq_len
-    
-    def __getitem__(self, index):#
+
+
+## -------------------------------------------------------------------------------------------------
+    def __getitem__(self, index):
         
         return (self._input_tensor[index:index+self._seq_len], self._target_tensor[index+self._seq_len:index+2*self._seq_len])
 
@@ -75,7 +86,9 @@ class CreateCustomDataset(Dataset):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+
 class ThisDataStoring(DataStoring):
+    
     # Frame ID renamed
     C_VAR0          = 'Episode ID'
 
@@ -85,8 +98,10 @@ class ThisDataStoring(DataStoring):
     C_VAR_SEC       = 'Second'
     C_VAR_MICROSEC  = 'Microsecond'
 
+
 ## -------------------------------------------------------------------------------------------------
     def __init__(self, p_space: Set = None):
+        
         self.space = p_space
 
         # Initialization as an episodic detail data storage
@@ -101,8 +116,10 @@ class ThisDataStoring(DataStoring):
 
         super().__init__(self.variables)
 
+
 ## -------------------------------------------------------------------------------------------------
     def add_episode(self, p_episode_id):
+        
         self.add_frame(p_episode_id)
         self.current_episode = p_episode_id
 
@@ -131,10 +148,12 @@ class ThisDataStoring(DataStoring):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+
 class RandomActionGenerator(Policy):
 
     C_NAME      = 'RandomActionGenerator'
        
+    
 ## -------------------------------------------------------------------------------------------------
     def compute_action(self) -> Action:
 
@@ -145,6 +164,8 @@ class RandomActionGenerator(Policy):
 
         return Action(self._id, self._action_space, my_action_values)
     
+
+
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -184,6 +205,7 @@ class DataGenerator(Scenario):
         self._ds_rewards = None
 
 
+## -------------------------------------------------------------------------------------------------
     def _setup(self, p_mode, p_ada: bool, p_visualize: bool, p_logging) -> Model:
 
         # Setup Environment
@@ -208,14 +230,17 @@ class DataGenerator(Scenario):
                      p_logging=p_logging
                      )
     
+    
 ## -------------------------------------------------------------------------------------------------
     def get_latency(self) -> timedelta:
+        
         return self._env.get_latency()
+
 
 ## -------------------------------------------------------------------------------------------------
     def _run_cycle(self):
 
-        # 3 Environment: get current state
+        # 0 Environment: get current state
         state = self._env.get_state()
         state.set_tstamp(self._timer.get_time())
 
@@ -241,12 +266,14 @@ class DataGenerator(Scenario):
         reward = self._env.compute_reward()
         ts = self._timer.get_time()
         reward.set_tstamp(ts)
-        self._ds_rewards.memorize_row(self._cycle_id, ts, reward.get_action_reward(0))
+        self._ds_rewards.memorize_row(self._cycle_id, ts, reward.get_action_reward(reward.agent_ids[0]))
 
         return False, False, True, False
     
+    
 ## -------------------------------------------------------------------------------------------------
     def get_latency(self) -> timedelta:
+        
         return self._env.get_latency()
 
 
@@ -255,15 +282,19 @@ class DataGenerator(Scenario):
 
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
+
 # 1 Implement your own agent policy
 class MyPolicy (Policy):
 
     C_NAME      = 'MyPolicy'
 
+
+## -------------------------------------------------------------------------------------------------
     def set_random_seed(self, p_seed=None):
         random.seed(p_seed)
 
 
+## -------------------------------------------------------------------------------------------------
     def compute_action(self, p_state: State) -> Action:
         # Create a numpy array for your action values 
         my_action_values = np.zeros(self._action_space.get_num_dim())
@@ -276,19 +307,28 @@ class MyPolicy (Policy):
         return Action(self._id, self._action_space, my_action_values)
 
 
+## -------------------------------------------------------------------------------------------------
     def _adapt(self) -> bool:
         # Adapting neural network with the created dataset
         self.log(self.C_LOG_TYPE_I, 'Sorry, I am a stupid agent...')
 
         # Only return True if something has been adapted...
         return False
-    
+
+
+
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
 
 # Implement your own SL scenario
 class SLScenario(Scenario):
 
     C_NAME      = 'Matrix'
 
+
+## -------------------------------------------------------------------------------------------------
     def _setup(self, p_mode, p_ada: bool, p_visualize: bool, p_logging) -> Model:
         # Setup Environment
         """
@@ -312,17 +352,19 @@ class SLScenario(Scenario):
                      p_logging=p_logging
                      )
     
+    
 ## -------------------------------------------------------------------------------------------------
     def get_env(self):
         return self._env
+
 
 ## -------------------------------------------------------------------------------------------------
     def get_latency(self) -> timedelta:
         return self._env.get_latency()
     
+    
 ## -------------------------------------------------------------------------------------------------
     def _run_cycle(self):
-    
 
         # agent neural network
         self.log(self.C_LOG_TYPE_I, 'Process time', self._timer.get_time(), ': Agent adapts policy...')
@@ -352,6 +394,8 @@ class SupervisedLearner(Training):
 
     C_NAME      = 'SupervisedLearner'
 
+
+## -------------------------------------------------------------------------------------------------
     def __init__(self, **p_kwargs):
         super().__init__(**p_kwargs)
 
