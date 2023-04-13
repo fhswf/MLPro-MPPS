@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-10  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
+## -- 2023-04-13  1.0.1     SY       Debugging
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-03-28)
+Ver. 1.0.1 (2023-04-13)
 
 This module provides a default implementation of the Liquid Station in MLPro-MPPS as RL Environment.
 """
@@ -276,7 +277,7 @@ class LS_RLEnv(Environment):
         
         elif self.reward_type == Reward.C_TYPE_EVERY_AGENT:
            for agent_id in self._last_action.get_agent_ids():
-               r_reward = self.calc_reward(agent_id)
+               r_reward = self.calc_reward(self._last_action.get_agent_ids().index(agent_id))
                reward.add_agent_reward(agent_id, r_reward)
                
         else:

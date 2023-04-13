@@ -621,9 +621,12 @@ class SupervisedLearner(Training):
 
 
 
+
+
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+
 # Create scenario and start training
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     # Parameters for demo mode
     cycle_limit     = 500          
@@ -632,27 +635,18 @@ if __name__ == "__main__":
     logging         = Log.C_LOG_WE
     visualize       = None
     path            = str(Path.home())
- 
-else:
-    # Parameters for internal unit test
-    cycle_limit     = 50
-    epi_limit       = 10
-    data_epi_limit  = 20
-    logging         = Log.C_LOG_NOTHING
-    visualize       = False
-    path            = None
 
 
-# Create and run training object
-training = SupervisedLearner(p_scenario_dg=DataGenerator,          # init DataGenerator senario
-                             p_scenario_cls=SLScenario,            # init SuperviseLearning senario
-                             p_cycle_limit=cycle_limit,            # set training cyle limit
-                             p_cycles_per_epi_limit=epi_limit,     # set episodes per cycle
-                             p_data_epi_limit=data_epi_limit,      # length of the created dataset 
-                             p_path=path,                          # get path to store solutions
-                             p_visualize=visualize,                # visualize plots
-                             p_logging=logging                     # log trianing process
-                             )
-
-# start a run
-training.run()
+    # Create and run training object
+    training = SupervisedLearner(p_scenario_dg=DataGenerator,          # init DataGenerator senario
+                                 p_scenario_cls=SLScenario,            # init SuperviseLearning senario
+                                 p_cycle_limit=cycle_limit,            # set training cyle limit
+                                 p_cycles_per_epi_limit=epi_limit,     # set episodes per cycle
+                                 p_data_epi_limit=data_epi_limit,      # length of the created dataset 
+                                 p_path=path,                          # get path to store solutions
+                                 p_visualize=visualize,                # visualize plots
+                                 p_logging=logging                     # log trianing process
+                                 )
+    
+    # start a run
+    training.run()
