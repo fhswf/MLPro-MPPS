@@ -7,7 +7,7 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
-## -- 2023-04-13  1.0.1     SY       Code Cleaning
+## -- 2023-04-13  1.0.1     SY/ML    Code Cleaning and Debugging
 ## -------------------------------------------------------------------------------------------------
 
 """
@@ -83,8 +83,10 @@ class EAPolicy(Policy):
                                             )
                                       )
         # store buffer element
-        self._population.add_element(new_individual)
+        self._population.add_element(new_individual)  
 
+
+## -------------------------------------------------------------------------------------------------
     def _adapt(self) -> bool:
         
         self.ada_buffer = BufferRnd(2)     # adaption buffer
@@ -96,6 +98,7 @@ class EAPolicy(Policy):
         self.mutation()
         
         return True
+    
     
 ## -------------------------------------------------------------------------------------------------
     def selection(self):
@@ -120,6 +123,7 @@ class EAPolicy(Policy):
                                                        )
                                                   )
                                    )
+        
         
 ## -------------------------------------------------------------------------------------------------
     def recombination(self):
