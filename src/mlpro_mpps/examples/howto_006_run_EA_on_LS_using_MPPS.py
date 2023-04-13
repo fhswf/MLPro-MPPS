@@ -219,7 +219,7 @@ class EASenario(Scenario):
             self._model._policy._store_behaviour(action, state, reward)
 
         # select start individual
-        self._model._policy.individual = self._model._policy._population.get_sample(random.randint(0,self._model._policy._size-1))
+        self._model._policy.individual = self._model._policy._population.get_sample(random.randint(1, self._model._policy._size-1))
 
 
 ## -------------------------------------------------------------------------------------------------
