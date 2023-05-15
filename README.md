@@ -54,8 +54,7 @@ Additionally, the class diagram of the basic function is available in [this dire
 - Clean code paradigma
 
 ## Citing MLPro-MPPS
-......
-
+- https://doi.org/10.1016/j.simpa.2023.100509
 
 ## Project and Team
 Project MLPro-MPPS was started in 2022 by the [Group for Automation Technology and Learning Systems at the South Westphalia University of Applied Sciences, Germany](https://www.fh-swf.de/de/forschung___transfer_4/labore_3/labs/labor_fuer_automatisierungstechnik__soest_1/standardseite_57.php).
