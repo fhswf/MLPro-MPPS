@@ -31,7 +31,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install --user --upgrade setuptools
         pip install flake8 pytest
         pip install -r requirements.txt
     - name: Lint with flake8
@@ -64,7 +63,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install --user --upgrade setuptools
         pip install flake8 pytest
         pip install -r requirements.txt
     - name: Test with pytest
@@ -91,7 +89,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install --upgrade pip
-        pip install --user --upgrade setuptools
         pip install flake8 pytest
         pip install -r requirements.txt
     - name: Test with pytest
