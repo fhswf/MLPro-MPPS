@@ -16,7 +16,7 @@ This example demonstrates the implementation of the MPPS-based Larger-Scale BGLP
 
 You will learn:
     
-    1) How to set up a built-in MPPS to a RL environment.
+    1) How to set up a built-in MPPS to a GT gameboard.
     
     2) How to set up GT game and training, including players, random policies, etc.
     
