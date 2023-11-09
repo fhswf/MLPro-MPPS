@@ -1,4 +1,4 @@
-git+https://github.com/fhswf/MLPro-MPPS.git@main
+git+https://github.com/fhswf/MLPro-MPPS.git@LS_BGLP
 git+https://github.com/fhswf/MLPro.git@main
 dill>=0.3.6
 numpy>=1.24.2
