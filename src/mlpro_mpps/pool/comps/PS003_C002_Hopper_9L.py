@@ -105,16 +105,16 @@ class Hopper9(Component):
         A silo consists of two sensors and two states components.
         """
         hopper_sensor = Hopper9_Sensor(p_name_short='Hopper9_Sensor1',
-                                     p_base_set=Dimension.C_BASE_SET_Z,
-                                     p_boundaries=[0,1])
+                                       p_base_set=Dimension.C_BASE_SET_Z,
+                                       p_boundaries=[0,1])
         hopper_fill_level = Hopper9_FillLevel(p_name_short='Hopper9_FillLevel',
-                                            p_base_set=Dimension.C_BASE_SET_R,
-                                            p_unit='L',
-                                            p_boundaries=[0,9.1])
+                                              p_base_set=Dimension.C_BASE_SET_R,
+                                              p_unit='L',
+                                              p_boundaries=[0,9.1])
         hopper_overflow = Hopper9_Overflow(p_name_short='Hopper9_Overflow',
-                                         p_base_set=Dimension.C_BASE_SET_R,
-                                         p_unit='L',
-                                         p_boundaries=[0,sys.maxsize])
+                                           p_base_set=Dimension.C_BASE_SET_R,
+                                           p_unit='L',
+                                           p_boundaries=[0,sys.maxsize])
         
         self._add_sensor(p_sensor=hopper_sensor)
         self._add_component_states(p_comp_states=hopper_overflow)
