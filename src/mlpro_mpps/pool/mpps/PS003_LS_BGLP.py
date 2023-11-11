@@ -17,9 +17,7 @@ such as:
 
 1. LS_BGLP: based on http://dx.doi.org/10.1109/ETFA54631.2023.10275577
 
-2. LS_BGLP_SG1: serial production system with obvious bottleneck situation
-
-3. LS_BGLP_SG2: serial-parallel production system with obvious bottleneck situation
+3. LS_BGLP_SP: serial-parallel production system
 
 """
 
@@ -59,24 +57,7 @@ class LS_BGLP(SimMPPS):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class LS_BGLP_SG1(SimMPPS):
-
-
-## -------------------------------------------------------------------------------------------------
-    def _setup_mpps(self, p_auto_adjust_names=True):
-        pass
-
-
-## -------------------------------------------------------------------------------------------------
-    def _simulate_reaction(self, p_state: State, p_action: Action) -> State:
-        pass
-
-
-                     
-                        
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
-class LS_BGLP_SG2(SimMPPS):
+class LS_BGLP_SP(SimMPPS):
 
 
 ## -------------------------------------------------------------------------------------------------
