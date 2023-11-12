@@ -191,13 +191,13 @@ class VacuumPump1(Component):
                             p_unit='s',
                             p_boundaries=[0.979, 9.5])
         transported_material = VC1_TransportedMaterial(p_name_short='VC1_TransportedMaterial',
-                                                      p_base_set=Dimension.C_BASE_SET_R,
-                                                      p_unit='L',
-                                                      p_boundaries=[0,sys.maxsize])
+                                                       p_base_set=Dimension.C_BASE_SET_R,
+                                                       p_unit='L',
+                                                       p_boundaries=[0,sys.maxsize])
         power_consumption = VC1_PowerConsumption(p_name_short='VC1_PowerConsumption',
-                                                p_base_set=Dimension.C_BASE_SET_R,
-                                                p_unit='kW',
-                                                p_boundaries=[0,sys.maxsize])
+                                                 p_base_set=Dimension.C_BASE_SET_R,
+                                                 p_unit='kW',
+                                                 p_boundaries=[0,sys.maxsize])
         
         self._add_actuator(p_actuator=timer)
         self._add_component_states(p_comp_states=transported_material)
