@@ -18,4 +18,5 @@ This module provides a default implementation of the BGLP in MLPro-MPPS as RL En
 
 from mlpro_mpps.pool.mpps.PS003_LS_BGLP import LS_BGLP
 from mlpro.bf.math import *
-from mlpro.gt.models import *
+# from mlpro.gt.models import *
+from mlpro.gt.dynamicgames.basics import *
