@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.mods
-## -- Module  : PS003_M008_BatchDosing.py
+## -- Module  : PS003_M009_Feeding_SP.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -12,35 +12,34 @@
 """
 Ver. 1.0.0 (2023-11-12)
 
-This module provides a default implementation of a module of the LS-BGLP, which is a Batch Dosing
-station.
+This module provides a default implementation of a module of the LS-BGLP, which is a Feeding station.
 """
 
 
 from mlpro_mpps.mpps import *
-from mlpro_mpps.pool.comps.PS003_C008_Silo_30L import *
-from mlpro_mpps.pool.comps.PS003_C023_Inventory import *
-from mlpro_mpps.pool.comps.PS003_C013_VacuumPump3 import *
-from mlpro_mpps.pool.comps.PS003_C025_DosingUnit import *
+from mlpro_mpps.pool.comps.PS003_C003_Silo_15L import *
+from mlpro_mpps.pool.comps.PS003_C026_Hopper_10L_SP import *
+from mlpro_mpps.pool.comps.PS003_C011_VacuumPump1 import *
+from mlpro_mpps.pool.comps.PS003_C014_ScrewConveyor1 import *
 
 
                      
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class BatchDosingStation(Module):
+class FeedingStation(Module):
 
 
 ## -------------------------------------------------------------------------------------------------
     def _setup_module(self):
-
-        silo = Silo30(p_name='SiloH')
-        inventory = FinishedGoodsInventory(p_name='Inventory')
-        act1 = VacuumPump3(p_name='ActH1')
-        act2 = DosingUnit(p_name='ActH2')
+        
+        silo = Silo15(p_name='SiloB')
+        hopper = Hopper10SP(p_name='HopperB')
+        act1 = VacuumPump1(p_name='ActB1')
+        act2 = ScrewConveyor1(p_name='ActB2')
         
         self._add_component(p_component=silo)
-        self._add_component(p_component=inventory)
+        self._add_component(p_component=hopper)
         self._add_component(p_component=act1)
         self._add_component(p_component=act2)
     
