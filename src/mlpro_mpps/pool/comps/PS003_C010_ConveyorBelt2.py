@@ -39,10 +39,10 @@ class CB2_TransportedMaterial(SimState):
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_TransBelt1_Cont(p_name='TF_TransBelt2_Cont',
-                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                   p_dt=0.05,
-                                   coef=0.01/60)
+        _func = TF_TransBelt_Cont(p_name='TF_TransBelt2_Cont',
+                                  p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                                  p_dt=0.05,
+                                  coef=0.01/60)
         return _func
 
 
@@ -61,13 +61,13 @@ class CB2_PowerConsumption(SimState):
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_PowerBelt1_Cont(p_name='TF_PowerBelt2_Cont',
-                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                   p_dt=0.05,
-                                   min_power=20.5,
-                                   max_power=42.5,
-                                   min_rpm=450,
-                                   max_rpm=1500)
+        _func = TF_PowerBelt_Cont(p_name='TF_PowerBelt2_Cont',
+                                  p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                                  p_dt=0.05,
+                                  min_power=20.5,
+                                  max_power=42.5,
+                                  min_rpm=450,
+                                  max_rpm=1500)
         return _func
 
 

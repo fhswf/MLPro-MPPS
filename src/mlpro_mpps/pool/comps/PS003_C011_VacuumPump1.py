@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : PS003_C009_ConveyorBelt1.py
+## -- Module  : PS003_C011_VacuumPump1.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -12,7 +12,7 @@
 """
 Ver. 1.0.0 (2023-11-12)
 
-This module provides a default implementation of a component of the LS-BGLP, which is a Conveyor Belt
+This module provides a default implementation of a component of the LS-BGLP, which is a Vacuum Pump
 Type 1.
 """
 
@@ -27,21 +27,21 @@ import sys
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class CB1_TransportedMaterial(SimState):
+class VC1_TransportedMaterial(SimState):
     """
     This class serves as a component state to calculate the transported material.
     """
 
     C_TYPE = 'SimState'
-    C_NAME = 'CB1_TransportedMaterial'
+    C_NAME = 'VC1_TransportedMaterial'
   
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_TransBelt_Cont(p_name='TF_TransBelt1_Cont',
-                                  p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                  p_dt=0.05,
-                                  coef=0.01/60)
+        _func = TF_VacuumPump(p_name='TF_VacuumPump1',
+                              p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                              p_dt=0.05,
+                              coef=[0.3535, 0.0096])
         return _func
 
 
@@ -49,7 +49,7 @@ class CB1_TransportedMaterial(SimState):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class TF_TransBelt_Cont(TransferFunction):
+class TF_VacuumPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
@@ -70,7 +70,7 @@ class TF_TransBelt_Cont(TransferFunction):
         Parameters
         ----------
         p_input : list
-            [0] = Rotational speed in rpm
+            [0] = Turn-on duration
             [1] = Status of the actuator
             [2] = Fill-level of the previous buffer
         p_range : float
@@ -83,10 +83,13 @@ class TF_TransBelt_Cont(TransferFunction):
         """
         if p_input[1]:
             if p_range is None:
-                mass_transport = self.coef*p_input[0]
+                mass_transport = (2*self.coef[1])+self.coef[0]
             else:
-                mass_transport = self.coef*p_input[0]*p_range
-            
+                if p_input[0] <= p_range:
+                    mass_transport = ((2*self.coef[1])+self.coef[0])*p_input[0]
+                else:
+                    mass_transport = ((2*self.coef[1])+self.coef[0])*p_range
+        
             if mass_transport > p_input[2]:
                 return p_input[2]
             else:
@@ -99,24 +102,24 @@ class TF_TransBelt_Cont(TransferFunction):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class CB1_PowerConsumption(SimState):
+class VC1_PowerConsumption(SimState):
     """
     This class serves as a component state to calculate the power consumption.
     """
 
     C_TYPE = 'SimState'
-    C_NAME = 'CB1_PowerConsumption'
+    C_NAME = 'VC1_PowerConsumption'
   
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_PowerBelt_Cont(p_name='TF_PowerBelt1_Cont',
-                                  p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                  p_dt=0.05,
-                                  min_power=40.0,
-                                  max_power=50.5,
-                                  min_rpm=450,
-                                  max_rpm=1800)
+        _func = TF_PowerVacuumPump(p_name='TF_PowerVacuumPump',
+                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                                   p_dt=0.05,
+                                   min_power=0,
+                                   max_power=456,
+                                   min_duration=0.979,
+                                   max_duration=9.5)
         return _func
 
 
@@ -124,7 +127,7 @@ class CB1_PowerConsumption(SimState):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class TF_PowerBelt_Cont(TransferFunction):
+class TF_PowerVacuumPump(TransferFunction):
   
     
 ## -------------------------------------------------------------------------------------------------      
@@ -133,8 +136,8 @@ class TF_PowerBelt_Cont(TransferFunction):
             try:
                 self.min_power = p_args['min_power']
                 self.max_power = p_args['max_power']
-                self.min_rpm = p_args['min_rpm']
-                self.max_rpm = p_args['max_rpm']
+                self.min_duration = p_args['min_duration']
+                self.max_duration = p_args['max_duration']
             except:
                 raise NotImplementedError('One/More parameters for this function is missing.')           
         return True
@@ -148,7 +151,7 @@ class TF_PowerBelt_Cont(TransferFunction):
         Parameters
         ----------
         p_input : list
-            [0] = Rotational speed in rpm
+            [0] = Turn-on duration
             [1] = Status of the actuator
         p_range : float
             period of measuring the power consumption in seconds.
@@ -159,11 +162,13 @@ class TF_PowerBelt_Cont(TransferFunction):
             The power consumption in kW.
         """
         if p_input[1]:
-            normalized_rpm = (p_input[0]-self.min_rpm)/(self.max_rpm-self.min_rpm)
             if p_range is None:
-                power  = normalized_rpm*(self.max_power-self.min_power)+self.min_power
+                power = self.max_power
             else:
-                power  = (normalized_rpm*(self.max_power-self.min_power)+self.min_power)*p_range
+                if p_input[0] <= p_range:
+                    power = self.max_power*p_input[0]
+                else:
+                    power = self.max_power*p_range
             return power/1000.0
         else:
             return 0
@@ -173,28 +178,28 @@ class TF_PowerBelt_Cont(TransferFunction):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ConveyorBelt1(Component):
+class VacuumPump1(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
     def _setup_component(self):
         """
-        A conveyor belt consists of an actuator and two states components.
+        A vacuum pump consists of an actuator and two states components.
         """
-        motor = SimActuator(p_name_short='Motor',
+        timer = SimActuator(p_name_short='Timer',
                             p_base_set=Dimension.C_BASE_SET_R,
-                            p_unit='rpm',
-                            p_boundaries=[450,1800])
-        transported_material = CB1_TransportedMaterial(p_name_short='CB1_TransportedMaterial',
-                                                       p_base_set=Dimension.C_BASE_SET_R,
-                                                       p_unit='L',
-                                                       p_boundaries=[0,sys.maxsize])
-        power_consumption = CB1_PowerConsumption(p_name_short='CB1_PowerConsumption',
-                                                 p_base_set=Dimension.C_BASE_SET_R,
-                                                 p_unit='kW',
-                                                 p_boundaries=[0,sys.maxsize])
+                            p_unit='s',
+                            p_boundaries=[0.979, 9.5])
+        transported_material = VC1_TransportedMaterial(p_name_short='VC1_TransportedMaterial',
+                                                      p_base_set=Dimension.C_BASE_SET_R,
+                                                      p_unit='L',
+                                                      p_boundaries=[0,sys.maxsize])
+        power_consumption = VC1_PowerConsumption(p_name_short='VC1_PowerConsumption',
+                                                p_base_set=Dimension.C_BASE_SET_R,
+                                                p_unit='kW',
+                                                p_boundaries=[0,sys.maxsize])
         
-        self._add_actuator(p_actuator=motor)
+        self._add_actuator(p_actuator=timer)
         self._add_component_states(p_comp_states=transported_material)
         self._add_component_states(p_comp_states=power_consumption)
     
