@@ -77,7 +77,7 @@ class VibratoryConveyor(Component):
 ## -------------------------------------------------------------------------------------------------
     def _setup_component(self):
         """
-        A vibratory conveyor consists of an actuator and two states components.
+        A bucket elevator consists of an actuator and two states components.
         """
         switch = SimActuator(p_name_short='Switch',
                              p_base_set=Dimension.C_BASE_SET_Z,
