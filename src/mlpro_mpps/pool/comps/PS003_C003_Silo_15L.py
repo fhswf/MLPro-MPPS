@@ -143,7 +143,7 @@ class Silo15(Component):
         silo_overflow = Silo15_Overflow(p_name_short='Silo15_Overflow',
                                         p_base_set=Dimension.C_BASE_SET_R,
                                         p_unit='L',
-                                        _boundaries=[0,sys.maxsize])
+                                        p_boundaries=[0,sys.maxsize])
         
         self._add_sensor(p_sensor=silo_sensor_1)
         self._add_sensor(p_sensor=silo_sensor_2)

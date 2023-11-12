@@ -137,13 +137,13 @@ class MixingSilo17(Component):
                                              p_base_set=Dimension.C_BASE_SET_Z,
                                              p_boundaries=[0,1])
         silo_fill_level = MixingSilo17_FillLevel(p_name_short='MixingSilo17_FillLevel',
-                                           p_base_set=Dimension.C_BASE_SET_R,
-                                           p_unit='L',
-                                           p_boundaries=[0,17.42])
+                                                 p_base_set=Dimension.C_BASE_SET_R,
+                                                 p_unit='L',
+                                                 p_boundaries=[0,17.42])
         silo_overflow = MixingSilo17_Overflow(p_name_short='MixingSilo17_Overflow',
                                               p_base_set=Dimension.C_BASE_SET_R,
                                               p_unit='L',
-                                              _boundaries=[0,sys.maxsize])
+                                              p_boundaries=[0,sys.maxsize])
         
         self._add_sensor(p_sensor=silo_sensor_1)
         self._add_sensor(p_sensor=silo_sensor_2)

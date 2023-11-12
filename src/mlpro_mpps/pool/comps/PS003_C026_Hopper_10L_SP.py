@@ -5,12 +5,12 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
-## -- 2023-11-11  0.0.0     SY       Creation
-## -- 2023-11-11  1.0.0     SY       Release of first version
+## -- 2023-11-12  0.0.0     SY       Creation
+## -- 2023-11-12  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-11)
+Ver. 1.0.0 (2023-11-12)
 
 This module provides a default implementation of a component of the BGLP, which is a 10L Mini Hopper
 for serial-parallel processes.
@@ -152,16 +152,16 @@ class Hopper10SP(Component):
         A silo consists of two sensors and two states components.
         """
         hopper_sensor = Hopper10SP_Sensor(p_name_short='Hopper10SP_Sensor1',
-                                        p_base_set=Dimension.C_BASE_SET_Z,
-                                        p_boundaries=[0,1])
+                                          p_base_set=Dimension.C_BASE_SET_Z,
+                                          p_boundaries=[0,1])
         hopper_fill_level = Hopper10SP_FillLevel(p_name_short='Hopper10SP_FillLevel',
-                                               p_base_set=Dimension.C_BASE_SET_R,
-                                               p_unit='L',
-                                               p_boundaries=[0,10.0])
+                                                 p_base_set=Dimension.C_BASE_SET_R,
+                                                 p_unit='L',
+                                                 p_boundaries=[0,10.0])
         hopper_overflow = Hopper10SP_Overflow(p_name_short='Hopper10SP_Overflow',
-                                            p_base_set=Dimension.C_BASE_SET_R,
-                                            p_unit='L',
-                                            p_boundaries=[0,sys.maxsize])
+                                              p_base_set=Dimension.C_BASE_SET_R,
+                                              p_unit='L',
+                                              p_boundaries=[0,sys.maxsize])
         
         self._add_sensor(p_sensor=hopper_sensor)
         self._add_component_states(p_comp_states=hopper_overflow)
