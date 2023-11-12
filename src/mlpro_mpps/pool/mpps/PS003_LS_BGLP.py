@@ -31,6 +31,9 @@ from mlpro_mpps.pool.mods.PS003_M005_Storing import *
 from mlpro_mpps.pool.mods.PS003_M006_Weighing import *
 from mlpro_mpps.pool.mods.PS003_M007_Filling import *
 from mlpro_mpps.pool.mods.PS003_M008_BatchDosing import *
+from mlpro_mpps.pool.mods.PS003_M009_Feeding_SP import *
+from mlpro_mpps.pool.mods.PS003_M010_Storing_SP import *
+from mlpro_mpps.pool.mods.PS003_M011_BatchDosing_SP import *
 
 
                      
@@ -636,7 +639,46 @@ class LS_BGLP_SP(SimMPPS):
 
 ## -------------------------------------------------------------------------------------------------
     def _setup_mpps(self, p_auto_adjust_names=True):
-        pass
+        
+        # 1. Add elements
+        loading = LoadingStation(p_name='LoadingStation')
+        feeding = FeedingStation_SP(p_name='FeedingStation')
+        transporting = TransportingStation(p_name='TransportingStation')
+        mixing = MixingStation(p_name='MixingStation')
+        storing = StoringStation_SP(p_name='StoringStation')
+        weighing = WeighingStation(p_name='WeighingStation')
+        filling = FillingStation(p_name='FillingStation')
+        dosing = BatchDosingStation_SP(p_name='BatchDosingStation')
+        
+        self._add_element(p_elem=loading)
+        self._add_element(p_elem=feeding)
+        self._add_element(p_elem=transporting)
+        self._add_element(p_elem=mixing)
+        self._add_element(p_elem=storing)
+        self._add_element(p_elem=weighing)
+        self._add_element(p_elem=filling)
+        self._add_element(p_elem=dosing)
+        
+        # 2. Check duplications of the elements names
+        while not self._elements_names_checker():
+            if p_auto_adjust_names:
+                self._elements_names_auto_adjust()
+            else:
+                raise NameError('There are duplications of the elements names. You can just simply set p_auto_adjust_names to True.')
+
+        # 3. Setup which actions connected to which actuators
+        self._actions_in_order = False
+
+        # 4. Setup input signals for updating sensors or component states values
+        _sens = self.get_sensors()
+        _acts = self.get_actuators()
+        _sts = self.get_component_states()
+        
+        # 4.1. Actuators-related states
+        
+        # 4.2. Buffers-related states
+                
+        # 4.3. Buffers-related sensor
 
 
 ## -------------------------------------------------------------------------------------------------
