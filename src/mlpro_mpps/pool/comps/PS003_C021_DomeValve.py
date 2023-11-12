@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : PS003_C020_BucketElevator.py
+## -- Module  : PS003_C021_DomeValve.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -12,8 +12,7 @@
 """
 Ver. 1.0.0 (2023-11-12)
 
-This module provides a default implementation of a component of the LS-BGLP, which is a Bucket
-Elevator.
+This module provides a default implementation of a component of the LS-BGLP, which is a Dome Valve.
 """
 
 
@@ -28,21 +27,21 @@ import sys
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class BuE_TransportedMaterial(SimState):
+class DV_TransportedMaterial(SimState):
     """
     This class serves as a component state to calculate the transported material.
     """
 
     C_TYPE = 'SimState'
-    C_NAME = 'BuE_TransportedMaterial'
+    C_NAME = 'DV_TransportedMaterial'
   
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_TransBelt_Binary(p_name='TF_TransBuE_Binary',
+        _func = TF_TransBelt_Binary(p_name='TF_TransDV_Binary',
                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                     p_dt=0.05,
-                                    coef=0.265)
+                                    coef=0.325)
         return _func
 
 
@@ -50,20 +49,20 @@ class BuE_TransportedMaterial(SimState):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class BuE_PowerConsumption(SimState):
+class DV_PowerConsumption(SimState):
     """
     This class serves as a component state to calculate the power consumption.
     """
 
     C_TYPE = 'SimState'
-    C_NAME = 'BuE_PowerConsumption'
+    C_NAME = 'DV_PowerConsumption'
   
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_PowerBelt_Binary(p_name='TF_PowerBuE_Binary',
+        _func = TF_PowerBelt_Binary(p_name='TF_PowerDV_Binary',
                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                    power=22.50)
+                                    power=20.25)
         return _func
 
 
@@ -71,7 +70,7 @@ class BuE_PowerConsumption(SimState):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class BucketElevator(Component):
+class DomeValve(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -83,14 +82,14 @@ class BucketElevator(Component):
                              p_base_set=Dimension.C_BASE_SET_Z,
                              p_unit='',
                              p_boundaries=[0,1])
-        transported_material = BuE_TransportedMaterial(p_name_short='BuE_TransportedMaterial',
-                                                       p_base_set=Dimension.C_BASE_SET_R,
-                                                       p_unit='L',
-                                                       p_boundaries=[0,sys.maxsize])
-        power_consumption = BuE_PowerConsumption(p_name_short='BuE_PowerConsumption',
-                                                 p_base_set=Dimension.C_BASE_SET_R,
-                                                 p_unit='kW',
-                                                 p_boundaries=[0,sys.maxsize])
+        transported_material = DV_TransportedMaterial(p_name_short='DV_TransportedMaterial',
+                                                      p_base_set=Dimension.C_BASE_SET_R,
+                                                      p_unit='L',
+                                                      p_boundaries=[0,sys.maxsize])
+        power_consumption = DV_PowerConsumption(p_name_short='DV_PowerConsumption',
+                                                p_base_set=Dimension.C_BASE_SET_R,
+                                                p_unit='kW',
+                                                p_boundaries=[0,sys.maxsize])
         
         self._add_actuator(p_actuator=switch)
         self._add_component_states(p_comp_states=transported_material)
