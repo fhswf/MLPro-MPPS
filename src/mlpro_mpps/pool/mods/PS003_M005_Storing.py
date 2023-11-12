@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.mods
-## -- Module  : PS003_M004_Mixing.py
+## -- Module  : PS003_M005_Storing.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -12,31 +12,31 @@
 """
 Ver. 1.0.0 (2023-11-12)
 
-This module provides a default implementation of a module of the LS-BGLP, which is a Mixing station.
+This module provides a default implementation of a module of the LS-BGLP, which is a Storing station.
 """
 
 
 from mlpro_mpps.mpps import *
-from mlpro_mpps.pool.comps.PS003_C006_MixingSilo_17L import *
-from mlpro_mpps.pool.comps.PS003_C007_Hopper_8L import *
-from mlpro_mpps.pool.comps.PS003_C012_VacuumPump2 import *
-from mlpro_mpps.pool.comps.PS003_C015_ScrewConveyor2 import *
+from mlpro_mpps.pool.comps.PS003_C001_Silo_17L import *
+from mlpro_mpps.pool.comps.PS003_C004_Hopper_10L import *
+from mlpro_mpps.pool.comps.PS003_C011_VacuumPump1 import *
+from mlpro_mpps.pool.comps.PS003_C019_VibratoryConveyor import *
 
 
                      
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class MixingStation(Module):
+class StoringStation(Module):
 
 
 ## -------------------------------------------------------------------------------------------------
     def _setup_module(self):
 
-        silo = MixingSilo17(p_name='SiloD')
-        hopper = Hopper8(p_name='HopperD')
-        act1 = VacuumPump2(p_name='ActD1')
-        act2 = ScrewConveyor2(p_name='ActD2')
+        silo = Silo17(p_name='SiloE')
+        hopper = Hopper10(p_name='HopperE')
+        act1 = VacuumPump1(p_name='ActE1')
+        act2 = VibratoryConveyor(p_name='ActE2')
         
         self._add_component(p_component=silo)
         self._add_component(p_component=hopper)
