@@ -1,7 +1,7 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
 ## -- Package : mlpro_mpps.pool.comps
-## -- Module  : PS003_C014_ScrewConveyor1.py
+## -- Module  : PS003_C015_ScrewConveyor2.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
@@ -13,7 +13,7 @@
 Ver. 1.0.0 (2023-11-12)
 
 This module provides a default implementation of a component of the LS-BGLP, which is a Screw Conveyor
-Type 1.
+Type 2.
 """
 
 
@@ -28,18 +28,18 @@ import sys
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class SC1_TransportedMaterial(SimState):
+class SC2_TransportedMaterial(SimState):
     """
     This class serves as a component state to calculate the transported material.
     """
 
     C_TYPE = 'SimState'
-    C_NAME = 'SC1_TransportedMaterial'
+    C_NAME = 'SC2_TransportedMaterial'
   
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_TransBelt_Cont(p_name='TF_TransSC1_Cont',
+        _func = TF_TransBelt_Cont(p_name='TF_TransSC2_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0.05,
                                   coef=0.0135/60)
@@ -50,24 +50,24 @@ class SC1_TransportedMaterial(SimState):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class SC1_PowerConsumption(SimState):
+class SC2_PowerConsumption(SimState):
     """
     This class serves as a component state to calculate the power consumption.
     """
 
     C_TYPE = 'SimState'
-    C_NAME = 'SC1_PowerConsumption'
+    C_NAME = 'SC2_PowerConsumption'
   
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_PowerBelt_Cont(p_name='TF_PowerSC1_Cont',
+        _func = TF_PowerBelt_Cont(p_name='TF_PowerSC2_Cont',
                                   p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                   p_dt=0.05,
                                   min_power=17.75,
                                   max_power=30.75,
                                   min_rpm=250,
-                                  max_rpm=1000)
+                                  max_rpm=1300)
         return _func
 
 
@@ -75,7 +75,7 @@ class SC1_PowerConsumption(SimState):
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class ScrewConveyor1(Component):
+class ScrewConveyor2(Component):
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -86,12 +86,12 @@ class ScrewConveyor1(Component):
         motor = SimActuator(p_name_short='Motor',
                             p_base_set=Dimension.C_BASE_SET_R,
                             p_unit='rpm',
-                            p_boundaries=[250,1000])
-        transported_material = SC1_TransportedMaterial(p_name_short='SC1_TransportedMaterial',
+                            p_boundaries=[250,1300])
+        transported_material = SC2_TransportedMaterial(p_name_short='SC2_TransportedMaterial',
                                                        p_base_set=Dimension.C_BASE_SET_R,
                                                        p_unit='L',
                                                        p_boundaries=[0,sys.maxsize])
-        power_consumption = SC1_PowerConsumption(p_name_short='SC1_PowerConsumption',
+        power_consumption = SC2_PowerConsumption(p_name_short='SC2_PowerConsumption',
                                                  p_base_set=Dimension.C_BASE_SET_R,
                                                  p_unit='kW',
                                                  p_boundaries=[0,sys.maxsize])
