@@ -36,9 +36,9 @@ class LoadingStation(Module):
         """
         silo = SiloLoading(p_name='SiloA')
         hopper = Hopper9(p_name='HopperA')
-        belt = ConveyorBelt1(p_name='ActA1')
+        act1 = ConveyorBelt1(p_name='ActA1')
         
         self._add_component(p_component=silo)
         self._add_component(p_component=hopper)
-        self._add_component(p_component=belt)
+        self._add_component(p_component=act1)
     
