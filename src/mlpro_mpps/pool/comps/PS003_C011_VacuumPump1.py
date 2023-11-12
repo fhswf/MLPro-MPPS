@@ -113,7 +113,7 @@ class VC1_PowerConsumption(SimState):
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_PowerVacuumPump(p_name='TF_PowerVacuumPump',
+        _func = TF_PowerVacuumPump(p_name='TF_PowerVacuumPump1',
                                    p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
                                    p_dt=0.05,
                                    min_power=0,
