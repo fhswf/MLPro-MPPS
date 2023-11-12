@@ -27,14 +27,12 @@ from mlpro_mpps.pool.comps.PS003_C014_ScrewConveyor1 import *
                         
 ## -------------------------------------------------------------------------------------------------
 ## -------------------------------------------------------------------------------------------------
-class LoadingStation(Module):
+class FeedingStation(Module):
 
 
 ## -------------------------------------------------------------------------------------------------
     def _setup_module(self):
-        """
-        Loading station consists of a silo, a hopper, and a conveyor belt.
-        """
+        
         silo = Silo15(p_name='SiloB')
         hopper = Hopper10(p_name='HopperB')
         act1 = VacuumPump1(p_name='ActB1')

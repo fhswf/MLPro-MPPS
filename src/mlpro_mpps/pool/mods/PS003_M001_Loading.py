@@ -31,9 +31,7 @@ class LoadingStation(Module):
 
 ## -------------------------------------------------------------------------------------------------
     def _setup_module(self):
-        """
-        Loading station consists of a silo, a hopper, and a conveyor belt.
-        """
+        
         silo = SiloLoading(p_name='SiloA')
         hopper = Hopper9(p_name='HopperA')
         act1 = ConveyorBelt1(p_name='ActA1')
