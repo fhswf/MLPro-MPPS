@@ -6,11 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-11-11  0.0.0     SY       Creation
-## -- 2023-11-11  1.0.0     SY       Release of first version
+## -- 2023-11-13  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-11)
+Ver. 1.0.0 (2023-11-13)
 
 This module provides a default implementation of a component of the BGLP, which is a 30L Silo
 for serial-parallel processes.
@@ -22,7 +22,6 @@ from mlpro_mpps.mpps import *
 from mlpro.bf.physics import TransferFunction
 from mlpro.bf.math import *
 from mlpro_mpps.pool.comps.PS003_C001_Silo_17L import *
-from mlpro_mpps.pool.comps.PS003_C027_Silo_17L_SP import *
 import sys
 
 
@@ -87,11 +86,11 @@ class Silo30SP_FillLevel(SimState):
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_FillLevel_2Inputs(p_name='TF_FillLevel_Silo30SP',
-                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                     _dt=0,
-                                     max_vol=30.00,
-                                     min_vol=0)
+        _func = TF_FillLevel(p_name='TF_FillLevel_Silo30SP',
+                             p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                             _dt=0,
+                             max_vol=30.00,
+                             min_vol=0)
         return _func
 
 

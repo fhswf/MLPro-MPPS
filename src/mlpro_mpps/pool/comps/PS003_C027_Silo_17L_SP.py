@@ -86,58 +86,12 @@ class Silo17SP_FillLevel(SimState):
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_FillLevel_2Inputs(p_name='TF_FillLevel_Silo17SP',
-                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                                     _dt=0,
-                                     max_vol=17.42,
-                                     min_vol=0)
+        _func = TF_FillLevel(p_name='TF_FillLevel_Silo17SP',
+                             p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                             _dt=0,
+                             max_vol=17.42,
+                             min_vol=0)
         return _func
-
-
-                 
-                        
-## -------------------------------------------------------------------------------------------------
-## -------------------------------------------------------------------------------------------------
-class TF_FillLevel_2Inputs(TransferFunction):
-  
-    
-## -------------------------------------------------------------------------------------------------      
-    def _set_function_parameters(self, p_args) -> bool:
-        if self.get_type() == self.C_TRF_FUNC_CUSTOM:
-            try:
-                self.max_vol = p_args['max_vol']
-                self.min_vol = p_args['min_vol']
-            except:
-                raise NotImplementedError('One/More parameters for this function is missing.')           
-        return True
-  
-    
-## -------------------------------------------------------------------------------------------------      
-    def _custom_function(self, p_input, p_range=None):
-        """
-        To measure the current fill-level.
-
-        Parameters
-        ----------
-        p_input : list
-            [0] = Actual fill-level
-            [1] = Volume in from Actuator 1
-            [2] = Volume in from Actuator 2
-            [3] = Volume out
-
-        Returns
-        -------
-        float
-            Actual fill-level.
-        """
-        output = p_input[0]+p_input[1]+p_input[2]-p_input[3]
-        
-        if output >= self.max_vol:
-            return self.max_vol
-        elif output <= self.min_vol:
-            return self.min_vol
-        else:
-            return output
 
 
                      

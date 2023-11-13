@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-11-09  0.0.0     SY       Creation
 ## -- 2023-11-12  1.0.0     SY       Release of first version, LS-BGLP Type 1
+## -- 2023-11-13  2.0.0     SY       Release of second version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-12)
+Ver. 1.0.0 (2023-11-13)
 
 This module provides implementations of the LS-BGLP in MLPro-MPPS in three different settings,
 such as:
@@ -34,6 +35,8 @@ from mlpro_mpps.pool.mods.PS003_M008_BatchDosing import *
 from mlpro_mpps.pool.mods.PS003_M009_Feeding_SP import *
 from mlpro_mpps.pool.mods.PS003_M010_Storing_SP import *
 from mlpro_mpps.pool.mods.PS003_M011_BatchDosing_SP import *
+from mlpro_mpps.pool.mods.PS003_M012_Mixing_SP import *
+from mlpro_mpps.pool.mods.PS003_M013_Filling_SP import *
 
 
                      
@@ -270,7 +273,7 @@ class LS_BGLP(SimMPPS):
         self._add_signal(
             _sts['DU_TransportedMaterial'],
             _acts['Switch_3'].get_status,
-            _sts['Silo17_FillLevel_2'].get_value
+            _sts['Silo30_FillLevel'].get_value
             )
         
         # 4.2. Buffers-related states
@@ -469,15 +472,15 @@ class LS_BGLP(SimMPPS):
             )
         
         self._add_signal(
-            _sts['Silo17_Overflow_2'], 
-            _sts['Silo17_FillLevel_2'].get_value, 
+            _sts['Silo30_Overflow'], 
+            _sts['Silo30_FillLevel'].get_value, 
             _sts['VC3_TransportedMaterial'].get_value, 
             _sts['DU_TransportedMaterial'].get_value
             )
         
         self._add_signal(
-            _sts['Silo17_FillLevel_2'], 
-            _sts['Silo17_FillLevel_2'].get_value, 
+            _sts['Silo30_FillLevel'], 
+            _sts['Silo30_FillLevel'].get_value, 
             _sts['VC3_TransportedMaterial'].get_value, 
             _sts['DU_TransportedMaterial'].get_value
             )
@@ -595,13 +598,13 @@ class LS_BGLP(SimMPPS):
             )
         
         self._add_signal(
-            _sens['Silo17_Sensor1_2'],
-            _sts['Silo17_FillLevel_2'].get_value
+            _sens['Silo30_Sensor1'],
+            _sts['Silo30_FillLevel'].get_value
             )
         
         self._add_signal(
-            _sens['Silo17_Sensor2_2'],
-            _sts['Silo17_FillLevel_2'].get_value
+            _sens['Silo30_Sensor2'],
+            _sts['Silo30_FillLevel'].get_value
             )
 
 
@@ -644,10 +647,10 @@ class LS_BGLP_SP(SimMPPS):
         loading = LoadingStation(p_name='LoadingStation')
         feeding = FeedingStation_SP(p_name='FeedingStation')
         transporting = TransportingStation(p_name='TransportingStation')
-        mixing = MixingStation(p_name='MixingStation')
+        mixing = MixingStation_SP(p_name='MixingStation')
         storing = StoringStation_SP(p_name='StoringStation')
         weighing = WeighingStation(p_name='WeighingStation')
-        filling = FillingStation(p_name='FillingStation')
+        filling = FillingStation_SP(p_name='FillingStation')
         dosing = BatchDosingStation_SP(p_name='BatchDosingStation')
         
         self._add_element(p_elem=loading)
@@ -675,10 +678,526 @@ class LS_BGLP_SP(SimMPPS):
         _sts = self.get_component_states()
         
         # 4.1. Actuators-related states
+        self._add_signal(
+            _sts['CB1_TransportedMaterial'],            # p_updated_elem
+            _acts['Motor'].get_value,                   # p_input_fcts[0]
+            _acts['Motor'].get_status,                  # p_input_fcts[1]
+            _sts['SiloLoadingFillLevel'].get_value      # p_input_fcts[2]
+            )
+        
+        self._add_signal(
+            _sts['CB1_PowerConsumption'],
+            _acts['Motor'].get_value, 
+            _acts['Motor'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC1_TransportedMaterial'],
+            _acts['Timer'].get_value, 
+            _acts['Timer'].get_status, 
+            _sts['Hopper9_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VC1_PowerConsumption'],
+            _acts['Timer'].get_value, 
+            _acts['Timer'].get_status
+            )
+        
+        self._add_signal(
+            _sts['SC1_TransportedMaterial'],
+            _acts['Motor_1'].get_value,
+            _acts['Motor_1'].get_status,
+            _sts['Silo15_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SC1_PowerConsumption'],
+            _acts['Motor_1'].get_value, 
+            _acts['Motor_1'].get_status
+            )
+        
+        self._add_signal(
+            _sts['BE1_TransportedMaterial'],
+            _acts['Motor_2'].get_value,
+            _acts['Motor_2'].get_status,
+            _sts['Hopper10SP_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['BE1_PowerConsumption'],
+            _acts['Motor_2'].get_value, 
+            _acts['Motor_2'].get_status
+            )
+        
+        self._add_signal(
+            _sts['CB2_TransportedMaterial'],
+            _acts['Motor_3'].get_value,
+            _acts['Motor_3'].get_status,
+            _sts['Silo12_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['CB2_PowerConsumption'],
+            _acts['Motor_3'].get_value, 
+            _acts['Motor_3'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC2SP_TransportedMaterial'],
+            _acts['Timer_1'].get_value, 
+            _acts['Timer_1'].get_status, 
+            _sts['Hopper10SP_FillLevel'].get_value,
+            _sts['BE1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VC2SP_PowerConsumption'],
+            _acts['Timer_1'].get_value, 
+            _acts['Timer_1'].get_status
+            )
+        
+        self._add_signal(
+            _sts['SC2_TransportedMaterial'],
+            _acts['Motor_4'].get_value,
+            _acts['Motor_4'].get_status,
+            _sts['MixingSilo17_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SC2_PowerConsumption'],
+            _acts['Motor_4'].get_value, 
+            _acts['Motor_4'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC1SP_TransportedMaterial'],
+            _acts['Timer_2'].get_value, 
+            _acts['Timer_2'].get_status, 
+            _sts['Hopper9_FillLevel_1'].get_value, 
+            _sts['Hopper8_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VC1SP_PowerConsumption'],
+            _acts['Timer_2'].get_value, 
+            _acts['Timer_2'].get_status
+            )
+        
+        self._add_signal(
+            _sts['ViC_TransportedMaterial'],
+            _acts['Switch'].get_status,
+            _sts['Silo17SP_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['ViC_PowerConsumption'],
+            _acts['Switch'].get_status
+            )
+        
+        self._add_signal(
+            _sts['BE2_TransportedMaterial'],
+            _acts['Motor_5'].get_value,
+            _acts['Motor_5'].get_status,
+            _sts['Hopper10SP_FillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['BE2_PowerConsumption'],
+            _acts['Motor_5'].get_value, 
+            _acts['Motor_5'].get_status
+            )
+        
+        self._add_signal(
+            _sts['RF_TransportedMaterial'],
+            _acts['Motor_6'].get_value,
+            _acts['Motor_6'].get_status,
+            _sts['Silo15_FillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['RF_PowerConsumption'],
+            _acts['Motor_6'].get_value, 
+            _acts['Motor_6'].get_status
+            )
+        
+        self._add_signal(
+            _sts['BuESP_TransportedMaterial'],
+            _acts['Switch_1'].get_status,
+            _sts['Hopper10SP_FillLevel_1'].get_value,
+            _sts['BE2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['BuESP_PowerConsumption'],
+            _acts['Switch_1'].get_status
+            )
+        
+        self._add_signal(
+            _sts['DV_TransportedMaterial'],
+            _acts['Switch_2'].get_status,
+            _sts['Silo17_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['DV_PowerConsumption'],
+            _acts['Switch_2'].get_status
+            )
+        
+        self._add_signal(
+            _sts['VC3SP_TransportedMaterial'],
+            _acts['Timer_3'].get_value, 
+            _acts['Timer_3'].get_status, 
+            _sts['Hopper9_FillLevel_2'].get_value, 
+            _sts['Hopper12_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sts['VC3SP_PowerConsumption'],
+            _acts['Timer_3'].get_value, 
+            _acts['Timer_3'].get_status
+            )
+        
+        self._add_signal(
+            _sts['DU_TransportedMaterial'],
+            _acts['Switch_3'].get_status,
+            _sts['Silo30SP_FillLevel'].get_value
+            )
         
         # 4.2. Buffers-related states
+        self._add_signal(
+            _sts['SiloLoadingOverflow'],
+            _sts['SiloLoadingFillLevel'].get_value, 
+            _sts['CB1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['SiloLoadingFillLevel'],
+            _sts['SiloLoadingFillLevel'].get_value, 
+            _sts['CB1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper9_Overflow'], 
+            _sts['Hopper9_FillLevel'].get_value, 
+            _sts['CB1_TransportedMaterial'].get_value,
+            _sts['VC1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper9_FillLevel'],
+            _sts['Hopper9_FillLevel'].get_value,
+            _sts['CB1_TransportedMaterial'].get_value, 
+            _sts['VC1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo15_Overflow'], 
+            _sts['Silo15_FillLevel'].get_value, 
+            _sts['VC1_TransportedMaterial'].get_value, 
+            _sts['SC1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo15_FillLevel'], 
+            _sts['Silo15_FillLevel'].get_value, 
+            _sts['VC1_TransportedMaterial'].get_value, 
+            _sts['SC1_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper10SP_Overflow'], 
+            _sts['Hopper10SP_FillLevel'].get_value, 
+            _sts['SC1_TransportedMaterial'].get_value,
+            _sts['BE1_TransportedMaterial'].get_value,
+            _sts['VC2SP_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper10SP_FillLevel'],
+            _sts['Hopper10SP_FillLevel'].get_value,
+            _sts['SC1_TransportedMaterial'].get_value, 
+            _sts['BE1_TransportedMaterial'].get_value,
+            _sts['VC2SP_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo12_Overflow'], 
+            _sts['Silo12_FillLevel'].get_value, 
+            _sts['BE1_TransportedMaterial'].get_value, 
+            _sts['CB2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo12_FillLevel'], 
+            _sts['Silo12_FillLevel'].get_value, 
+            _sts['BE1_TransportedMaterial'].get_value, 
+            _sts['CB2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper9_Overflow_1'], 
+            _sts['Hopper9_FillLevel_1'].get_value, 
+            _sts['CB2_TransportedMaterial'].get_value,
+            _sts['VC2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper9_FillLevel_1'],
+            _sts['Hopper9_FillLevel_1'].get_value,
+            _sts['CB2_TransportedMaterial'].get_value, 
+            _sts['VC2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['MixingSilo17_Overflow'], 
+            _sts['MixingSilo17_FillLevel'].get_value, 
+            _sts['VC2SP_TransportedMaterial'].get_value, 
+            _sts['SC2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['MixingSilo17_FillLevel'], 
+            _sts['MixingSilo17_FillLevel'].get_value, 
+            _sts['VC2SP_TransportedMaterial'].get_value, 
+            _sts['SC2_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper8_Overflow'], 
+            _sts['Hopper8_FillLevel'].get_value, 
+            _sts['SC2_TransportedMaterial'].get_value,
+            _sts['VC1_TransportedMaterial_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper8_FillLevel'],
+            _sts['Hopper8_FillLevel'].get_value,
+            _sts['SC2_TransportedMaterial'].get_value, 
+            _sts['VC1_TransportedMaterial_1'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo17SP_Overflow'], 
+            _sts['Silo17SP_FillLevel'].get_value, 
+            _sts['VC1SP_TransportedMaterial'].get_value, 
+            _sts['ViC_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo17SP_FillLevel'], 
+            _sts['Silo17SP_FillLevel'].get_value, 
+            _sts['VC1SP_TransportedMaterial'].get_value, 
+            _sts['ViC_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper10SP_Overflow_1'], 
+            _sts['Hopper10SP_FillLevel_1'].get_value, 
+            _sts['ViC_TransportedMaterial'].get_value,
+            _sts['BE2_TransportedMaterial'].get_value,
+            _sts['BuESP_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper10SP_FillLevel_1'],
+            _sts['Hopper10SP_FillLevel_1'].get_value,
+            _sts['ViC_TransportedMaterial'].get_value, 
+            _sts['BE2_TransportedMaterial'].get_value,
+            _sts['BuESP_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo15_Overflow_1'], 
+            _sts['Silo15_FillLevel_1'].get_value, 
+            _sts['BE2_TransportedMaterial'].get_value, 
+            _sts['RF_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo15_FillLevel_1'], 
+            _sts['Silo15_FillLevel_1'].get_value, 
+            _sts['BE2_TransportedMaterial'].get_value, 
+            _sts['RF_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper9_Overflow_2'], 
+            _sts['Hopper9_FillLevel_2'].get_value, 
+            _sts['RF_TransportedMaterial'].get_value,
+            _sts['BuE_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper9_FillLevel_2'],
+            _sts['Hopper9_FillLevel_2'].get_value,
+            _sts['RF_TransportedMaterial'].get_value, 
+            _sts['BuE_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo17_Overflow'], 
+            _sts['Silo17_FillLevel'].get_value, 
+            _sts['BuESP_TransportedMaterial'].get_value, 
+            _sts['DV_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo17_FillLevel'], 
+            _sts['Silo17_FillLevel'].get_value, 
+            _sts['BuESP_TransportedMaterial'].get_value, 
+            _sts['DV_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper12_Overflow'], 
+            _sts['Hopper12_FillLevel'].get_value, 
+            _sts['DV_TransportedMaterial'].get_value,
+            _sts['VC3_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Hopper12_FillLevel'],
+            _sts['Hopper12_FillLevel'].get_value,
+            _sts['DV_TransportedMaterial'].get_value, 
+            _sts['VC3_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo30SP_Overflow'], 
+            _sts['Silo30SP_FillLevel'].get_value, 
+            _sts['VC3SP_TransportedMaterial'].get_value, 
+            _sts['DU_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['Silo30SP_FillLevel'], 
+            _sts['Silo30SP_FillLevel'].get_value, 
+            _sts['VC3SP_TransportedMaterial'].get_value, 
+            _sts['DU_TransportedMaterial'].get_value
+            )
+        
+        self._add_signal(
+            _sts['InventoryLevel'], 
+            _sts['InventoryLevel'].get_value, 
+            _sts['DU_TransportedMaterial'].get_value
+            )       
                 
         # 4.3. Buffers-related sensor
+        self._add_signal(
+            _sens['SiloLoadingSensor1'],
+            _sts['SiloLoadingFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['SiloLoadingSensor2'],
+            _sts['SiloLoadingFillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper9_Sensor1'],
+            _sts['Hopper9_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo15_Sensor1'],
+            _sts['Silo15_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo15_Sensor2'],
+            _sts['Silo15_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper10SP_Sensor1'],
+            _sts['Hopper10SP_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo12_Sensor1'],
+            _sts['Silo12_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo12_Sensor2'],
+            _sts['Silo12_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper9_Sensor1_1'],
+            _sts['Hopper9_FillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sens['MixingSilo17_Sensor1'],
+            _sts['MixingSilo17_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['MixingSilo17_Sensor2'],
+            _sts['MixingSilo17_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper8_Sensor1'],
+            _sts['Hopper8_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo17SP_Sensor1'],
+            _sts['Silo17SP_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo17SP_Sensor2'],
+            _sts['Silo17SP_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper10SP_Sensor1_1'],
+            _sts['Hopper10SP_FillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo15_Sensor1_1'],
+            _sts['Silo15_FillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo15_Sensor2_1'],
+            _sts['Silo15_FillLevel_1'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper9_Sensor1_2'],
+            _sts['Hopper9_FillLevel_2'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo17_Sensor1'],
+            _sts['Silo17_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo17_Sensor2'],
+            _sts['Silo17_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Hopper12_Sensor1'],
+            _sts['Hopper12_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo30SP_Sensor1'],
+            _sts['Silo30SP_FillLevel'].get_value
+            )
+        
+        self._add_signal(
+            _sens['Silo30SP_Sensor2'],
+            _sts['Silo30SP_FillLevel'].get_value
+            )
 
 
 ## -------------------------------------------------------------------------------------------------

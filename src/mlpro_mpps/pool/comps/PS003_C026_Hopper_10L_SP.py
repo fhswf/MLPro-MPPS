@@ -6,11 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-11-12  0.0.0     SY       Creation
-## -- 2023-11-12  1.0.0     SY       Release of first version
+## -- 2023-11-13  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-12)
+Ver. 1.0.0 (2023-11-13)
 
 This module provides a default implementation of a component of the BGLP, which is a 10L Mini Hopper
 for serial-parallel processes.
@@ -132,11 +132,54 @@ class Hopper10SP_Overflow(SimState):
     
 ## -------------------------------------------------------------------------------------------------      
     def _setup_function(self) -> TransferFunction:
-        _func = TF_Overflow(p_name='TF_Hopper10SP_Overflow',
-                            p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
-                            p_dt=0,
-                            max_vol=10.0)
+        _func = TF_Overflow_2Outputs(p_name='TF_Hopper10SP_Overflow',
+                                     p_type=TransferFunction.C_TRF_FUNC_CUSTOM,
+                                     p_dt=0,
+                                     max_vol=10.0)
         return _func
+
+
+                 
+                        
+## -------------------------------------------------------------------------------------------------
+## -------------------------------------------------------------------------------------------------
+class TF_Overflow_2Outputs(TransferFunction):
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def _set_function_parameters(self, p_args) -> bool:
+        if self.get_type() == self.C_TRF_FUNC_CUSTOM:
+            try:
+                self.max_vol = p_args['max_vol']
+            except:
+                raise NotImplementedError('One/More parameters for this function is missing.')           
+        return True
+  
+    
+## -------------------------------------------------------------------------------------------------      
+    def _custom_function(self, p_input, p_range=None):
+        """
+        To measure the current overflow level.
+
+        Parameters
+        ----------
+        p_input : list
+            [0] = Actual fill-level
+            [1] = Volume in
+            [2] = Volume out from actuator 1
+            [3] = Volume out from actuator 2
+
+        Returns
+        -------
+        float
+            Actual fill-level.
+        """
+        cur_level = p_input[0]+p_input[1]-p_input[2]-p_input[3]
+        
+        if cur_level > self.max_vol:
+            return cur_level-self.max_vol
+        else:
+            return 0
 
 
                  
