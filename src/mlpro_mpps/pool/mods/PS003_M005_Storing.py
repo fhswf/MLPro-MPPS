@@ -19,7 +19,7 @@ This module provides a default implementation of a module of the LS-BGLP, which 
 from mlpro_mpps.mpps import *
 from mlpro_mpps.pool.comps.PS003_C001_Silo_17L import *
 from mlpro_mpps.pool.comps.PS003_C004_Hopper_10L import *
-from mlpro_mpps.pool.comps.PS003_C029_VacuumPump1_SP import *
+from mlpro_mpps.pool.comps.PS003_C011_VacuumPump1 import *
 from mlpro_mpps.pool.comps.PS003_C019_VibratoryConveyor import *
 
 
@@ -35,7 +35,7 @@ class StoringStation(Module):
 
         silo = Silo17(p_name='SiloE')
         hopper = Hopper10(p_name='HopperE')
-        act1 = VacuumPump1SP(p_name='ActE1')
+        act1 = VacuumPump1(p_name='ActE1')
         act2 = VibratoryConveyor(p_name='ActE2')
         
         self._add_component(p_component=silo)
