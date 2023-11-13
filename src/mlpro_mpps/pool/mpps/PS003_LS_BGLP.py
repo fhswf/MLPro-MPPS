@@ -939,14 +939,14 @@ class LS_BGLP_SP(SimMPPS):
             _sts['Hopper9_Overflow_1'], 
             _sts['Hopper9_FillLevel_1'].get_value, 
             _sts['CB2_TransportedMaterial'].get_value,
-            _sts['VC2_TransportedMaterial'].get_value
+            _sts['VC2SP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
             _sts['Hopper9_FillLevel_1'],
             _sts['Hopper9_FillLevel_1'].get_value,
             _sts['CB2_TransportedMaterial'].get_value, 
-            _sts['VC2_TransportedMaterial'].get_value
+            _sts['VC2SP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
@@ -967,14 +967,14 @@ class LS_BGLP_SP(SimMPPS):
             _sts['Hopper8_Overflow'], 
             _sts['Hopper8_FillLevel'].get_value, 
             _sts['SC2_TransportedMaterial'].get_value,
-            _sts['VC1_TransportedMaterial_1'].get_value
+            _sts['VC1SP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
             _sts['Hopper8_FillLevel'],
             _sts['Hopper8_FillLevel'].get_value,
             _sts['SC2_TransportedMaterial'].get_value, 
-            _sts['VC1_TransportedMaterial_1'].get_value
+            _sts['VC1SP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
@@ -1025,14 +1025,14 @@ class LS_BGLP_SP(SimMPPS):
             _sts['Hopper9_Overflow_2'], 
             _sts['Hopper9_FillLevel_2'].get_value, 
             _sts['RF_TransportedMaterial'].get_value,
-            _sts['BuE_TransportedMaterial'].get_value
+            _sts['BuESP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
             _sts['Hopper9_FillLevel_2'],
             _sts['Hopper9_FillLevel_2'].get_value,
             _sts['RF_TransportedMaterial'].get_value, 
-            _sts['BuE_TransportedMaterial'].get_value
+            _sts['BuESP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
@@ -1053,14 +1053,14 @@ class LS_BGLP_SP(SimMPPS):
             _sts['Hopper12_Overflow'], 
             _sts['Hopper12_FillLevel'].get_value, 
             _sts['DV_TransportedMaterial'].get_value,
-            _sts['VC3_TransportedMaterial'].get_value
+            _sts['VC3SP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
             _sts['Hopper12_FillLevel'],
             _sts['Hopper12_FillLevel'].get_value,
             _sts['DV_TransportedMaterial'].get_value, 
-            _sts['VC3_TransportedMaterial'].get_value
+            _sts['VC3SP_TransportedMaterial'].get_value
             )
         
         self._add_signal(
