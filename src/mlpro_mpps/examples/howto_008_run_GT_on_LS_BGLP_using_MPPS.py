@@ -117,7 +117,7 @@ if __name__ == "__main__":
     logging         = Log.C_LOG_ALL
     visualize       = False
     dest_path       = str(Path.home())
-    cycle_limit     = 1000
+    cycle_limit     = 20000
     cycle_per_ep    = 100
     eval_freq       = 10
     eval_grp_size   = 5
@@ -156,4 +156,4 @@ training = GTTraining(
 
 training.run()
 if __name__ == "__main__":
-    training._scenario.get_env().data_storing.save_data(training._root_path, 'ls_bglp')
+    training._scenario.get_env().data_storing.save_data(training._root_path, 'bglp')
