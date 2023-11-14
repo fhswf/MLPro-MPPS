@@ -12,10 +12,11 @@
 ## -- 2023-02-15  1.0.3     SY       Incorporating SB3 algorithm via SB3 Wrapper of MLPro
 ## -- 2023-02-17  1.0.4     SY       Optimizing for paper
 ## -- 2023-02-28  1.0.5     SY       Update following new pool.ml
+## -- 2023-11-14  1.0.6     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.5 (2023-02-28)
+Ver. 1.0.6 (2023-11-14)
 
 This example demonstrates the implementation of the MPPS-based BGLP as an RL Environment.
 
@@ -37,7 +38,6 @@ from stable_baselines3 import PPO, A2C
 from mlpro.wrappers.sb3 import WrPolicySB32MLPro
 from copy import deepcopy
 import torch
-import random
 from pathlib import Path
 
 
