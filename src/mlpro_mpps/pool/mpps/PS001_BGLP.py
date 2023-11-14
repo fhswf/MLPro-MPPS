@@ -13,10 +13,11 @@
 ## -- 2023-02-01  1.0.4     SY       Refactoring
 ## -- 2023-02-02  1.0.5     SY       Refactoring
 ## -- 2023-02-27  1.0.6     SY       Refactoring
+## -- 2023-11-14  1.0.7     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.6 (2023-02-27)
+Ver. 1.0.7 (2023-11-14)
 
 This module provides a default implementation of the BGLP in MLPro-MPPS.
 """
@@ -247,12 +248,12 @@ class BGLP(SimMPPS):
             )
         
         self._add_signal(
-            _sens['SiloSensor1_1'], 
+            _sens['HopperSensor'], 
             _sts['HopperFillLevel'].get_value
             )
    
         self._add_signal(
-            _sens['SiloSensor1_2'], 
+            _sens['SiloSensor1_1'], 
             _sts['SiloFillLevel'].get_value
             )
    
@@ -262,12 +263,12 @@ class BGLP(SimMPPS):
             )
         
         self._add_signal(
-            _sens['SiloSensor1_3'], 
+            _sens['HopperSensor_1'], 
             _sts['HopperFillLevel_1'].get_value
             )
         
         self._add_signal(
-            _sens['SiloSensor1_4'], 
+            _sens['SiloSensor1_2'], 
             _sts['SiloFillLevel_1'].get_value
             )
    
@@ -277,7 +278,7 @@ class BGLP(SimMPPS):
             )
    
         self._add_signal(
-            _sens['SiloSensor1_5'], 
+            _sens['HopperSensor_2'], 
             _sts['HopperFillLevel_2'].get_value
             )
 
