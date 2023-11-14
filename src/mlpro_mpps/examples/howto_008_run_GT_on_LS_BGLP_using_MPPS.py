@@ -26,8 +26,7 @@ You will learn:
 from mlpro_mpps.pool.ml.gt_gameboard.GT001_LS_BGLP import LS_BGLP_GTGameBoard
 from mlpro_mpps.pool.ml.gt_gameboard.GT002_LS_BGLP_SP import LS_BGLP_SP_GTGameBoard
 from mlpro.bf.math import *
-# from mlpro.gt.models import *
-from mlpro.gt.dynamicgames.basics import *
+from mlpro.gt.models import *
 from mlpro.rl.pool.policies.randomgenerator import RandomGenerator
 from pathlib import Path
 
@@ -137,26 +136,26 @@ else:
     stagnant_limit  = 0
     score_ma_hor    = 0
     
-# training = GTTraining(
-#     p_game_cls=MyGame,
-#     p_cycle_limit=cycle_limit,
-#     p_cycles_per_epi_limit=cycle_per_ep,
-#     p_eval_frequency=eval_freq,
-#     p_eval_grp_size=eval_grp_size,
-#     p_adaptation_limit=adapt_limit,
-#     p_stagnation_limit=stagnant_limit,
-#     p_score_ma_horizon=score_ma_hor,
-#     p_collect_states=True,
-#     p_collect_actions=True,
-#     p_collect_rewards=True,
-#     p_collect_training=True,
-#     p_visualize=visualize,
-#     p_path=dest_path,
-#     p_logging=logging)
+training = GTTraining(
+    p_game_cls=MyGame,
+    p_cycle_limit=cycle_limit,
+    p_cycles_per_epi_limit=cycle_per_ep,
+    p_eval_frequency=eval_freq,
+    p_eval_grp_size=eval_grp_size,
+    p_adaptation_limit=adapt_limit,
+    p_stagnation_limit=stagnant_limit,
+    p_score_ma_horizon=score_ma_hor,
+    p_collect_states=True,
+    p_collect_actions=True,
+    p_collect_rewards=True,
+    p_collect_training=True,
+    p_visualize=visualize,
+    p_path=dest_path,
+    p_logging=logging)
 
-# training.run()
-# if __name__ == "__main__":
-#     training._scenario.get_env().data_storing.save_data(training._root_path, 'ls_bglp')
+training.run()
+if __name__ == "__main__":
+    training._scenario.get_env().data_storing.save_data(training._root_path, 'ls_bglp')
     
 training = GTTraining(
     p_game_cls=MyGameSP,

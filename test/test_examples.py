@@ -8,11 +8,12 @@
 ## -- 2023-02-27  0.0.0     SY/MRD   Creation
 ## -- 2023-02-27  1.0.0     SY/MRD   Release First Version
 ## -- 2023-03-28  1.0.1     SY/MRD   Replacing importlib with runpy, add howtos
+## -- 2023-11-14  1.0.2     SY       Replacing importlib with runpy, add howtos
 ## -------------------------------------------------------------------------------------------------
 
 
 """
-Ver. 1.0.1 (2023-03-28)
+Ver. 1.0.2 (2023-11-14)
 
 Unit test for all examples available.
 """
@@ -33,6 +34,7 @@ howto_list = {
     "ht_005": "mlpro_mpps.examples.howto_005_run_RL_on_LS_using_MPPS",
     "ht_006": "mlpro_mpps.examples.howto_006_run_EA_on_LS_using_MPPS",
     "ht_007": "mlpro_mpps.examples.howto_007_run_using_LS_MPPS_data_generation",
+    "ht_008": "mlpro_mpps.examples.howto_008_run_GT_on_LS_BGLP_using_MPPS",
 }
 
 

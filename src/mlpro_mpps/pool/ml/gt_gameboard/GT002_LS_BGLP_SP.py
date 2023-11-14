@@ -19,8 +19,7 @@ MLPro-MPPS as a GT Game Board.
 
 from mlpro_mpps.pool.mpps.PS003_LS_BGLP import LS_BGLP_SP
 from mlpro.bf.math import *
-# from mlpro.gt.models import *
-from mlpro.gt.dynamicgames.basics import *
+from mlpro.gt.models import *
 
 
                      
