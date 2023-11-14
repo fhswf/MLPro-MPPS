@@ -154,6 +154,6 @@ training = GTTraining(
     p_path=dest_path,
     p_logging=logging)
 
-training.run()
 if __name__ == "__main__":
+    training.run()
     training._scenario.get_env().data_storing.save_data(training._root_path, 'bglp')
