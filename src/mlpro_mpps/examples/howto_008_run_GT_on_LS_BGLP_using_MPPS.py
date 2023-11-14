@@ -6,11 +6,11 @@
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-11-09  0.0.0     SY       Creation
-## -- 2023-11-13  1.0.0     SY       Release of first version
+## -- 2023-11-14  1.0.0     SY       Release of first version
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-13)
+Ver. 1.0.0 (2023-11-14)
 
 This example demonstrates the implementation of the MPPS-based Larger-Scale BGLP as an GT Game Board.
 
@@ -176,4 +176,4 @@ training = GTTraining(
 
 training.run()
 if __name__ == "__main__":
-    training._scenario.get_env().data_storing.save_data(training._root_path, 'ls_bglp')
+    training._scenario.get_env().data_storing.save_data(training._root_path, 'ls_bglp_sp')
