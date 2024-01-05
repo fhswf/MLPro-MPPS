@@ -19,6 +19,9 @@ pip install mlpro-mpps
 ### Dependencies
 Please read [requirements.txt](https://github.com/fhswf/MLPro-MPPS/blob/main/requirements.txt)
 
+### Introduction Video
+You can see a video of the introduction of MLPro-MPPS at the 2nd IEEE Industrial Electronics Society Annual Online Conference by clicking [this link](https://youtu.be/zjvDDBpl-bE).
+
 ### First Steps
 After installing MLPro-MPPS and its dependencies, we suggest starting with the ready-to-run examples:
 1. [HOWTO 001 - SETTING UP COMPONENTS AND MODULES](https://github.com/fhswf/MLPro-MPPS/blob/main/src/mlpro_mpps/examples/howto_001_set_up_components_and_modules_in_MPPS.py)
