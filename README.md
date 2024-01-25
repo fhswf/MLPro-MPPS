@@ -3,7 +3,7 @@
 [![PyPI Total Downloads](https://static.pepy.tech/personalized-badge/mlpro-mpps?period=total&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Total%20Downloads)](https://pepy.tech/project/mlpro-mpps)
 [![PyPI Last Month Downloads](https://static.pepy.tech/personalized-badge/mlpro-mpps?period=month&units=international_system&left_color=blue&right_color=orange&left_text=PyPI%20Last%20Month%20Downloads)](https://pepy.tech/project/mlpro-mpps)
 
-# MLPro-MPPS - A Customizable Framework for Multi-Purpose Production System in Python
+# MLPro-MPPS - A Customizable Framework for Multi-Purpose Production Systems in Python
 
 <img src="https://github.com/fhswf/MLPro/blob/main/doc/logo/original/logo.png?raw=True" align="right" width="25%"/>
 MLPro-MPPS provides functionalities to design and develop customizable multi-purpose production systems in Python. This framework is integrated with MLPro (https://mlpro.readthedocs.io) and inherits several basic functionalities from MLPro. The user can design a production system simulation from the lowest component level (sensors and actuators) until the combination of them in the form of MPPS. The other possibility is to use the ready-to-use components in the pool of objects. Moreover, since MLPro-MPPS is compatible with MLPro, it is possible to utilize MLPro-MPPS as an environment in MLPro-RL, as a game board in MLPro-GT, or as a state transition function in an MLPro-BF-Systems. Hence, MLPro-MPPS is reusable and powerful.
