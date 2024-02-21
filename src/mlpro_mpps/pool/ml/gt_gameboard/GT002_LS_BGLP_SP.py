@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-11-13  0.0.0     SY       Creation
 ## -- 2023-11-13  1.0.0     SY       Release of first version
+## -- 2024-02-12  1.0.1     SY       Refactoring due to MLPro-GT-DG
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-13)
+Ver. 1.0.1 (2024-02-12)
 
 This module provides a default implementation of the LS-BGLP for serial-parallel processes in
 MLPro-MPPS as a GT Game Board.
@@ -19,7 +20,7 @@ MLPro-MPPS as a GT Game Board.
 
 from mlpro_mpps.pool.mpps.PS003_LS_BGLP import LS_BGLP_SP
 from mlpro.bf.math import *
-from mlpro.gt.models import *
+from mlpro.gt.dynamicgames import *
 
 
                      
