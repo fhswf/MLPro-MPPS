@@ -1,17 +1,18 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
-## -- Package : mlpro_mpps.examples
-## -- Module  : howto_007_run_using_LS_MPPS_data_generation.py
+## -- Package : mlpro_mpps
+## -- Module  : howto_sl_001_liquid_station_for_data_generation.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -- 2023-04-13  1.0.1     SY       Code Cleaning and Debugging
+## -- 2024-02-21  1.0.2     SY       Shifting and renaming module
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-04-13)
+Ver. 1.0.2 (2024-02-21)
 
 This example demonstrates the implementation of the MPPS-based Liquid Laboratroy Station for data storing.
 Based on this a dataset can be generated automatically from a MPPS environment and can be used to train a 

@@ -1,19 +1,20 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
-## -- Package : mlpro_mpps.examples
-## -- Module  : howto_006_run_EA_on_LS_using_MPPS.py
+## -- Package : mlpro_mpps
+## -- Module  : howto_ea_001_liquid_station.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-03-21  0.0.0     ML       Creation
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -- 2023-04-13  1.0.1     SY/ML    Code Cleaning and Debugging
+## -- 2024-02-21  1.0.2     SY       Shifting and renaming module
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2023-04-13)
+Ver. 1.0.2 (2024-02-21)
 
-This example demonstrates the implementation of the MPPS-based Liquid Laboratroy Station as an EA Environment.
+This example demonstrates the implementation of the MPPS-based Liquid Laboratory Station as an EA Environment.
 
 You will learn:
     

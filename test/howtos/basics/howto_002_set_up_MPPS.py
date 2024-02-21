@@ -1,16 +1,17 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
-## -- Package : mlpro_mpps.examples
+## -- Package : mlpro_mpps
 ## -- Module  : howto_002_set_up_MPPS.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-02-13  0.0.0     SY       Creation
 ## -- 2023-02-13  1.0.0     SY       Release of first version
+## -- 2024-02-21  1.0.1     SY       Shifting and renaming module
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-02-13)
+Ver. 1.0.1 (2024-02-21)
 
 This example shows the procedure for setting up a system using MPPS.
 
@@ -26,9 +27,6 @@ You will learn:
 
 
 from mlpro_mpps.mpps import *
-from mlpro_mpps.examples.howto_001_set_up_components_and_modules_in_MPPS import *
-
-
 
 
 
@@ -42,6 +40,7 @@ class MySystemSimulation(SimMPPS):
         self.C_SCIREF_TYPE    = self.C_SCIREF_TYPE_NONE
         
         # 1.2. Add elements (components/modules)
+        # MyStations is defined in howto_001_set_up_components_and_modules_in_MPPS
         station_1 = MyStation(p_name='station_1')
         station_2 = MyStation(p_name='station_2')
         

@@ -1,16 +1,17 @@
 ## -------------------------------------------------------------------------------------------------
 ## -- Project : MLPro - A Synoptic Framework for Standardized Machine Learning Tasks
-## -- Package : mlpro_mpps.examples
+## -- Package : mlpro_mpps
 ## -- Module  : howto_001_set_up_components_and_modules_in_MPPS.py
 ## -------------------------------------------------------------------------------------------------
 ## -- History :
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-02-13  0.0.0     SY       Creation
 ## -- 2023-02-13  1.0.0     SY       Release of first version
+## -- 2024-02-21  1.0.1     SY       Shifting and renaming module
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-02-13)
+Ver. 1.0.1 (2024-02-21)
 
 This example shows the procedure for setting up components and modules in MPPS.
 
