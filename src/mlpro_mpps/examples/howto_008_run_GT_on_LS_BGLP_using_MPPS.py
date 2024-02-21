@@ -7,10 +7,11 @@
 ## -- yyyy-mm-dd  Ver.      Auth.    Description
 ## -- 2023-11-09  0.0.0     SY       Creation
 ## -- 2023-11-14  1.0.0     SY       Release of first version
+## -- 2024-02-12  1.0.1     SY       Refactoring due to MLPro-GT-DG
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.0 (2023-11-14)
+Ver. 1.0.1 (2024-02-12)
 
 This example demonstrates the implementation of the MPPS-based Larger-Scale BGLP as an GT Game Board.
 
@@ -26,7 +27,7 @@ You will learn:
 from mlpro_mpps.pool.ml.gt_gameboard.GT001_LS_BGLP import LS_BGLP_GTGameBoard
 from mlpro_mpps.pool.ml.gt_gameboard.GT002_LS_BGLP_SP import LS_BGLP_SP_GTGameBoard
 from mlpro.bf.math import *
-from mlpro.gt.models import *
+from mlpro.gt.dynamicgames import *
 from mlpro.rl.pool.policies.randomgenerator import RandomGenerator
 from pathlib import Path
 
