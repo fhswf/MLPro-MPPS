@@ -57,6 +57,7 @@ Additionally, the class diagram of the basic function is available in [this dire
 - Clean code paradigma
 
 ## Citing MLPro-MPPS
+- https://doi.org/10.1109/ONCON60463.2023.10431280
 - https://doi.org/10.1016/j.simpa.2023.100509
 
 ## Project and Team
