@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name='mlpro-mpps',
-version='1.2.1',
+version='1.2.2',
 description='MLPro-MPPS - A Customizable Framework for Multi-Purpose Production Systems in Python',
 author='MLPro Team',
 author_mail='mlpro@listen.fh-swf.de',
