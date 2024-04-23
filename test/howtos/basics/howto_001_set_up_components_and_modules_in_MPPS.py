@@ -8,10 +8,11 @@
 ## -- 2023-02-13  0.0.0     SY       Creation
 ## -- 2023-02-13  1.0.0     SY       Release of first version
 ## -- 2024-02-21  1.0.1     SY       Shifting and renaming module
+## -- 2024-04-23  1.0.2     SY       Refactoring
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.1 (2024-02-21)
+Ver. 1.0.2 (2024-04-23)
 
 This example shows the procedure for setting up components and modules in MPPS.
 
@@ -56,8 +57,7 @@ class MySensor(SimSensor):
     
     
 # 1.3. Define the transfer function class, see https://mlpro.readthedocs.io/content/02_basic_functions/mlpro_bf/sub/layer3_application_support/physics/01_transferfunction.html
-class TF_MySensor(TransferFunction):
-    
+class TF_BufferSensor(TransferFunction):
     
     def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
@@ -98,8 +98,7 @@ class State1(SimState):
     
     
 # 2.3. Define the transfer function class
-class TF_MyState(TransferFunction):
-    
+class TF_TransBelt_Cont(TransferFunction):
     
     def _set_function_parameters(self, p_args) -> bool:
         if self.get_type() == self.C_TRF_FUNC_CUSTOM:
@@ -124,7 +123,6 @@ class TF_MyState(TransferFunction):
 # 3. How to create a Component
 # 3.1. Define a component class
 class MyComponent(Component):
-    
     
     # 3.2. Set up a component
     def _setup_component(self):
