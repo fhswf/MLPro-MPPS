@@ -9,10 +9,11 @@
 ## -- 2023-03-28  1.0.0     ML/SY    Release of first version
 ## -- 2023-04-13  1.0.1     SY       Code Cleaning
 ## -- 2024-02-21  1.0.2     SY       Shifting and renaming module
+## -- 2024-04-23  1.0.3     SY       Refactoring due to MLPro-Int-SB3
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.2 (2024-02-21)
+Ver. 1.0.3 (2024-04-23)
 
 This example demonstrates the implementation of the MPPS-based Liquid Station as an RL Environment.
 
@@ -31,7 +32,7 @@ from mlpro_mpps.pool.ml.rl_environment.RL002_LS import LS_RLEnv
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 from stable_baselines3 import PPO, A2C
-from mlpro.wrappers.sb3 import WrPolicySB32MLPro
+from mlpro_int_sb3.wrappers import WrPolicySB32MLPro
 from copy import deepcopy
 import torch
 from pathlib import Path

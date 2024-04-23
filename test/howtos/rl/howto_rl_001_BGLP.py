@@ -14,10 +14,11 @@
 ## -- 2023-02-28  1.0.5     SY       Update following new pool.ml
 ## -- 2023-11-14  1.0.6     SY       Refactoring
 ## -- 2024-02-21  1.0.7     SY       Shifting and renaming module
+## -- 2024-04-23  1.0.8     SY       Refactoring due to MLPro-Int-SB3
 ## -------------------------------------------------------------------------------------------------
 
 """
-Ver. 1.0.7 (2024-02-21)
+Ver. 1.0.8 (2024-04-23)
 
 This example demonstrates the implementation of the MPPS-based BGLP as an RL Environment.
 
@@ -36,7 +37,7 @@ from mlpro_mpps.pool.ml.rl_environment.RL001_BGLP import BGLP_RLEnv
 from mlpro.bf.math import *
 from mlpro.rl.models import *
 from stable_baselines3 import PPO, A2C
-from mlpro.wrappers.sb3 import WrPolicySB32MLPro
+from mlpro_int_sb3.wrappers import WrPolicySB32MLPro
 from copy import deepcopy
 import torch
 from pathlib import Path

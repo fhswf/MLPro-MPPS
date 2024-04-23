@@ -292,6 +292,8 @@ class BGLP(SimMPPS):
             actions = Action.get_sorted_values()
             for idx, (_, acts) in enumerate(self.get_actuators().items()):
                 acts.set_value(actions[idx])
+                if (idx == 2) and (actions[idx]== 0):
+                    acts.deactivate()
         else:
             raise NotImplementedError
         
