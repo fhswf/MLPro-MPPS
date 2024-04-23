@@ -55,6 +55,8 @@ class BGLP4RL(BGLP):
                 boundaries = acts.get_boundaries()
                 final_action = action[idx]*(boundaries[1]-boundaries[0])+boundaries[0]
                 acts.set_value(final_action)
+                if (idx == 2) and (final_action == 0):
+                    acts.deactivate()
             else:
                 acts.set_value(True)
         
@@ -78,6 +80,7 @@ class BGLP4RL(BGLP):
         current_volume = self.get_component_states()['InventoryLevel'].get_value()
         overlfow = sum(self.parent.get_overflow())
         power = sum(self.parent.get_power())
+        transport = self.parent.get_transported_material()
         self.parent.current_demand = self.parent.get_demand(init_inventory_level, current_volume)
         self.parent.prod_reached += (current_volume-init_inventory_level)
         
@@ -85,6 +88,11 @@ class BGLP4RL(BGLP):
         self.parent.data_storing.memorize("overflow",str(self.parent.data_frame), overlfow/self.parent.t_set)
         self.parent.data_storing.memorize("power",str(self.parent.data_frame), power/self.parent.t_set)
         self.parent.data_storing.memorize("demand",str(self.parent.data_frame), self.parent.current_demand/self.parent.t_set)
+        self.parent.data_storing.memorize("CBTransportedMaterial",str(self.parent.data_frame), transport[0])
+        self.parent.data_storing.memorize("VC1TransportedMaterial",str(self.parent.data_frame), transport[1])
+        self.parent.data_storing.memorize("VCTransportedMaterial",str(self.parent.data_frame), transport[2])
+        self.parent.data_storing.memorize("VC2TransportedMaterial",str(self.parent.data_frame), transport[3])
+        self.parent.data_storing.memorize("RFTransportedMaterial",str(self.parent.data_frame), transport[4])
         
         return self.parent._state
 
@@ -149,7 +157,15 @@ class BGLP_RLEnv(Environment):
         self.prod_scenario = prod_scenario
         self.margin_p = margin_p
         
-        self.data_lists = ["time","overflow","power","demand"]
+        self.data_lists = ["time",
+                           "overflow",
+                           "power",
+                           "demand",
+                           "CBTransportedMaterial",
+                           "VC1TransportedMaterial",
+                           "VCTransportedMaterial",
+                           "VC2TransportedMaterial",
+                           "RFTransportedMaterial"]
         self.data_storing = DataStoring(self.data_lists)
         self.data_frame = None
         
@@ -170,6 +186,11 @@ class BGLP_RLEnv(Environment):
                           'VCPowerConsumption',
                           'VC2PowerConsumption',
                           'RFPowerConsumption']
+        self.set_transported = ['CBTransportedMaterial',
+                                'VC1TransportedMaterial',
+                                'VCTransportedMaterial',
+                                'VC2TransportedMaterial',
+                                'RFTransportedMaterial']
         
         self.reset()
 
@@ -248,7 +269,7 @@ class BGLP_RLEnv(Environment):
 
 
 ## -------------------------------------------------------------------------------------------------
-    def get_demand(self, init_volume, cur_volume) -> list:
+    def get_demand(self, init_volume, cur_volume) -> float:
         delta = cur_volume-init_volume
         
         if (self.demand*self.t_set) > delta:
@@ -256,6 +277,16 @@ class BGLP_RLEnv(Environment):
         else:
             total_demand = 0
         return total_demand
+
+
+## -------------------------------------------------------------------------------------------------
+    def get_transported_material(self) -> list:
+        transported_material = []
+        
+        for x in range(len(self.set_transported)):
+            transport = self._fct_strans.get_component_states()[self.set_transported[x]].get_value()
+            transported_material.append(transport)
+        return transported_material
 
 
 ## -------------------------------------------------------------------------------------------------
